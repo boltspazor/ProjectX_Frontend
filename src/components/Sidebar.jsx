@@ -17,14 +17,25 @@ import logoutIconActive from "../assets/logout_highlighted_button_icon.svg";
 // Profile photo
 import profilePhoto from "../assets/profile_photo_random.jpg";
 
-export default function Sidebar() {
+export default function Sidebar({ activeView, setActiveView }) {
+  const items = [
+    { label: "Home", value: "home", icon: homeIcon, iconActive: homeIconActive },
+    { label: "Explore", value: "explore", icon: exploreIcon, iconActive: exploreIconActive },
+    { label: "Messages", value: "messages", icon: messageIcon, iconActive: messageIconActive },
+    { label: "Profile", value: "profile", icon: profileIcon, iconActive: profileIconActive },
+  ];
+
+  function handleClick(value) {
+    setActiveView(value);
+  }
+
   return (
     <aside className="hidden md:flex flex-col w-80 bg-[#0f0f0f] border-r border-gray-800 p-8 fixed left-0 top-20 h-[calc(100vh-5rem)] text-white overflow-y-auto">
 
       {/* Profile Image */}
       <div className="relative w-28 h-28 mx-auto mb-6">
         <div className="absolute inset-0 bg-gradient-to-r from-teal-400 via-purple-400 to-pink-500 blur-[35px] opacity-40"></div>
-        <img src={profilePhoto} className="relative w-28 h-28 rounded-full object-cover" />
+        <img src={profilePhoto} className="relative w-28 h-28 rounded-full object-cover" alt="Profile" />
       </div>
 
       <h2 className="text-lg font-semibold text-center">idkwhoisrahul_04</h2>
@@ -54,29 +65,33 @@ export default function Sidebar() {
 
       {/* Buttons */}
       <nav className="space-y-4 text-[15px] font-medium">
-
-        {[
-          { label: "Home", icon: homeIcon, iconActive: homeIconActive },
-          { label: "Explore", icon: exploreIcon, iconActive: exploreIconActive },
-          { label: "Messages", icon: messageIcon, iconActive: messageIconActive },
-          { label: "Profile", icon: profileIcon, iconActive: profileIconActive },
-        ].map((item, i) => (
-          <button
-            key={i}
-            className="group relative w-full rounded-xl p-[2px] border border-gray-600 hover:border-transparent hover:bg-gradient-to-r hover:from-teal-400 hover:via-purple-400 hover:to-pink-400 transition"
-          >
-            <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#0f0f0f]">
-              <img src={item.icon} className="h-5 w-5 opacity-90 group-hover:hidden" />
-              <img src={item.iconActive} className="h-5 w-5 hidden group-hover:block" />
-              <span className="group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-teal-400 group-hover:via-purple-400 group-hover:to-pink-400 transition-none">
-                {item.label}
+        {items.map((item, i) => {
+          const active = activeView === item.value;
+          return (
+            <button
+              key={i}
+              onClick={() => handleClick(item.value)}
+              aria-pressed={active}
+              className={`relative w-full rounded-xl p-[2px] border ${active ? "border-transparent" : "border-gray-600"} ${active ? "bg-gradient-to-r from-teal-400 via-purple-400 to-pink-400" : "hover:border-transparent hover:bg-gradient-to-r hover:from-teal-400 hover:via-purple-400 hover:to-pink-400"} transition`}
+            >
+              <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#0f0f0f]">
+                <img src={active ? item.iconActive : item.icon} className="h-5 w-5" />
+                <span className={`${active ? "text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-purple-400 to-pink-400" : ""}`}>
+                  {item.label}
+                </span>
               </span>
-            </span>
-          </button>
-        ))}
+            </button>
+          );
+        })}
 
         {/* Logout */}
-        <button className="group relative w-full rounded-xl p-[1px] border border-red-500 hover:border-transparent hover:bg-gradient-to-r hover:from-red-400 hover:to-pink-500 transition mt-10">
+        <button
+          className="group relative w-full rounded-xl p-[1px] border border-red-500 hover:border-transparent hover:bg-gradient-to-r hover:from-red-400 hover:to-pink-500 transition mt-10"
+          onClick={() => {
+            // Handle logout logic here
+            console.log("Logout clicked");
+          }}
+        >
           <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#0f0f0f]">
             <img src={logoutIcon} className="h-5 w-5 opacity-90 group-hover:hidden" />
             <img src={logoutIconActive} className="h-5 w-5 hidden group-hover:block" />
@@ -85,7 +100,6 @@ export default function Sidebar() {
             </span>
           </span>
         </button>
-
       </nav>
     </aside>
   );
