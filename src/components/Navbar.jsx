@@ -1,7 +1,7 @@
 import React from "react";
-import logo from "../assets/projectX_logo.svg";
-import bell from "../assets/bell_icon.svg";
-import shop from "../assets/shop_icon.svg";
+import logo from "../assets/logo.svg";
+import bell from "../assets/bell.svg";
+import shop from "../assets/shop.svg";
 
 export default function Navbar() {
   return (

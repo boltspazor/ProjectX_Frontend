@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 
-export default function Messages() {
+export default function MessagesPage() {
   const [activeChat, setActiveChat] = useState(null);
   const [messageInput, setMessageInput] = useState("");
 

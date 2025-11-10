@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import Stories from "./Stories";
-import PostCard from "./PostCard";
-import Comments from "./Comments";
+import Stories from "../components/Stories";
+import PostCard from "../components/PostCard";
+import Comments from "../components/Comments";
 
-export default function Home() {
+export default function HomePage() {
   const [activePostId, setActivePostId] = useState(null);
 
   const handleCommentClick = (postId) => {
