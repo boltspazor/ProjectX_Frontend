@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import Feed from "./components/Feed";
-import Home from "./components/Home";
-import Messages from "./components/Messages";
 import MobileNav from "./components/MobileNav";
+import HomePage from "./pages/HomePage";
+import ExplorePage from "./pages/ExplorePage";
+import MessagesPage from "./pages/MessagesPage";
+import ProfilePage from "./pages/ProfilePage";
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
@@ -12,15 +13,15 @@ export default function App() {
   const renderView = () => {
     switch (activeView) {
       case "home":
-        return <Home />;
+        return <HomePage />;
       case "explore":
-        return <Feed />;
+        return <ExplorePage />;
       case "messages":
-        return <Messages />;
+        return <MessagesPage />;
       case "profile":
-        return <div className="flex-1 p-8 text-center text-gray-400">Profile Coming Soon</div>;
+        return <ProfilePage />;
       default:
-        return <Home />;
+        return <HomePage />;
     }
   };
 

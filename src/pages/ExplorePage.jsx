@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import PostCard from "./PostCard";
-import Filters from "./Filters";
-import Accounts from "./Accounts";
-import Communities from "./Communities";
+import PostCard from "../components/PostCard";
+import Filters from "../components/Filters";
+import Accounts from "../components/Accounts";
+import Communities from "../components/Communities";
 
-export default function Feed() {
+export default function ExplorePage() {
   const [activeTab, setActiveTab] = useState("Posts");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchQuery, setSearchQuery] = useState("");

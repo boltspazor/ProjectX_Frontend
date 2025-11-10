@@ -1,21 +1,19 @@
-import React from "react";
-
 // Normal icons
-import homeIcon from "../assets/home_button_icon.svg";
-import exploreIcon from "../assets/explore_button_icon.svg";
-import messageIcon from "../assets/message_button_icon.svg";
-import profileIcon from "../assets/profile_button_icon.svg";
-import logoutIcon from "../assets/logout_button_icon.svg";
+import homeIcon from "../assets/home.svg";
+import exploreIcon from "../assets/explore.svg";
+import messageIcon from "../assets/message.svg";
+import profileIcon from "../assets/profile.svg";
+import logoutIcon from "../assets/logout.svg";
 
 // Highlighted icons
-import homeIconActive from "../assets/home_highlighted_button_icon.svg";
-import exploreIconActive from "../assets/explore_highlighted_button_icon.svg";
-import messageIconActive from "../assets/message_highlighted_button_icon.svg";
-import profileIconActive from "../assets/profile_highlighted_button_icon.svg";
-import logoutIconActive from "../assets/logout_highlighted_button_icon.svg";
+import homeIconActive from "../assets/home-active.svg";
+import exploreIconActive from "../assets/explore-active.svg";
+import messageIconActive from "../assets/message-active.svg";
+import profileIconActive from "../assets/profile-active.svg";
+import logoutIconActive from "../assets/logout-active.svg";
 
 // Profile photo
-import profilePhoto from "../assets/profile_photo_random.jpg";
+import profilePhoto from "../assets/profile-photo.jpg";
 
 export default function Sidebar({ activeView, setActiveView }) {
   const items = [
@@ -33,37 +31,37 @@ export default function Sidebar({ activeView, setActiveView }) {
     <aside className="hidden md:flex flex-col w-80 bg-[#0f0f0f] border-r border-gray-800 p-8 fixed left-0 top-20 h-[calc(100vh-5rem)] text-white overflow-y-auto">
 
       {/* Profile Image */}
-      <div className="relative w-28 h-28 mx-auto mb-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-teal-400 via-purple-400 to-pink-500 blur-[35px] opacity-40"></div>
-        <img src={profilePhoto} className="relative w-28 h-28 rounded-full object-cover" alt="Profile" />
-      </div>
-
-      <h2 className="text-lg font-semibold text-center">idkwhoisrahul_04</h2>
-      <p className="text-sm text-gray-400 text-center mb-8">Rahul Chauhan</p>
-
-      {/* Stats */}
-      <div className="flex justify-center text-center mb-10 text-sm">
-        <div className="px-3">
-          <p className="font-bold">21</p>
-          <p className="text-gray-400 text-xs">Posts</p>
+        <div className="relative w-28 h-28 mx-auto mb-6">
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-400 via-purple-400 to-pink-500 rounded-full blur-lg opacity-90"></div>
+          <img src={profilePhoto} className="relative w-28 h-28 rounded-full object-cover border-2 border-gray-900" alt="Profile" />
         </div>
 
-        <div className="border-l border-gray-700 mx-2 h-5"></div>
+        <h2 className="text-lg font-semibold text-center">idkwhoisrahul_04</h2>
+        <p className="text-sm text-gray-400 text-center mb-8">Rahul Chauhan</p>
 
-        <div className="px-3">
-          <p className="font-bold">738</p>
-          <p className="text-gray-400 text-xs">Followers</p>
+        {/* Stats */}
+        <div className="flex justify-center text-center mb-10 text-sm">
+          <div className="px-3">
+            <p className="font-bold">21</p>
+            <p className="text-gray-400 text-xs">Posts</p>
+          </div>
+
+          <div className="border-l border-gray-700 mx-2 h-5"></div>
+
+          <div className="px-3">
+            <p className="font-bold">738</p>
+            <p className="text-gray-400 text-xs">Followers</p>
+          </div>
+
+          <div className="border-l border-gray-700 mx-2 h-5"></div>
+
+          <div className="px-3">
+            <p className="font-bold">512</p>
+            <p className="text-gray-400 text-xs">Following</p>
+          </div>
         </div>
 
-        <div className="border-l border-gray-700 mx-2 h-5"></div>
-
-        <div className="px-3">
-          <p className="font-bold">512</p>
-          <p className="text-gray-400 text-xs">Following</p>
-        </div>
-      </div>
-
-      {/* Buttons */}
+        {/* Buttons */}
       <nav className="space-y-4 text-[15px] font-medium">
         {items.map((item, i) => {
           const active = activeView === item.value;
