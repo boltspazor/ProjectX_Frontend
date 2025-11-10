@@ -29,3 +29,48 @@
     scrollbar-width: none;
   }
 }
+
+@keyframes rotateGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 360% 50%;
+  }
+}
+
+/* Automatic soft glow every 10s */
+@keyframes softGlow {
+  0%, 70% {
+    box-shadow: 0 0 0px rgba(255, 255, 255, 0.1);
+  }
+  80% {
+    box-shadow: 0 0 8px 3px rgba(255, 255, 255, 0.25);
+  }
+  85% {
+    box-shadow: 0 0 12px 5px rgba(255, 255, 255, 0.3);
+  }
+  90% {
+    box-shadow: 0 0 8px 3px rgba(255, 255, 255, 0.25);
+  }
+  100% {
+    box-shadow: 0 0 0px rgba(255, 255, 255, 0.1);
+  }
+}
+
+.animate-spin-slow-glow {
+  background: conic-gradient(
+    from 0deg,
+    #14b8a6,
+    #a855f7,
+    #ec4899,
+    #14b8a6
+  );
+  background-size: 400% 400%;
+  animation: rotateGradient 10s linear infinite, softGlow 10s ease-in-out infinite;
+  transition: box-shadow 0.8s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.animate-spin-slow-glow:hover {
+  box-shadow: 0 0 16px 6px rgba(255, 255, 255, 0.35);
+}
