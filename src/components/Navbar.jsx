@@ -23,11 +23,14 @@ export default function Navbar() {
           className="h-5 w-5 md:h-6 md:w-6 cursor-pointer opacity-90 hover:opacity-100 transition"
         />
 
-        <button className="relative rounded-full p-[2px] bg-gradient-to-r from-teal-400 via-purple-400 to-pink-500 hover:opacity-90 transition">
-          <span className="block px-3 py-1.5 md:px-5 md:py-2 text-xs md:text-sm font-medium rounded-full bg-black text-white">
-            Create a Post
-          </span>
-        </button>
+      <button className="relative rounded-full p-[2px] animate-spin-slow-glow hover:opacity-90">
+  <span className="block px-3 py-1.5 md:px-5 md:py-2 text-xs md:text-sm font-medium rounded-full bg-black text-white">
+    Create a Post
+  </span>
+</button>
+
+
+
 
       </div>
     </header>
