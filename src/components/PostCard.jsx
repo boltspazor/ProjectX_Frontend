@@ -3,12 +3,13 @@ import React, { useState } from "react";
 import likeIcon from "../assets/like.svg";
 import commentIcon from "../assets/comment.svg";
 import messageIcon from "../assets/message.svg";
+import postSampleImage from "../assets/post-sample.jpg";
 
 export default function PostCard({ variant = "grid", postId, onCommentClick, isActive }) {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(234);
 
-  const postImage = "src/assets/post-sample.jpg";
+  const postImage = postSampleImage;
   const profileImage = "https://i.pravatar.cc/100";
   const username = "sheryanne_xoxo";
   const caption = "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.";
