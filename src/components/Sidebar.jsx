@@ -28,11 +28,11 @@ export default function Sidebar({ activeView, setActiveView }) {
   }
 
   return (
-    <aside className="hidden md:flex flex-col w-80 bg-[#0f0f0f] border-r border-gray-800 p-8 fixed left-0 top-20 h-[calc(100vh-5rem)] text-white overflow-y-auto">
+    <aside className="hidden md:flex flex-col w-80 bg-[#0f0f0f] border-r border-gray-800 p-8 fixed left-0 top-24 h-[calc(100vh-6rem)] text-white overflow-y-auto">
 
       {/* Profile Image */}
         <div className="relative w-28 h-28 mx-auto mb-6">
-          <div className="absolute inset-0 bg-gradient-to-r from-teal-400 via-purple-400 to-pink-500 rounded-full blur-lg opacity-90"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 rounded-full blur-lg opacity-90"></div>
           <img src={profilePhoto} className="relative w-28 h-28 rounded-full object-cover border-2 border-gray-900" alt="Profile" />
         </div>
 
@@ -70,11 +70,11 @@ export default function Sidebar({ activeView, setActiveView }) {
               key={i}
               onClick={() => handleClick(item.value)}
               aria-pressed={active}
-              className={`relative w-full rounded-xl p-[2px] border ${active ? "border-transparent" : "border-gray-600"} ${active ? "bg-gradient-to-r from-teal-400 via-purple-400 to-pink-400" : "hover:border-transparent hover:bg-gradient-to-r hover:from-teal-400 hover:via-purple-400 hover:to-pink-400"} transition`}
+              className={`relative w-full rounded-xl p-[2px] border ${active ? "border-transparent" : "border-gray-600"} ${active ? "bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" : "hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600"} transition`}
             >
               <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#0f0f0f]">
-                <img src={active ? item.iconActive : item.icon} className="h-5 w-5" />
-                <span className={`${active ? "text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-purple-400 to-pink-400" : ""}`}>
+                <img src={active ? item.icon : item.icon} className="h-5 w-5" />
+                <span className={`${active ? "text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" : ""}`}>
                   {item.label}
                 </span>
               </span>
@@ -84,7 +84,7 @@ export default function Sidebar({ activeView, setActiveView }) {
 
         {/* Logout */}
         <button
-          className="group relative w-full rounded-xl p-[1px] border border-red-500 hover:border-transparent hover:bg-gradient-to-r hover:from-red-400 hover:to-pink-500 transition mt-10"
+          className="group relative w-full rounded-xl p-[1px] border border-orange-500 hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:to-orange-600 transition mt-10"
           onClick={() => {
             // Handle logout logic here
             console.log("Logout clicked");
@@ -92,8 +92,8 @@ export default function Sidebar({ activeView, setActiveView }) {
         >
           <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#0f0f0f]">
             <img src={logoutIcon} className="h-5 w-5 opacity-90 group-hover:hidden" />
-            <img src={logoutIconActive} className="h-5 w-5 hidden group-hover:block" />
-            <span className="text-red-400 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-red-400 group-hover:to-pink-500 transition-none">
+            <img src={logoutIcon} className="h-5 w-5 hidden group-hover:block" />
+            <span className="text-orange-400 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-400 group-hover:to-orange-600 transition-none">
               Logout
             </span>
           </span>

@@ -61,10 +61,10 @@
 .animate-spin-slow-glow {
   background: conic-gradient(
     from 0deg,
-    #14b8a6,
-    #a855f7,
-    #ec4899,
-    #14b8a6
+    #fb923c,
+    #f97316,
+    #ea580c,
+    #fb923c
   );
   background-size: 400% 400%;
   animation: rotateGradient 10s linear infinite, softGlow 10s ease-in-out infinite;

@@ -23,7 +23,7 @@ export default function Communities({ searchQuery = "", hasSearched = false }) {
             {sampleCommunities.map((community, i) => (
               <div
                 key={i}
-                className="relative border border-gray-800 rounded-xl overflow-hidden bg-[#111] hover:border-purple-500 transition-all"
+                className="relative border border-gray-800 rounded-xl overflow-hidden bg-[#111] hover:border-orange-500 transition-all"
               >
                 {/* Top 1/3rd section with 3 equal parts */}
                 <div className="grid grid-cols-3 h-24">
@@ -55,7 +55,7 @@ export default function Communities({ searchQuery = "", hasSearched = false }) {
         {suggestedCommunities.map((community, i) => (
           <div
             key={i}
-            className="relative border border-gray-800 rounded-xl overflow-hidden bg-[#111] hover:border-purple-500 transition-all"
+            className="relative border border-gray-800 rounded-xl overflow-hidden bg-[#111] hover:border-orange-500 transition-all"
           >
             {/* Top 1/3rd section with 3 equal parts */}
             <div className="grid grid-cols-3 h-24">

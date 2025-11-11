@@ -1,45 +1,173 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
+import StoryViewer from "./StoryViewer";
 
 export default function Stories() {
+  const scrollContainerRef = useRef(null);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [selectedStoryIndex, setSelectedStoryIndex] = useState(null);
+
   const stories = [
-    { id: 1, username: "samad_123", image: "https://i.pravatar.cc/100?img=1" },
-    { id: 2, username: "samad_123", image: "https://i.pravatar.cc/100?img=2" },
-    { id: 3, username: "samad_123", image: "https://i.pravatar.cc/100?img=3" },
-    { id: 4, username: "samad_123", image: "https://i.pravatar.cc/100?img=4" },
-    { id: 5, username: "samad_123", image: "https://i.pravatar.cc/100?img=5" },
-    { id: 6, username: "samad_123", image: "https://i.pravatar.cc/100?img=6" },
+    { id: 1, username: "shresque", image: "https://i.pravatar.cc/100?img=1" },
+    { id: 2, username: "aaravgoel_", image: "https://i.pravatar.cc/100?img=2" },
+    { id: 3, username: "nandihknee", image: "https://i.pravatar.cc/100?img=3" },
+    { id: 4, username: "_anirudhp...", image: "https://i.pravatar.cc/100?img=4" },
+    { id: 5, username: "slayyush", image: "https://i.pravatar.cc/100?img=5" },
+    { id: 6, username: "excuseyo...", image: "https://i.pravatar.cc/100?img=6" },
     { id: 7, username: "samad_123", image: "https://i.pravatar.cc/100?img=7" },
+    { id: 8, username: "rahul_04", image: "https://i.pravatar.cc/100?img=8" },
+    { id: 9, username: "sheryanne_xoxo", image: "https://i.pravatar.cc/100?img=9" },
+    { id: 10, username: "idkwhoisrahul", image: "https://i.pravatar.cc/100?img=10" },
+    { id: 11, username: "user_123", image: "https://i.pravatar.cc/100?img=11" },
+    { id: 12, username: "creative_mind", image: "https://i.pravatar.cc/100?img=12" },
   ];
 
-  return (
-    <div className="w-full bg-black border border-gray-800 rounded-xl py-3 md:py-4 px-4 md:px-6">
-      <div className="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide">
-        {/* Add Story Button */}
-        <div className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0">
-          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer hover:bg-gray-700 transition">
-            <span className="text-xl md:text-2xl text-gray-400">+</span>
-          </div>
-          <span className="text-xs text-gray-400">Add Story</span>
-        </div>
+  const checkScrollPosition = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
+      setShowLeftArrow(scrollLeft > 10);
+    }
+  };
 
-        {/* Story Items */}
-        {stories.map((story) => (
-          <div key={story.id} className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0">
-            <div className="w-14 h-14 md:w-16 md:h-16 rounded-full p-[2px] bg-gradient-to-tr from-purple-500 via-pink-500 to-green-500 cursor-pointer">
-              <div className="w-full h-full rounded-full border-2 border-black overflow-hidden flex items-center justify-center">
-                <img
-                  src={story.image}
-                  alt={story.username}
-                  className="w-full h-full object-cover"
-                />
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      checkScrollPosition();
+      container.addEventListener("scroll", checkScrollPosition);
+      
+      // Also check on resize to handle responsive changes
+      const handleResize = () => {
+        setTimeout(checkScrollPosition, 100);
+      };
+      window.addEventListener("resize", handleResize);
+      
+      return () => {
+        container.removeEventListener("scroll", checkScrollPosition);
+        window.removeEventListener("resize", handleResize);
+      };
+    }
+  }, []);
+
+  const scroll = (direction) => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 200;
+      scrollContainerRef.current.scrollBy({
+        left: direction === "right" ? scrollAmount : -scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  return (
+    <div className="w-full max-w-7xl mx-auto">
+      <div className="relative bg-black border border-gray-800 rounded-xl py-3 md:py-4 px-3 sm:px-4 md:px-6">
+        {/* Left Arrow - Show when scrolled */}
+        {showLeftArrow && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={() => scroll("left")}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/80 backdrop-blur-sm border border-gray-700 flex items-center justify-center hover:bg-black/90 transition-all cursor-pointer"
+            aria-label="Scroll left"
+          >
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-white rotate-180" />
+          </motion.button>
+        )}
+
+        {/* Stories Container */}
+        <div
+          ref={scrollContainerRef}
+          className="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+        >
+          {/* Add Story Button */}
+          <div className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0">
+            <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 cursor-pointer hover:scale-105 transition-transform duration-200">
+              <div className="w-full h-full rounded-full bg-black flex items-center justify-center">
+                <span className="text-xl md:text-2xl text-white font-light">+</span>
               </div>
             </div>
-            <span className="text-xs text-gray-400 max-w-[56px] md:max-w-[64px] truncate">
-              {story.username}
-            </span>
+            <span className="text-xs text-gray-400 whitespace-nowrap">Add Story</span>
           </div>
-        ))}
+
+          {/* Story Items */}
+          {stories.map((story, index) => {
+            const isLastStory = index === stories.length - 1;
+            const shouldShowArrow = isLastStory && showRightArrow;
+
+            return (
+              <motion.div
+                key={story.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: index * 0.02 }}
+                className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0"
+              >
+                <div className="relative group">
+                  <div 
+                    className="w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-orange-400 via-orange-500 to-orange-600 cursor-pointer hover:scale-105 transition-transform duration-200"
+                    onClick={() => setSelectedStoryIndex(index)}
+                  >
+                    <div className="w-full h-full rounded-full border-2 border-black overflow-hidden relative">
+                      <img
+                        src={story.image}
+                        alt={story.username}
+                        className="w-full h-full object-cover"
+                      />
+                      {/* Arrow Overlay on last story when more content available */}
+                      {shouldShowArrow && (
+                        <motion.div 
+                          className="absolute inset-0 flex items-center justify-end pr-0.5 md:pr-1"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-white flex items-center justify-center shadow-md">
+                            <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-black" />
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <span className="text-xs text-white max-w-[70px] md:max-w-[80px] truncate text-center">
+                  {story.username}
+                </span>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Right Arrow Button - Always visible when more content */}
+        {showRightArrow && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={() => scroll("right")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/80 backdrop-blur-sm border border-gray-700 flex items-center justify-center hover:bg-black/90 transition-all cursor-pointer"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-white" />
+          </motion.button>
+        )}
       </div>
+
+      {/* Story Viewer */}
+      {selectedStoryIndex !== null && (
+        <StoryViewer
+          stories={stories}
+          initialIndex={selectedStoryIndex}
+          onClose={() => setSelectedStoryIndex(null)}
+        />
+      )}
     </div>
   );
 }

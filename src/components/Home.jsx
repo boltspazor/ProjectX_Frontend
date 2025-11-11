@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Stories from "./Stories";
 import PostCard from "./PostCard";
 import Comments from "./Comments";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const [activePostId, setActivePostId] = useState(null);
@@ -15,7 +16,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex-1 overflow-y-auto h-[calc(100vh-8rem)] md:h-[calc(100vh-5rem)]">
+    <main className="flex-1 overflow-y-auto h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)]">
       <div className="p-4 md:p-8">
         {/* Stories Section */}
         <div className="max-w-full mx-auto mb-6">

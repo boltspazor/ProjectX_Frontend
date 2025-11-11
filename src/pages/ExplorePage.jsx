@@ -18,7 +18,7 @@ export default function ExplorePage() {
   };
 
   return (
-    <main className="flex-1 overflow-y-auto p-4 md:p-8 h-[calc(100vh-8rem)] md:h-[calc(100vh-5rem)]">
+    <main className="flex-1 overflow-y-auto p-4 md:p-8 h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)]">
       {/* Filters */}
       <div onKeyPress={handleSearchKeyPress}>
         <Filters

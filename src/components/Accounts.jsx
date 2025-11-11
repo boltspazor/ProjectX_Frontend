@@ -39,7 +39,7 @@ export default function Accounts({ searchQuery = "", hasSearched = false }) {
                   key={i}
                   className="flex flex-col items-center min-w-[100px] md:min-w-[120px] flex-shrink-0"
                 >
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gray-700 mb-3 border border-gray-600 hover:border-purple-500 transition-all"></div>
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gray-700 mb-3 border border-gray-600 hover:border-orange-500 transition-all"></div>
                   <p className="text-sm md:text-base font-medium">
                     {account.username}
                   </p>
@@ -62,7 +62,7 @@ export default function Accounts({ searchQuery = "", hasSearched = false }) {
         {suggestedAccounts.map((account, i) => (
           <div
             key={i}
-            className="flex items-center gap-4 border border-gray-700 rounded-lg px-4 py-3 md:px-6 md:py-4 hover:border-purple-500 transition-all bg-[#0f0f0f]"
+            className="flex items-center gap-4 border border-gray-700 rounded-lg px-4 py-3 md:px-6 md:py-4 hover:border-orange-500 transition-all bg-[#0f0f0f]"
           >
             <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-600"></div>
             <div>

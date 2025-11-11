@@ -151,12 +151,12 @@ export default function Comments({ isOpen, onClose }) {
                     onChange={(e) => setNewComment(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
                     placeholder="Add a comment..."
-                    className="flex-1 bg-[#2b2a2a] text-white rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    className="flex-1 bg-[#2b2a2a] text-white rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
                   />
                   <button
                     onClick={handleSendComment}
                     disabled={!newComment.trim()}
-                    className="px-4 py-2 bg-purple-500 hover:bg-purple-600 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full text-sm font-semibold transition"
+                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full text-sm font-semibold transition"
                   >
                     Send
                   </button>

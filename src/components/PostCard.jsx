@@ -33,7 +33,7 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
           w-full rounded-xl overflow-hidden bg-[#111] border shadow-sm
           transition-all duration-300
           md:max-h-[700px] md:flex md:flex-col
-          ${isActive ? 'border-purple-400' : 'border-gray-800'}
+          ${isActive ? 'border-orange-400' : 'border-gray-800'}
         `}
       >
 
