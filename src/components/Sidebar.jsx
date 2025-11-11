@@ -84,16 +84,15 @@ export default function Sidebar({ activeView, setActiveView }) {
 
         {/* Logout */}
         <button
-          className="group relative w-full rounded-xl p-[1px] border border-orange-500 hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:to-orange-600 transition mt-10"
+          className="group relative w-full rounded-xl p-[2px] border border-gray-600 hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600 transition mt-10"
           onClick={() => {
             // Handle logout logic here
             console.log("Logout clicked");
           }}
         >
           <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#0f0f0f]">
-            <img src={logoutIcon} className="h-5 w-5 opacity-90 group-hover:hidden" />
-            <img src={logoutIcon} className="h-5 w-5 hidden group-hover:block" />
-            <span className="text-orange-400 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-400 group-hover:to-orange-600 transition-none">
+            <img src={logoutIcon} className="h-5 w-5" />
+            <span className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-400 group-hover:via-orange-500 group-hover:to-orange-600 transition-all">
               Logout
             </span>
           </span>

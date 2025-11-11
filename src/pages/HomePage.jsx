@@ -38,11 +38,9 @@ export default function HomePage() {
           </div>
 
           {/* Comments Section - Desktop only, side by side */}
-          {activePostId !== null && (
-            <div className="hidden md:block sticky top-0 h-fit">
-              <Comments isOpen={activePostId !== null} onClose={handleCloseComments} />
-            </div>
-          )}
+          <div className="hidden md:block sticky top-0 h-fit">
+            <Comments isOpen={activePostId !== null} onClose={handleCloseComments} />
+          </div>
 
           {/* Comments Section - Mobile only, overlay */}
           <div className="md:hidden">
