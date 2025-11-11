@@ -14,8 +14,11 @@ import logoutIconActive from "../assets/logout-active.svg";
 
 // Profile photo
 import profilePhoto from "../assets/profile-photo.jpg";
+import LogoutConfirmationModal from "./LogoutConfirmationModal";
+import React, { useState } from "react";
 
 export default function Sidebar({ activeView, setActiveView }) {
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const items = [
     { label: "Home", value: "home", icon: homeIcon, iconActive: homeIconActive },
     { label: "Explore", value: "explore", icon: exploreIcon, iconActive: exploreIconActive },
@@ -26,6 +29,17 @@ export default function Sidebar({ activeView, setActiveView }) {
   function handleClick(value) {
     setActiveView(value);
   }
+
+  const handleLogout = () => {
+    // Handle logout logic here
+    console.log("User logged out");
+    // You can add actual logout logic here, like clearing tokens, redirecting, etc.
+    // For example: localStorage.clear(); window.location.href = '/login';
+  };
+
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+  };
 
   return (
     <aside className="hidden md:flex flex-col w-80 bg-[#0f0f0f] border-r border-gray-800 p-8 fixed left-0 top-24 h-[calc(100vh-6rem)] text-white overflow-y-auto">
@@ -85,10 +99,7 @@ export default function Sidebar({ activeView, setActiveView }) {
         {/* Logout */}
         <button
           className="group relative w-full rounded-xl p-[2px] border border-gray-600 hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600 transition mt-10"
-          onClick={() => {
-            // Handle logout logic here
-            console.log("Logout clicked");
-          }}
+          onClick={handleLogoutClick}
         >
           <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#0f0f0f]">
             <img src={logoutIcon} className="h-5 w-5" />
@@ -98,6 +109,13 @@ export default function Sidebar({ activeView, setActiveView }) {
           </span>
         </button>
       </nav>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmationModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+      />
     </aside>
   );
 }
