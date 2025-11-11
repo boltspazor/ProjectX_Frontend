@@ -6,10 +6,12 @@ import HomePage from "./pages/HomePage";
 import ExplorePage from "./pages/ExplorePage";
 import MessagesPage from "./pages/MessagesPage";
 import ProfilePage from "./pages/ProfilePage";
+import ShopPage from "./pages/ShopPage";
 import CreatePost from "./components/CreatePost"; // ✅ import the new component
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
 
   // ✅ include createPost view
   const renderView = () => {
@@ -22,17 +24,25 @@ export default function App() {
         return <MessagesPage />;
       case "profile":
         return <ProfilePage />;
+      case "shop":
+        return <ShopPage />;
       case "createPost":
-        return <CreatePost setActiveView={setActiveView} />; // pass back function for "←" navigation
+        // Legacy full page view - will be handled by modal now
+        return <HomePage />;
       default:
         return <HomePage />;
     }
   };
 
+  // Handle create post button click
+  const handleCreatePostClick = () => {
+    setIsCreatePostOpen(true);
+  };
+
   return (
     <div className="bg-black text-white min-h-screen flex flex-col">
-      {/* ✅ Pass setActiveView to Navbar */}
-      <Navbar setActiveView={setActiveView} />
+      {/* ✅ Pass handleCreatePostClick to Navbar */}
+      <Navbar setActiveView={setActiveView} onCreatePostClick={handleCreatePostClick} />
 
       {/* Sidebar + Main Content layout */}
       <div className="flex flex-1 overflow-hidden pb-14 md:pb-0">
@@ -45,6 +55,13 @@ export default function App() {
 
       {/* Mobile bottom navigation */}
       <MobileNav activeView={activeView} setActiveView={setActiveView} />
+
+      {/* Create Post Modal */}
+      <CreatePost
+        isOpen={isCreatePostOpen}
+        onClose={() => setIsCreatePostOpen(false)}
+        setActiveView={setActiveView}
+      />
     </div>
   );
 }
