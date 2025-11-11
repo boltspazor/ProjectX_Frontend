@@ -15,7 +15,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="flex-1 overflow-y-auto h-[calc(100vh-8rem)] md:h-[calc(100vh-5rem)]">
+    <main className="flex-1 overflow-y-auto h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)]">
       <div className="p-4 md:p-8">
         {/* Stories Section - Centered */}
         <div className="w-full flex justify-center mb-6">

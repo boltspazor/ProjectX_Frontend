@@ -40,7 +40,7 @@ export default function MessagesPage() {
   };
 
   return (
-    <main className="flex-1 overflow-hidden bg-black h-[calc(100vh-8rem)] md:h-[calc(100vh-5rem)]">
+    <main className="flex-1 overflow-hidden bg-black h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)]">
       <div className="h-full flex">
         {/* Left Side - Chat List */}
         <div className={`${activeChat ? 'hidden md:block' : 'block'} w-full md:w-96 border-r border-gray-800 overflow-y-auto`}>
@@ -52,7 +52,7 @@ export default function MessagesPage() {
                 <div
                   key={chat.id}
                   onClick={() => handleChatClick(chat)}
-                  className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-[#0f0f0f] border border-gray-800 hover:border-purple-500 cursor-pointer transition"
+                  className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-[#0f0f0f] border border-gray-800 hover:border-orange-500 cursor-pointer transition"
                 >
                   {/* Profile Picture */}
                   <div className="relative flex-shrink-0">
@@ -117,8 +117,8 @@ export default function MessagesPage() {
                   <div
                     className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${
                       message.sender === 'sender'
-                        ? 'bg-teal-600/40 text-white'
-                        : 'bg-purple-600/40 text-white'
+                        ? 'bg-orange-600/40 text-white'
+                        : 'bg-orange-500/30 text-white'
                     }`}
                   >
                     <p className="text-sm md:text-base">{message.text}</p>
@@ -136,12 +136,12 @@ export default function MessagesPage() {
                   onChange={(e) => setMessageInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Type a message..."
-                  className="flex-1 bg-[#2f2f2f] border border-gray-800 rounded-full px-4 py-2 md:py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition"
+                  className="flex-1 bg-[#2f2f2f] border border-gray-800 rounded-full px-4 py-2 md:py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!messageInput.trim()}
-                  className="p-2 md:p-3 bg-purple-500 hover:bg-purple-600 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full transition"
+                  className="p-2 md:p-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full transition"
                 >
                   <Send className="w-5 h-5 text-white" />
                 </button>

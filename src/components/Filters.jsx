@@ -53,7 +53,7 @@ export default function Filters({
 
           {/* Underline indicator */}
           <div
-            className="absolute bottom-0 h-[2px] rounded-full bg-gradient-to-r from-teal-400 via-purple-500 to-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.5)] transition-all duration-500 ease-[cubic-bezier(0.45,0.05,0.55,0.95)]"
+            className="absolute bottom-0 h-[2px] rounded-full bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 shadow-[0_0_8px_rgba(251,146,60,0.5)] transition-all duration-500 ease-[cubic-bezier(0.45,0.05,0.55,0.95)]"
             style={indicatorStyle}
           ></div>
         </div>
@@ -68,7 +68,7 @@ export default function Filters({
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#2f2f2f] border border-gray-800 rounded-full pl-9 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition"
+              className="w-full bg-[#2f2f2f] border border-gray-800 rounded-full pl-9 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
             />
           </div>
 
@@ -77,7 +77,7 @@ export default function Filters({
             onClick={() => setIsAIEnabled(!isAIEnabled)}
             className={`relative w-12 h-6 flex items-center rounded-full transition-all duration-500 flex-shrink-0 ${
               isAIEnabled
-                ? "bg-gradient-to-r from-purple-500 to-pink-500"
+                ? "bg-gradient-to-r from-orange-400 to-orange-600"
                 : "bg-gray-700"
             }`}
           >

@@ -6,7 +6,7 @@ export default function ShopPage() {
   const [activeTab, setActiveTab] = useState("store");
 
   return (
-    <main className="flex-1 overflow-y-auto h-[calc(100vh-8rem)] md:h-[calc(100vh-5rem)]">
+    <main className="flex-1 overflow-y-auto h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)]">
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         {/* Tabs */}
         <div className="flex gap-8 mb-8 border-b border-gray-800">
@@ -20,7 +20,7 @@ export default function ShopPage() {
             {activeTab === "store" && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-400 via-purple-400 to-pink-400"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600"
                 initial={false}
                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
@@ -36,7 +36,7 @@ export default function ShopPage() {
             {activeTab === "history" && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-400 via-purple-400 to-pink-400"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600"
                 initial={false}
                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
@@ -60,7 +60,7 @@ export default function ShopPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="relative rounded-xl overflow-hidden bg-gradient-to-r from-teal-400 via-purple-500 to-pink-500 p-6 md:p-12 text-center"
+                className="relative rounded-xl overflow-hidden bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 p-6 md:p-12 text-center"
               >
                 <div className="space-y-3 md:space-y-4">
                   <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-white leading-tight">
@@ -94,7 +94,7 @@ export default function ShopPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.2 }}
                     whileHover={{ scale: 1.02, y: -4 }}
-                    className="md:w-1/4 bg-[#1a1a1a] border border-gray-800 rounded-lg p-6 cursor-pointer hover:border-purple-500 transition-all duration-300"
+                    className="md:w-1/4 bg-[#1a1a1a] border border-gray-800 rounded-lg p-6 cursor-pointer hover:border-orange-500 transition-all duration-300"
                   >
                     <div className="space-y-4">
                       <div className="w-20 h-20 md:w-24 md:h-24 bg-gray-700 rounded-lg"></div>
@@ -114,7 +114,7 @@ export default function ShopPage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4, delay: 0.2 + item * 0.1 }}
                         whileHover={{ scale: 1.02, y: -4 }}
-                        className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4 cursor-pointer hover:border-purple-500 transition-all duration-300"
+                        className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4 cursor-pointer hover:border-orange-500 transition-all duration-300"
                       >
                         <div className="space-y-3">
                           <div className="w-16 h-16 bg-gray-700 rounded-lg"></div>
@@ -155,7 +155,7 @@ export default function ShopPage() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4 }}
-                  className="relative rounded-xl p-[2px] bg-gradient-to-r from-teal-400 via-purple-400 to-pink-400"
+                  className="relative rounded-xl p-[2px] bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600"
                 >
                   <div className="bg-[#1a1a1a] rounded-[10px] p-6 md:p-8 h-full">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">

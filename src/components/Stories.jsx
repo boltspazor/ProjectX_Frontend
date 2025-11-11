@@ -89,7 +89,7 @@ export default function Stories() {
         >
           {/* Add Story Button */}
           <div className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0">
-            <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] bg-gradient-to-br from-teal-400 via-purple-500 to-pink-500 cursor-pointer hover:scale-105 transition-transform duration-200">
+            <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 cursor-pointer hover:scale-105 transition-transform duration-200">
               <div className="w-full h-full rounded-full bg-black flex items-center justify-center">
                 <span className="text-xl md:text-2xl text-white font-light">+</span>
               </div>
@@ -112,7 +112,7 @@ export default function Stories() {
               >
                 <div className="relative group">
                   <div 
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-orange-400 via-pink-500 to-purple-600 cursor-pointer hover:scale-105 transition-transform duration-200"
+                    className="w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-orange-400 via-orange-500 to-orange-600 cursor-pointer hover:scale-105 transition-transform duration-200"
                     onClick={() => setSelectedStoryIndex(index)}
                   >
                     <div className="w-full h-full rounded-full border-2 border-black overflow-hidden relative">

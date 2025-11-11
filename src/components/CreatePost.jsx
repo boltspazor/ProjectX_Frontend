@@ -234,7 +234,7 @@ function CreatePostContent({
                   placeholder="Enter your prompt"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg px-4 py-3 text-sm md:text-base focus:outline-none focus:border-purple-500 placeholder-gray-400 text-white"
+                  className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg px-4 py-3 text-sm md:text-base focus:outline-none focus:border-orange-500 placeholder-gray-400 text-white"
                 />
               </div>
 
@@ -242,7 +242,7 @@ function CreatePostContent({
               {prompt && (
                 <button
                   onClick={handleGenerate}
-                  className="w-full relative rounded-lg p-[1.5px] bg-gradient-to-r from-teal-400 via-purple-400 to-pink-500 hover:opacity-90 transition"
+                  className="w-full relative rounded-lg p-[1.5px] bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:opacity-90 transition"
                 >
                   <span className="block w-full bg-[#0f0f0f] rounded-lg py-3 text-sm md:text-base font-medium text-white">
                     Generate for 100 Credits
@@ -261,12 +261,12 @@ function CreatePostContent({
               <div>
                 <label
                   onClick={() => fileInputRef.current?.click()}
-                  className="block w-full border-2 border-dashed border-purple-500 rounded-lg p-8 md:p-12 text-center cursor-pointer hover:border-purple-400 transition group"
+                  className="block w-full border-2 border-dashed border-orange-500 rounded-lg p-8 md:p-12 text-center cursor-pointer hover:border-orange-400 transition group"
                 >
                   <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition">
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-orange-500/10 flex items-center justify-center group-hover:bg-orange-500/20 transition">
                       <svg
-                        className="w-6 h-6 md:w-8 md:h-8 text-purple-500"
+                        className="w-6 h-6 md:w-8 md:h-8 text-orange-500"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -308,7 +308,7 @@ function CreatePostContent({
                           setUploadedImage({ name: `recent-${img.id}.jpg` });
                           setStep("caption");
                         }}
-                        className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition border-2 border-transparent hover:border-purple-500"
+                        className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition border-2 border-transparent hover:border-orange-500"
                       >
                         <img
                           src={img.url}
@@ -352,7 +352,7 @@ function CreatePostContent({
                   value={caption}
                   onChange={(e) => setCaption(e.target.value)}
                   rows={4}
-                  className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg px-4 py-3 text-sm md:text-base focus:outline-none focus:border-purple-500 placeholder-gray-400 text-white resize-none"
+                  className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg px-4 py-3 text-sm md:text-base focus:outline-none focus:border-orange-500 placeholder-gray-400 text-white resize-none"
                 />
               </div>
 
@@ -371,14 +371,14 @@ function CreatePostContent({
                       setPreviewCaption(caption);
                       setStep("preview");
                     }}
-                    className="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-medium py-3 px-6 rounded-lg transition"
+                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-6 rounded-lg transition"
                   >
                     Continue
                   </button>
                 )}
                 <button
                   onClick={handleGenerate}
-                  className="flex-1 relative rounded-lg p-[1.5px] bg-gradient-to-r from-teal-400 via-purple-400 to-pink-500 hover:opacity-90 transition"
+                  className="flex-1 relative rounded-lg p-[1.5px] bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:opacity-90 transition"
                 >
                   <span className="block w-full bg-[#0f0f0f] rounded-lg py-3 text-sm md:text-base font-medium text-white">
                     Generate Caption for 100 Credits
@@ -419,7 +419,7 @@ function CreatePostContent({
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handlePost}
-                  className="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-medium py-3 px-6 rounded-lg transition"
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-6 rounded-lg transition"
                 >
                   Post
                 </button>
