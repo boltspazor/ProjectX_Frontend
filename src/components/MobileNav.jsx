@@ -1,40 +1,142 @@
 import React from "react";
+import { motion } from "framer-motion";
+import profilePhoto from "../assets/profile-photo.jpg";
+import homeIcon from "../assets/home_mobnav_icon.png";
+import exploreIcon from "../assets/explore_mobnav_icon.png";
+import messageIcon from "../assets/message_mobnav_icon.png";
+import shopIcon from "../assets/shop_mobnav_icon.png";
 
 export default function MobileNav({ activeView, setActiveView }) {
+  const navItems = [
+    { id: "home", icon: homeIcon, view: "home" },
+    { id: "explore", icon: exploreIcon, view: "explore" },
+    { id: "profile", icon: profilePhoto, view: "profile", isProfile: true },
+    { id: "messages", icon: messageIcon, view: "messages" },
+    { id: "shop", icon: shopIcon, view: "shop" },
+  ];
+
+  const handleNavClick = (view) => {
+    // Map shop to profile for now (can be changed later)
+    if (view === "shop") {
+      setActiveView("profile");
+    } else {
+      setActiveView(view);
+    }
+  };
+
+  const isActive = (view) => {
+    if (view === "shop") {
+      return activeView === "profile";
+    }
+    return activeView === view;
+  };
+
   return (
-    <div className="md:hidden fixed bottom-0 left-0 w-full bg-black border-t border-gray-800 text-white flex justify-around py-3 text-xs z-30">
-      <button
-        onClick={() => setActiveView("home")}
-        className={`px-3 py-2 rounded-lg transition ${
-          activeView === "home" ? "text-purple-400 font-semibold" : "text-gray-400"
-        }`}
-      >
-        Home
-      </button>
-      <button
-        onClick={() => setActiveView("explore")}
-        className={`px-3 py-2 rounded-lg transition ${
-          activeView === "explore" ? "text-purple-400 font-semibold" : "text-gray-400"
-        }`}
-      >
-        Explore
-      </button>
-      <button
-        onClick={() => setActiveView("messages")}
-        className={`px-3 py-2 rounded-lg transition ${
-          activeView === "messages" ? "text-purple-400 font-semibold" : "text-gray-400"
-        }`}
-      >
-        Messages
-      </button>
-      <button
-        onClick={() => setActiveView("profile")}
-        className={`px-3 py-2 rounded-lg transition ${
-          activeView === "profile" ? "text-purple-400 font-semibold" : "text-gray-400"
-        }`}
-      >
-        Profile
-      </button>
-  </div>
- );
+    <div className="md:hidden fixed bottom-0 left-0 w-full z-50 pb-5 pt-3">
+      {/* Background with subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-[#0a0a0a]/90 to-transparent pointer-events-none"></div>
+      
+      {/* Navigation Container */}
+      <div className="relative flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-4">
+        {navItems.map((item, index) => {
+          const active = isActive(item.view);
+          const isCenter = item.isProfile;
+
+          return (
+            <motion.button
+              key={item.id}
+              onClick={() => handleNavClick(item.view)}
+              className="relative focus:outline-none"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.5,
+                delay: index * 0.06,
+                ease: [0.23, 1, 0.32, 1],
+              }}
+              whileTap={{ scale: 0.92 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              {/* Gradient Border Container */}
+              <motion.div
+                className={`
+                  relative rounded-full
+                  ${isCenter ? "w-14 h-14 sm:w-16 sm:h-16 p-[2.5px] sm:p-[3px]" : "w-11 h-11 sm:w-12 sm:h-12 p-[2px] sm:p-[2.5px]"}
+                `}
+                animate={{
+                  background: active
+                    ? "linear-gradient(135deg, #06d6a0 0%, #118ab2 30%, #7209b7 60%, #d602f2 100%)"
+                    : "linear-gradient(135deg, rgba(6, 214, 160, 0.4) 0%, rgba(17, 138, 178, 0.4) 30%, rgba(114, 9, 183, 0.4) 60%, rgba(214, 2, 242, 0.4) 100%)",
+                }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                style={{
+                  filter: active 
+                    ? "drop-shadow(0 0 10px rgba(6, 214, 160, 0.5)) drop-shadow(0 0 20px rgba(114, 9, 183, 0.4)) drop-shadow(0 0 30px rgba(214, 2, 242, 0.3))" 
+                    : "drop-shadow(0 0 5px rgba(6, 214, 160, 0.25))",
+                }}
+              >
+                {/* Inner Circle */}
+                <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden relative">
+                  {isCenter ? (
+                    <motion.img
+                      src={item.icon}
+                      alt="Profile"
+                      className="w-full h-full object-cover rounded-full"
+                      whileHover={{ scale: 1.03 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                    />
+                  ) : (
+                    <motion.img
+                      src={item.icon}
+                      alt={item.id}
+                      className={`${isCenter ? "w-full h-full" : "w-6 h-6 sm:w-7 sm:h-7"} object-contain`}
+                      whileHover={{ scale: 1.08 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      animate={{
+                        opacity: active ? 1 : 0.7,
+                        scale: active ? 1 : 0.95,
+                      }}
+                    />
+                  )}
+                </div>
+
+                {/* Subtle inner glow for active state */}
+                {active && !isCenter && (
+                  <motion.div
+                    className="absolute inset-0 rounded-full"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    style={{
+                      background: "radial-gradient(circle at center, rgba(6, 214, 160, 0.12) 0%, transparent 70%)",
+                    }}
+                  />
+                )}
+              </motion.div>
+
+              {/* Subtle pulse ring for active center profile */}
+              {active && isCenter && (
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    opacity: [0.3, 0, 0.3],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  style={{
+                    border: "2px solid rgba(6, 214, 160, 0.35)",
+                  }}
+                />
+              )}
+            </motion.button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
