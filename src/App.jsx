@@ -6,10 +6,12 @@ import HomePage from "./pages/HomePage";
 import ExplorePage from "./pages/ExplorePage";
 import MessagesPage from "./pages/MessagesPage";
 import ProfilePage from "./pages/ProfilePage";
+import CreatePost from "./components/CreatePost"; // ✅ import the new component
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
 
+  // ✅ include createPost view
   const renderView = () => {
     switch (activeView) {
       case "home":
@@ -20,6 +22,8 @@ export default function App() {
         return <MessagesPage />;
       case "profile":
         return <ProfilePage />;
+      case "createPost":
+        return <CreatePost setActiveView={setActiveView} />; // pass back function for "←" navigation
       default:
         return <HomePage />;
     }
@@ -27,13 +31,13 @@ export default function App() {
 
   return (
     <div className="bg-black text-white min-h-screen flex flex-col">
-      
-      {/* Full-width navbar */}
-      <Navbar />
+      {/* ✅ Pass setActiveView to Navbar */}
+      <Navbar setActiveView={setActiveView} />
 
       {/* Sidebar + Main Content layout */}
       <div className="flex flex-1 overflow-hidden pb-14 md:pb-0">
         <Sidebar activeView={activeView} setActiveView={setActiveView} />
+
         <div className="flex-1 md:ml-80 overflow-hidden">
           {renderView()}
         </div>

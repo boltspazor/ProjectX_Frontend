@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Stories from "./Stories";
 import PostCard from "./PostCard";
 import Comments from "./Comments";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const [activePostId, setActivePostId] = useState(null);
