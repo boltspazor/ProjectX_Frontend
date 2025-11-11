@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import likeIcon from "../assets/like.svg";
 
 export default function Comments({ isOpen, onClose }) {
@@ -61,111 +62,144 @@ export default function Comments({ isOpen, onClose }) {
     }
   };
 
-  return (
+  const renderContent = () => (
     <>
-      {/* Overlay for mobile */}
-      {isOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={onClose}
-        />
-      )}
-
-      {/* Comments Panel */}
-      <div
-        className={`
-          fixed md:relative
-          top-0 md:top-0
-          right-0 md:right-auto
-          h-full md:h-auto
-          bg-[#0f0f0f]
-          border border-gray-800
-          rounded-xl
-          flex flex-col
-          z-50 md:z-auto
-          transition-all duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0 w-full md:w-full' : 'translate-x-full md:translate-x-0 w-0 md:w-0'}
-        `}
+      {/* Header */}
+      <motion.div 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1, duration: 0.3 }}
+        className="flex items-center justify-between p-4 md:p-5 border-b border-gray-800 flex-shrink-0 bg-[#0f0f0f]"
       >
-        {isOpen && (
-          <>
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-800">
-              <h3 className="text-lg font-semibold">Comments</h3>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-white transition text-2xl"
-              >
-                ×
-              </button>
-            </div>
+        <h3 className="text-lg md:text-xl font-semibold text-white">Comments</h3>
+        <button
+          onClick={onClose}
+          className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-gray-800 rounded-full"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </motion.div>
 
-            {/* Comments List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[500px] md:max-h-[600px]">
-              {comments.map((comment) => (
-                <div key={comment.id} className="flex gap-3">
-                  <img
-                    src={comment.image}
-                    alt={comment.username}
-                    className="w-8 h-8 rounded-full flex-shrink-0 object-cover"
-                  />
-                  <div className="flex-1">
-                    <div className="bg-[#1a1a1a] rounded-2xl px-4 py-2">
-                      <p className="font-semibold text-sm">{comment.username}</p>
-                      <p className="text-sm text-gray-300">{comment.text}</p>
-                    </div>
-                    <div className="flex items-center gap-4 mt-1 px-2">
-                      <button
-                        onClick={() => handleLikeComment(comment.id)}
-                        className="flex items-center gap-1 text-xs hover:scale-105 transition-transform"
-                      >
-                        <img
-                          src={likeIcon}
-                          alt="like"
-                          className="h-4 w-4"
-                          style={comment.liked ? { filter: 'invert(33%) sepia(97%) saturate(7471%) hue-rotate(348deg) brightness(96%) contrast(101%)' } : {}}
-                        />
-                        <span className={comment.liked ? 'text-red-500 font-semibold' : 'text-gray-400'}>
-                          {comment.likes > 0 ? comment.likes.toLocaleString() : 'Like'}
-                        </span>
-                      </button>
-                      <span className="text-xs text-gray-500">2h</span>
-                    </div>
-                  </div>
+      {/* Comments List */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 md:space-y-5 scrollbar-hide">
+        <AnimatePresence>
+          {comments.map((comment, index) => (
+            <motion.div
+              key={comment.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.3 }}
+              className="flex gap-3 md:gap-4"
+            >
+              <img
+                src={comment.image}
+                alt={comment.username}
+                className="w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0 object-cover border border-gray-700"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="bg-[#1a1a1a] rounded-2xl px-4 py-2.5 md:px-5 md:py-3 hover:bg-[#1f1f1f] transition-colors">
+                  <p className="font-semibold text-sm md:text-base text-white mb-1">{comment.username}</p>
+                  <p className="text-sm md:text-base text-gray-300 leading-relaxed break-words">{comment.text}</p>
                 </div>
-              ))}
-            </div>
-
-            {/* Comment Input */}
-            <div className="border-t border-gray-800 p-4">
-              <div className="flex gap-3 items-center">
-                <img
-                  src="https://i.pravatar.cc/100?img=30"
-                  alt="Your profile"
-                  className="w-8 h-8 rounded-full flex-shrink-0 object-cover"
-                />
-                <div className="flex-1 flex gap-2">
-                  <input
-                    type="text"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
-                    placeholder="Add a comment..."
-                    className="flex-1 bg-[#2b2a2a] text-white rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                  />
+                <div className="flex items-center gap-4 md:gap-5 mt-2 px-2">
                   <button
-                    onClick={handleSendComment}
-                    disabled={!newComment.trim()}
-                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full text-sm font-semibold transition"
+                    onClick={() => handleLikeComment(comment.id)}
+                    className="flex items-center gap-1.5 text-xs md:text-sm hover:scale-105 transition-transform group"
                   >
-                    Send
+                    <img
+                      src={likeIcon}
+                      alt="like"
+                      className="h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:scale-110"
+                      style={comment.liked ? { filter: 'invert(33%) sepia(97%) saturate(7471%) hue-rotate(348deg) brightness(96%) contrast(101%)' } : {}}
+                    />
+                    <span className={comment.liked ? 'text-red-500 font-semibold' : 'text-gray-400 group-hover:text-gray-300'}>
+                      {comment.likes > 0 ? comment.likes.toLocaleString() : 'Like'}
+                    </span>
                   </button>
+                  <span className="text-xs md:text-sm text-gray-500">2h</span>
                 </div>
               </div>
-            </div>
-          </>
-        )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
+
+      {/* Comment Input */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.3 }}
+        className="border-t border-gray-800 p-4 md:p-5 bg-[#0f0f0f] flex-shrink-0"
+      >
+        <div className="flex gap-3 md:gap-4 items-center">
+          <img
+            src="https://i.pravatar.cc/100?img=30"
+            alt="Your profile"
+            className="w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0 object-cover border border-gray-700"
+          />
+          <div className="flex-1 flex gap-2 md:gap-3">
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
+              placeholder="Add a comment..."
+              className="flex-1 bg-[#1a1a1a] border border-gray-700 text-white rounded-full px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder-gray-500 transition-all"
+            />
+            <motion.button
+              onClick={handleSendComment}
+              disabled={!newComment.trim()}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-5 md:px-6 py-2.5 md:py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded-full text-sm md:text-base font-semibold transition-colors text-white"
+            >
+              Send
+            </motion.button>
+          </div>
+        </div>
+      </motion.div>
     </>
+  );
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Overlay for mobile */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            onClick={onClose}
+          />
+
+          {/* Comments Panel - Mobile: Slide from right */}
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="md:hidden fixed top-0 right-0 h-full w-full bg-[#0f0f0f] border-l border-gray-800 rounded-tl-xl flex flex-col z-50 shadow-2xl"
+          >
+            {renderContent()}
+          </motion.div>
+
+          {/* Comments Panel - Desktop: Fade in */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="hidden md:flex relative h-auto max-h-[calc(100vh-8rem)] w-full min-w-[400px] max-w-[450px] bg-[#0f0f0f] border border-gray-800 rounded-xl flex-col z-auto shadow-lg"
+          >
+            {renderContent()}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import PostCard from "./PostCard";
 import Filters from "./Filters";
 import Accounts from "./Accounts";
@@ -9,6 +10,18 @@ export default function Feed() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isAIEnabled, setIsAIEnabled] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const categories = [
+    "Memes",
+    "Entertainment",
+    "Social Media",
+    "Technology",
+    "Gaming",
+    "Sports",
+    "Music",
+    "Art",
+  ];
 
   // Handle Enter key press
   const handleSearchKeyPress = (e) => {
@@ -30,6 +43,49 @@ export default function Feed() {
           setIsAIEnabled={setIsAIEnabled}
         />
       </div>
+
+      {/* Categories Section - Only show for Posts tab */}
+      {activeTab === "Posts" && (
+        <div className="max-w-7xl mx-auto mb-6 md:mb-8">
+          {/* Categories Title */}
+          <div className="mb-4 md:mb-5">
+            <h2 className="text-xl md:text-2xl font-semibold text-orange-500 mb-2">
+              Categories
+            </h2>
+            <div className="h-0.5 w-16 md:w-20 bg-orange-500 rounded-full"></div>
+          </div>
+
+          {/* Categories Grid */}
+          <div className="flex flex-wrap gap-3 md:gap-4">
+            {categories.map((category, index) => {
+              const isSelected = selectedCategory === category;
+              return (
+                <motion.button
+                  key={category}
+                  onClick={() => setSelectedCategory(isSelected ? null : category)}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`
+                    px-4 md:px-6 py-2 md:py-3 rounded-xl
+                    text-sm md:text-base font-medium
+                    transition-all duration-200
+                    ${
+                      isSelected
+                        ? "bg-orange-500 text-white shadow-lg shadow-orange-500/50"
+                        : "bg-[#1a1a1a] text-white border border-gray-700 hover:border-orange-500/50 hover:bg-[#222]"
+                    }
+                  `}
+                >
+                  {category}
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Conditional Rendering */}
       {activeTab === "Posts" && (
