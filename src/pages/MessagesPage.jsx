@@ -4,6 +4,14 @@ import { ArrowLeft, Send } from "lucide-react";
 export default function MessagesPage() {
   const [activeChat, setActiveChat] = useState(null);
   const [messageInput, setMessageInput] = useState("");
+  const [messages, setMessages] = useState([
+    { id: 1, text: "Hey! How are you doing?", sender: "receiver", time: "10:30 AM" },
+    { id: 2, text: "I'm good! Thanks for asking", sender: "sender", time: "10:32 AM" },
+    { id: 3, text: "What about you?", sender: "sender", time: "10:32 AM" },
+    { id: 4, text: "I'm doing great! Working on a new project", sender: "receiver", time: "10:35 AM" },
+    { id: 5, text: "That sounds exciting! Tell me more about it", sender: "sender", time: "10:36 AM" },
+    { id: 6, text: "It's a social media app with some cool features", sender: "receiver", time: "10:38 AM" },
+  ]);
 
   const chats = [
     { id: 1, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=10", time: "2h", unread: true },
@@ -15,18 +23,15 @@ export default function MessagesPage() {
     { id: 7, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=16", time: "5d", unread: false },
   ];
 
-  const chatMessages = [
-    { id: 1, text: "Hey! How are you doing?", sender: "receiver", time: "10:30 AM" },
-    { id: 2, text: "I'm good! Thanks for asking", sender: "sender", time: "10:32 AM" },
-    { id: 3, text: "What about you?", sender: "sender", time: "10:32 AM" },
-    { id: 4, text: "I'm doing great! Working on a new project", sender: "receiver", time: "10:35 AM" },
-    { id: 5, text: "That sounds exciting! Tell me more about it", sender: "sender", time: "10:36 AM" },
-    { id: 6, text: "It's a social media app with some cool features", sender: "receiver", time: "10:38 AM" },
-  ];
-
   const handleSendMessage = () => {
     if (messageInput.trim()) {
-      // Handle sending message logic here
+      const newMessage = {
+        id: messages.length + 1,
+        text: messageInput,
+        sender: "sender",
+        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      };
+      setMessages([...messages, newMessage]);
       setMessageInput("");
     }
   };
@@ -40,7 +45,7 @@ export default function MessagesPage() {
   };
 
   return (
-    <main className="flex-1 overflow-hidden bg-black h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)]">
+    <main className={`flex-1 overflow-hidden bg-black ${activeChat ? 'fixed inset-0 z-[70] md:relative md:z-auto md:h-[calc(100vh-4rem)]' : 'h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]'}`}>
       <div className="h-full flex">
         {/* Left Side - Chat List */}
         <div className={`${activeChat ? 'hidden md:block' : 'block'} w-full md:w-96 border-r border-gray-800 overflow-y-auto`}>
@@ -109,7 +114,7 @@ export default function MessagesPage() {
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-              {chatMessages.map((message) => (
+              {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${message.sender === 'sender' ? 'justify-end' : 'justify-start'}`}

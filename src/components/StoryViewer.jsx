@@ -1,12 +1,17 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, Heart, Send } from "lucide-react";
+import { X, Heart, Send } from "lucide-react";
+import ShareModal from "./ShareModal";
 
 export default function StoryViewer({ stories, initialIndex, onClose }) {
   const [currentStoryIndex, setCurrentStoryIndex] = useState(initialIndex);
   const [viewedStories, setViewedStories] = useState(new Set([initialIndex]));
   const [progress, setProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isPaused, setIsPaused] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const progressIntervalRef = useRef(null);
   const handleNextRef = useRef(null);
   const handlePrevRef = useRef(null);
@@ -41,24 +46,26 @@ export default function StoryViewer({ stories, initialIndex, onClose }) {
       clearInterval(progressIntervalRef.current);
     }
 
-    progressIntervalRef.current = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          if (handleNextRef.current) {
-            handleNextRef.current();
+    if (!isPaused) {
+      progressIntervalRef.current = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            if (handleNextRef.current) {
+              handleNextRef.current();
+            }
+            return 0;
           }
-          return 0;
-        }
-        return prev + 2;
-      });
-    }, 100);
+          return prev + 2;
+        });
+      }, 100);
+    }
 
     return () => {
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
       }
     };
-  }, [currentStoryIndex]);
+  }, [currentStoryIndex, isPaused]);
 
   const handleNext = () => {
     if (currentStoryIndex < stories.length - 1) {
@@ -183,13 +190,46 @@ export default function StoryViewer({ stories, initialIndex, onClose }) {
                 exit={{ scale: 0.9, opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 className="relative w-full h-full max-w-md mx-auto flex items-center justify-center"
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.2}
+                onDragEnd={(e, { offset, velocity }) => {
+                  const swipe = Math.abs(offset.x) * velocity.x;
+                  
+                  if (swipe < -10000) {
+                    // Swiped left - next story
+                    handleNext();
+                  } else if (swipe > 10000) {
+                    // Swiped right - previous story
+                    handlePrev();
+                  }
+                }}
+                onClick={() => setIsPaused(!isPaused)}
               >
                 <div className="relative w-full aspect-[9/16] max-h-[90vh] rounded-lg overflow-hidden bg-black">
                   <img
                     src={currentStory.image}
                     alt={currentStory.username}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover select-none"
+                    draggable="false"
                   />
+                  
+                  {/* Pause Indicator */}
+                  {isPaused && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+                    >
+                      <div className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center">
+                        <div className="flex gap-2">
+                          <div className="w-1 h-8 bg-white rounded-full"></div>
+                          <div className="w-1 h-8 bg-white rounded-full"></div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
                   
                   {/* Story Info Overlay */}
                   <div className="absolute top-4 left-4 right-4 flex items-center gap-3 z-10">
@@ -207,41 +247,37 @@ export default function StoryViewer({ stories, initialIndex, onClose }) {
                   </div>
 
                   {/* Interaction Buttons */}
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center gap-4 z-10">
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3 md:gap-4 z-10">
                     <input
                       type="text"
                       placeholder={`Reply to ${currentStory.username}...`}
-                      className="flex-1 bg-black/50 backdrop-blur-sm border border-gray-700 rounded-full px-4 py-2 text-white text-sm placeholder-gray-400 focus:outline-none focus:border-white"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-1 bg-black/50 backdrop-blur-sm border border-gray-700 rounded-full px-3 md:px-4 py-2 text-sm md:text-base text-white placeholder-gray-400 focus:outline-none focus:border-white"
                     />
-                    <button className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition">
-                      <Heart className="w-5 h-5 text-white" />
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLiked(!liked);
+                      }}
+                      className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition"
+                    >
+                      <Heart 
+                        className={`w-5 h-5 transition-all ${liked ? 'fill-red-500 text-red-500' : 'text-white'}`}
+                      />
                     </button>
-                    <button className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsShareModalOpen(true);
+                      }}
+                      className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition"
+                    >
                       <Send className="w-5 h-5 text-white" />
                     </button>
                   </div>
                 </div>
               </motion.div>
             </AnimatePresence>
-
-            {/* Navigation Arrows - Always Visible */}
-            {currentStoryIndex > 0 && (
-              <button
-                onClick={handlePrev}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition"
-              >
-                <ChevronLeft className="w-6 h-6 text-white" />
-              </button>
-            )}
-
-            {currentStoryIndex < stories.length - 1 && (
-              <button
-                onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition"
-              >
-                <ChevronRight className="w-6 h-6 text-white" />
-              </button>
-            )}
           </div>
 
           {/* Right Side - Unviewed Stories (Desktop Only) */}
@@ -275,6 +311,9 @@ export default function StoryViewer({ stories, initialIndex, onClose }) {
             </motion.div>
           )}
         </div>
+
+        {/* Share Modal */}
+        <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
       </motion.div>
     </AnimatePresence>
   );

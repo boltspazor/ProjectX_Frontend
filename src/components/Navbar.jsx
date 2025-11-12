@@ -13,13 +13,20 @@ export default function Navbar({ setActiveView, onCreatePostClick }) {
     }
   };
 
+  const handleLogoClick = () => {
+    setActiveView("home");
+  };
+
   return (
-    <header className="w-full h-20 md:h-24 border-b border-gray-800 px-4 md:px-2 flex items-center justify-between sticky top-0 bg-black z-20">
-      <div className="flex items-center py-2 md:py-3">
+    <header className="w-full h-14 md:h-16 border-b border-gray-800 px-4 md:px-2 flex items-center justify-between sticky top-0 bg-black z-20">
+      <div 
+        onClick={handleLogoClick}
+        className="flex items-center py-2 cursor-pointer hover:opacity-80 transition-opacity"
+      >
         <img
           src={logo}
           alt="Project Logo"
-          className="h-12 md:h-16 w-auto select-none object-contain cursor-pointer hover:opacity-90 transition-opacity"
+          className="h-10 md:h-12 w-auto select-none object-contain"
         />
         
       </div>

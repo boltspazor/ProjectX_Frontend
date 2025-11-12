@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import { Heart } from "lucide-react";
 import ShareModal from "./ShareModal";
-import likeIcon from "../assets/like.svg";
 import commentIcon from "../assets/comment.svg";
 import messageIcon from "../assets/message.svg";
 import postSampleImage from "../assets/post-sample.jpg";
@@ -64,13 +64,10 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
           {/* Actions */}
           <div className="flex items-center gap-4 px-4 py-3 flex-shrink-0">
             <button onClick={handleLike} className="focus:outline-none">
-              <img
-                src={likeIcon}
-                alt="like"
-                className={`h-6 w-6 cursor-pointer hover:scale-110 transition-transform duration-200 ${
-                  liked ? 'brightness-0 saturate-100 hue-rotate-[340deg] contrast-[2]' : ''
+              <Heart 
+                className={`h-6 w-6 cursor-pointer hover:scale-110 transition-all duration-200 ${
+                  liked ? 'fill-red-500 text-red-500' : 'text-white'
                 }`}
-                style={liked ? { filter: 'invert(33%) sepia(97%) saturate(7471%) hue-rotate(348deg) brightness(96%) contrast(101%)' } : {}}
               />
             </button>
             <button onClick={handleCommentClick} className="focus:outline-none">
@@ -137,11 +134,10 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
           {/* Actions */}
           <div className="flex items-center gap-3">
             <button onClick={handleLike} className="focus:outline-none">
-              <img
-                src={likeIcon}
-                alt="like"
-                className={`h-6 w-5 cursor-pointer hover:scale-110 transition-transform duration-200`}
-                style={liked ? { filter: 'invert(33%) sepia(97%) saturate(7471%) hue-rotate(348deg) brightness(96%) contrast(101%)' } : {}}
+              <Heart 
+                className={`h-5 w-5 cursor-pointer hover:scale-110 transition-all duration-200 ${
+                  liked ? 'fill-red-500 text-red-500' : 'text-white'
+                }`}
               />
             </button>
             <button onClick={handleCommentClick} className="focus:outline-none">

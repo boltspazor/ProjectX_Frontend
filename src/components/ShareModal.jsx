@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
@@ -34,7 +36,19 @@ export default function ShareModal({ isOpen, onClose }) {
     setSelectedFriends(new Set());
   };
 
-  return (
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -44,12 +58,34 @@ export default function ShareModal({ isOpen, onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[200]"
+            className="fixed top-0 left-0 right-0 bottom-0 bg-black/70 backdrop-blur-sm z-[200]"
             onClick={onClose}
+            style={{ 
+              position: 'fixed', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0,
+              width: '100vw',
+              height: '100vh',
+              margin: 0
+            }}
           />
 
           {/* Modal Container - Centers the modal */}
-          <div className="fixed inset-0 z-[201] flex items-center justify-center p-4 pointer-events-none">
+          <div 
+            className="fixed top-0 left-0 right-0 bottom-0 z-[201] flex items-center justify-center p-4 pointer-events-none" 
+            style={{ 
+              position: 'fixed !important', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0,
+              width: '100vw',
+              height: '100vh',
+              margin: 0
+            }}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -173,5 +209,9 @@ export default function ShareModal({ isOpen, onClose }) {
       )}
     </AnimatePresence>
   );
-}
 
+  // Use portal to render at body level
+  return typeof document !== 'undefined' 
+    ? createPortal(modalContent, document.body)
+    : null;
+}

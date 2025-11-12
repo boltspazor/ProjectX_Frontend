@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Normal icons
 import homeIcon from "../assets/home.svg";
 import exploreIcon from "../assets/explore.svg";
@@ -42,7 +43,7 @@ export default function Sidebar({ activeView, setActiveView }) {
   };
 
   return (
-    <aside className="hidden md:flex flex-col w-80 bg-[#0f0f0f] border-r border-gray-800 p-8 fixed left-0 top-24 h-[calc(100vh-6rem)] text-white overflow-y-auto">
+    <aside className="hidden md:flex flex-col w-80 bg-[#0f0f0f] border-r border-gray-800 p-8 fixed left-0 top-16 h-[calc(100vh-4rem)] text-white overflow-y-auto">
 
       {/* Profile Image */}
         <div className="relative w-28 h-28 mx-auto mb-6">

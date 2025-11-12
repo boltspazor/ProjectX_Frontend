@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import StoryViewer from "./StoryViewer";
 import profilePhoto from "../assets/profile-photo.jpg";
@@ -93,7 +94,7 @@ export default function Stories() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0"
+            className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0 py-1"
           >
             <div className="relative w-14 h-14 md:w-16 md:h-16 cursor-pointer group">
               {/* Profile Picture */}
@@ -128,7 +129,7 @@ export default function Stories() {
                 transition={{ duration: 0.3, delay: index * 0.02 }}
                 className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0"
               >
-                <div className="relative group">
+                <div className="relative group py-1">
                   <div 
                     className="w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-orange-400 via-orange-500 to-orange-600 cursor-pointer hover:scale-105 transition-transform duration-200"
                     onClick={() => setSelectedStoryIndex(index)}
