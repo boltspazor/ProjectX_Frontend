@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Normal icons
 import homeIcon from "../assets/home.svg";
 import exploreIcon from "../assets/explore.svg";
@@ -42,7 +43,7 @@ export default function Sidebar({ activeView, setActiveView }) {
   };
 
   return (
-    <aside className="hidden md:flex flex-col w-80 bg-[#0f0f0f] border-r border-gray-800 p-8 fixed left-0 top-24 h-[calc(100vh-6rem)] text-white overflow-y-auto">
+    <aside className="hidden md:flex flex-col w-80 bg-[#0f0f0f] border-r border-gray-800 p-8 fixed left-0 top-16 h-[calc(100vh-4rem)] text-white overflow-y-auto">
 
       {/* Profile Image */}
         <div className="relative w-28 h-28 mx-auto mb-6">
@@ -84,10 +85,10 @@ export default function Sidebar({ activeView, setActiveView }) {
               key={i}
               onClick={() => handleClick(item.value)}
               aria-pressed={active}
-              className={`relative w-full rounded-xl p-[2px] border ${active ? "border-transparent" : "border-gray-600"} ${active ? "bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" : "hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600"} transition`}
+              className={`relative w-full rounded-xl p-[2px] border ${active ? "border-transparent" : "border-gray-600"} ${active ? "bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" : "hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600"} transition-all duration-300`}
             >
               <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#0f0f0f]">
-                <img src={active ? item.icon : item.icon} className="h-5 w-5" />
+                <img src={active ? item.icon : item.icon} className="h-5 w-5" alt={item.label} />
                 <span className={`${active ? "text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" : ""}`}>
                   {item.label}
                 </span>
@@ -96,14 +97,39 @@ export default function Sidebar({ activeView, setActiveView }) {
           );
         })}
 
+        {/* Communities Section */}
+        <div className="pt-6 border-t border-gray-700">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-2">Your Communities</h3>
+          <div className="space-y-2">
+            {[
+              { name: "Music Lovers", members: "2.3k", image: "https://i.pravatar.cc/100?img=50" },
+              { name: "Tech Enthusiasts", members: "5.1k", image: "https://i.pravatar.cc/100?img=51" },
+              { name: "Photography", members: "1.8k", image: "https://i.pravatar.cc/100?img=52" },
+            ].map((community, idx) => (
+              <button
+                key={idx}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-800/50 transition-all duration-300 group"
+              >
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                  <img src={community.image} alt={community.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 text-left min-w-0">
+                  <p className="text-sm font-medium text-white truncate">{community.name}</p>
+                  <p className="text-xs text-gray-400">{community.members} members</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Logout */}
         <button
-          className="group relative w-full rounded-xl p-[2px] border border-gray-600 hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600 transition mt-10"
+          className="group relative w-full rounded-xl p-[2px] border border-gray-600 hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600 transition-all duration-300 mt-6"
           onClick={handleLogoutClick}
         >
           <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#0f0f0f]">
-            <img src={logoutIcon} className="h-5 w-5" />
-            <span className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-400 group-hover:via-orange-500 group-hover:to-orange-600 transition-all">
+            <img src={logoutIcon} className="h-5 w-5" alt="Logout" />
+            <span className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-400 group-hover:via-orange-500 group-hover:to-orange-600 transition-all duration-300">
               Logout
             </span>
           </span>

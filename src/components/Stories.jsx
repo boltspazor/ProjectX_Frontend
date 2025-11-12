@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import StoryViewer from "./StoryViewer";
+import profilePhoto from "../assets/profile-photo.jpg";
 
 export default function Stories() {
   const scrollContainerRef = useRef(null);
@@ -87,15 +89,32 @@ export default function Stories() {
             msOverflowStyle: "none",
           }}
         >
-          {/* Add Story Button */}
-          <div className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0">
-            <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 cursor-pointer hover:scale-105 transition-transform duration-200">
-              <div className="w-full h-full rounded-full bg-black flex items-center justify-center">
-                <span className="text-xl md:text-2xl text-white font-light">+</span>
+          {/* Add Story Button - Instagram Style */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0 py-1"
+          >
+            <div className="relative w-14 h-14 md:w-16 md:h-16 cursor-pointer group">
+              {/* Profile Picture */}
+              <div className="w-full h-full rounded-full border-2 border-gray-700 overflow-hidden">
+                <img
+                  src={profilePhoto}
+                  alt="Your story"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* Plus Icon Overlay */}
+              <div className="absolute bottom-0 right-0 w-5 h-5 md:w-6 md:h-6 bg-orange-500 rounded-full border-2 border-black flex items-center justify-center group-hover:bg-orange-600 transition-all duration-200 group-hover:scale-110">
+                <svg className="w-3 h-3 md:w-3.5 md:h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
+                </svg>
               </div>
             </div>
-            <span className="text-xs text-gray-400 whitespace-nowrap">Add Story</span>
-          </div>
+            <span className="text-xs text-gray-400 whitespace-nowrap">Your Story</span>
+          </motion.div>
 
           {/* Story Items */}
           {stories.map((story, index) => {
@@ -110,7 +129,7 @@ export default function Stories() {
                 transition={{ duration: 0.3, delay: index * 0.02 }}
                 className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0"
               >
-                <div className="relative group">
+                <div className="relative group py-1">
                   <div 
                     className="w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-orange-400 via-orange-500 to-orange-600 cursor-pointer hover:scale-105 transition-transform duration-200"
                     onClick={() => setSelectedStoryIndex(index)}

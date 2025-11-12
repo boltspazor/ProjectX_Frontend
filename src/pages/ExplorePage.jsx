@@ -1,9 +1,11 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import PostCard from "../components/PostCard";
 import Filters from "../components/Filters";
 import Accounts from "../components/Accounts";
 import Communities from "../components/Communities";
+import Comments from "../components/Comments";
 
 export default function ExplorePage() {
   const [activeTab, setActiveTab] = useState("Posts");
@@ -11,6 +13,15 @@ export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAIEnabled, setIsAIEnabled] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [activePostId, setActivePostId] = useState(null);
+
+  const handleCommentClick = (postId) => {
+    setActivePostId(postId);
+  };
+
+  const handleCloseComments = () => {
+    setActivePostId(null);
+  };
 
   const categories = [
     "Memes",
@@ -31,7 +42,7 @@ export default function ExplorePage() {
   };
 
   return (
-    <main className="flex-1 overflow-y-auto p-4 md:p-8 h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)]">
+    <main className="flex-1 overflow-y-auto p-4 md:p-8 h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]">
       {/* Filters */}
       <div onKeyPress={handleSearchKeyPress}>
         <Filters
@@ -105,9 +116,21 @@ export default function ExplorePage() {
             "
           >
             {Array.from({ length: isAIEnabled ? 20 : 20 }).map((_, i) => (
-              <PostCard key={i} />
+              <PostCard 
+                key={i} 
+                postId={i}
+                onCommentClick={handleCommentClick}
+                isActive={activePostId === i}
+              />
             ))}
           </div>
+
+          {/* Comments Section - Overlay for both mobile and desktop */}
+          <Comments 
+            isOpen={activePostId !== null} 
+            onClose={handleCloseComments}
+            variant="overlay"
+          />
         </>
       )}
 

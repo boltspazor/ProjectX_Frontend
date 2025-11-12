@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import profilePhoto from "../assets/profile-photo.jpg";
@@ -6,7 +7,7 @@ export default function ShopPage() {
   const [activeTab, setActiveTab] = useState("store");
 
   return (
-    <main className="flex-1 overflow-y-auto h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)]">
+    <main className="flex-1 overflow-y-auto h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]">
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         {/* Tabs */}
         <div className="flex gap-8 mb-8 border-b border-gray-800">
@@ -83,7 +84,7 @@ export default function ShopPage() {
               <div className="space-y-4">
                 <h3 className="text-2xl md:text-3xl font-bold text-white">Buy Credits</h3>
                 <p className="text-gray-400 text-sm md:text-base">
-                  Pay-per-use model (1 credit = ₹1)
+                  Pay-per-use model (1 credit = ₹0.1)
                 </p>
 
                 {/* Credit Packages */}

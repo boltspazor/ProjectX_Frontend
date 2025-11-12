@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import likeIcon from "../assets/like.svg";
+import { Heart } from "lucide-react";
 
-export default function Comments({ isOpen, onClose }) {
+export default function Comments({ isOpen, onClose, variant = "sidebar" }) {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([
     {
@@ -108,11 +109,10 @@ export default function Comments({ isOpen, onClose }) {
                     onClick={() => handleLikeComment(comment.id)}
                     className="flex items-center gap-1.5 text-xs md:text-sm hover:scale-105 transition-transform group"
                   >
-                    <img
-                      src={likeIcon}
-                      alt="like"
-                      className="h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:scale-110"
-                      style={comment.liked ? { filter: 'invert(33%) sepia(97%) saturate(7471%) hue-rotate(348deg) brightness(96%) contrast(101%)' } : {}}
+                    <Heart 
+                      className={`h-4 w-4 md:h-5 md:w-5 transition-all group-hover:scale-110 ${
+                        comment.liked ? 'fill-red-500 text-red-500' : 'text-gray-400 group-hover:text-gray-300'
+                      }`}
                     />
                     <span className={comment.liked ? 'text-red-500 font-semibold' : 'text-gray-400 group-hover:text-gray-300'}>
                       {comment.likes > 0 ? comment.likes.toLocaleString() : 'Like'}
@@ -131,29 +131,29 @@ export default function Comments({ isOpen, onClose }) {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.3 }}
-        className="border-t border-gray-800 p-4 md:p-5 bg-[#0f0f0f] flex-shrink-0"
+        className="border-t border-gray-800 p-3 md:p-5 bg-[#0f0f0f] flex-shrink-0"
       >
-        <div className="flex gap-3 md:gap-4 items-center">
+        <div className="flex gap-2 md:gap-4 items-center">
           <img
             src="https://i.pravatar.cc/100?img=30"
             alt="Your profile"
-            className="w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0 object-cover border border-gray-700"
+            className="w-8 h-8 md:w-10 md:h-10 rounded-full flex-shrink-0 object-cover border border-gray-700"
           />
-          <div className="flex-1 flex gap-2 md:gap-3">
+          <div className="flex-1 flex gap-2 items-center min-w-0">
             <input
               type="text"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
               placeholder="Add a comment..."
-              className="flex-1 bg-[#1a1a1a] border border-gray-700 text-white rounded-full px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder-gray-500 transition-all"
+              className="flex-1 min-w-0 bg-[#1a1a1a] border border-gray-700 text-white rounded-full px-3 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder-gray-500 transition-all"
             />
             <motion.button
               onClick={handleSendComment}
               disabled={!newComment.trim()}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-5 md:px-6 py-2.5 md:py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded-full text-sm md:text-base font-semibold transition-colors text-white"
+              className="px-3 md:px-6 py-2 md:py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded-full text-xs md:text-base font-semibold transition-colors text-white flex-shrink-0"
             >
               Send
             </motion.button>
@@ -167,37 +167,74 @@ export default function Comments({ isOpen, onClose }) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Overlay for mobile */}
+          {/* Overlay for mobile and desktop (when variant is overlay) */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className={`fixed inset-0 bg-black/70 backdrop-blur-sm z-[55] ${variant === "sidebar" ? "md:hidden" : ""}`}
             onClick={onClose}
           />
 
-          {/* Comments Panel - Mobile: Slide from right */}
+          {/* Comments Panel - Mobile: Slide from bottom (Instagram style) */}
           <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="md:hidden fixed top-0 right-0 h-full w-full bg-[#0f0f0f] border-l border-gray-800 rounded-tl-xl flex flex-col z-50 shadow-2xl"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ 
+              type: "spring", 
+              damping: 30, 
+              stiffness: 300,
+              mass: 0.8
+            }}
+            className="md:hidden fixed bottom-0 left-0 right-0 h-[85vh] bg-[#0f0f0f] border-t border-gray-800 rounded-t-3xl flex flex-col z-[60] shadow-2xl"
           >
+            {/* Handle bar */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-10 h-1 bg-gray-600 rounded-full"></div>
+            </div>
             {renderContent()}
           </motion.div>
 
-          {/* Comments Panel - Desktop: Fade in */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="hidden md:flex relative h-auto max-h-[calc(100vh-8rem)] w-full min-w-[400px] max-w-[450px] bg-[#0f0f0f] border border-gray-800 rounded-xl flex-col z-auto shadow-lg"
-          >
-            {renderContent()}
-          </motion.div>
+          {/* Comments Panel - Desktop Sidebar: Fade in with scale (only for sidebar variant) */}
+          {variant === "sidebar" && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              transition={{ 
+                type: "spring", 
+                damping: 25, 
+                stiffness: 250,
+                mass: 0.6
+              }}
+              className="hidden md:flex relative h-auto max-h-[calc(100vh-6rem)] w-full min-w-[400px] max-w-[450px] bg-[#0f0f0f] border border-gray-800 rounded-xl flex-col z-auto shadow-2xl"
+            >
+              {renderContent()}
+            </motion.div>
+          )}
+
+          {/* Comments Panel - Desktop Overlay: Centered modal (only for overlay variant) */}
+          {variant === "overlay" && (
+            <div className="hidden md:flex fixed inset-0 z-[60] items-center justify-center p-4 pointer-events-none">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                transition={{ 
+                  type: "spring", 
+                  damping: 25, 
+                  stiffness: 300,
+                  mass: 0.8
+                }}
+                className="w-full max-w-[500px] h-auto max-h-[85vh] bg-[#0f0f0f] border border-gray-800 rounded-2xl flex flex-col shadow-2xl pointer-events-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {renderContent()}
+              </motion.div>
+            </div>
+          )}
         </>
       )}
     </AnimatePresence>
