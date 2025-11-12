@@ -52,12 +52,12 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
             <span className="text-sm font-medium">{username}</span>
           </div>
 
-          {/* Post Image */}
-          <div className="w-full aspect-square md:aspect-auto md:flex-1 bg-black overflow-hidden flex items-center justify-center">
+          {/* Post Image - 4:3 aspect ratio (Instagram standard) */}
+          <div className="w-full aspect-[4/3] md:aspect-auto md:flex-1 bg-black overflow-hidden flex items-center justify-center">
             <img
               src={postImage}
               alt="post"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
             />
           </div>
 
@@ -113,12 +113,12 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
   return (
     <>
       <div className="w-full rounded-xl overflow-hidden bg-[#111] border border-gray-800 hover:border-gray-600 transition shadow-sm">
-        {/* Post Image */}
-        <div className="w-full h-64 md:h-72 bg-black overflow-hidden flex items-center justify-center">
+        {/* Post Image - 4:3 aspect ratio (Instagram standard) */}
+        <div className="w-full aspect-[4/3] bg-black overflow-hidden flex items-center justify-center">
           <img
             src={postImage}
             alt="post"
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
           />
         </div>
 

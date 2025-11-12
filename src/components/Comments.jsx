@@ -172,29 +172,43 @@ export default function Comments({ isOpen, onClose }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
             onClick={onClose}
           />
 
-          {/* Comments Panel - Mobile: Slide from right */}
+          {/* Comments Panel - Mobile: Slide from bottom (Instagram style) */}
           <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="md:hidden fixed top-0 right-0 h-full w-full bg-[#0f0f0f] border-l border-gray-800 rounded-tl-xl flex flex-col z-50 shadow-2xl"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ 
+              type: "spring", 
+              damping: 30, 
+              stiffness: 300,
+              mass: 0.8
+            }}
+            className="md:hidden fixed bottom-0 left-0 right-0 h-[85vh] bg-[#0f0f0f] border-t border-gray-800 rounded-t-3xl flex flex-col z-50 shadow-2xl"
           >
+            {/* Handle bar */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-10 h-1 bg-gray-600 rounded-full"></div>
+            </div>
             {renderContent()}
           </motion.div>
 
-          {/* Comments Panel - Desktop: Fade in */}
+          {/* Comments Panel - Desktop: Fade in with scale */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="hidden md:flex relative h-auto max-h-[calc(100vh-8rem)] w-full min-w-[400px] max-w-[450px] bg-[#0f0f0f] border border-gray-800 rounded-xl flex-col z-auto shadow-lg"
+            initial={{ opacity: 0, scale: 0.96, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 10 }}
+            transition={{ 
+              type: "spring", 
+              damping: 25, 
+              stiffness: 250,
+              mass: 0.6
+            }}
+            className="hidden md:flex relative h-auto max-h-[calc(100vh-8rem)] w-full min-w-[400px] max-w-[450px] bg-[#0f0f0f] border border-gray-800 rounded-xl flex-col z-auto shadow-2xl"
           >
             {renderContent()}
           </motion.div>

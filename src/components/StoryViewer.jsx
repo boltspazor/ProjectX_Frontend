@@ -279,4 +279,3 @@ export default function StoryViewer({ stories, initialIndex, onClose }) {
     </AnimatePresence>
   );
 }
-
