@@ -111,7 +111,7 @@ export default function App() {
       case "communities":
         return <CommunitiesPage />;
       case "profile":
-        return <ProfilePage />;
+        return <ProfilePage onLogout={handleLogout} />;
       case "shop":
         return <ShopPage />;
       case "notifications":

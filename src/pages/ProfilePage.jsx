@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { LogOut } from "lucide-react";
 import profilePhoto from "../assets/profile-photo.jpg";
 import PostDetailModal from "../components/PostDetailModal";
+import LogoutConfirmationModal from "../components/LogoutConfirmationModal";
 
-export default function ProfilePage() {
+export default function ProfilePage({ onLogout }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // Sample post images - 9 posts in a 3x3 grid
   const posts = [
@@ -84,10 +87,32 @@ export default function ProfilePage() {
     setSelectedPost(null);
   };
 
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    if (onLogout) {
+      onLogout();
+    }
+    setIsLogoutModalOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
       {/* Profile Content */}
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
+        {/* Logout Button - Mobile Only */}
+        <div className="flex justify-end mb-4 md:hidden">
+          <button
+            onClick={handleLogoutClick}
+            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+            title="Logout"
+          >
+            <LogOut className="h-5 w-5 text-red-500" />
+          </button>
+        </div>
+
         {/* Profile Info Section */}
         <div className="flex flex-col items-center gap-6 mb-8">
           {/* Profile Picture */}
@@ -196,6 +221,13 @@ export default function ProfilePage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         post={selectedPost}
+      />
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmationModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogoutConfirm}
       />
     </div>
   );
