@@ -1,20 +1,88 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import profilePhoto from "../assets/profile-photo.jpg";
+import PostDetailModal from "../components/PostDetailModal";
 
 export default function ProfilePage() {
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Sample post images - 9 posts in a 3x3 grid
   const posts = [
-    "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop", // Sky with bird
-    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop", // Car with sunset
-    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop", // Palm trees sunset
-    "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=400&fit=crop", // Beach sunset
-    "https://images.unsplash.com/photo-1490772888775-55fceea286b8?w=400&h=400&fit=crop", // Food/coffee
-    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop", // Mirror selfie
-    "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&h=400&fit=crop", // Clouds
-    "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&h=400&fit=crop", // Bridge sunset
-    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop", // Palm trees
+    {
+      id: 0,
+      image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop",
+      caption: "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.",
+      profileImage: profilePhoto,
+      username: "idkwhoisrahul_04"
+    },
+    {
+      id: 1,
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop",
+      caption: "Sunset vibes 🌅",
+      profileImage: profilePhoto,
+      username: "idkwhoisrahul_04"
+    },
+    {
+      id: 2,
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
+      caption: "Palm trees and paradise",
+      profileImage: profilePhoto,
+      username: "idkwhoisrahul_04"
+    },
+    {
+      id: 3,
+      image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=400&fit=crop",
+      caption: "Beach day 🏖️",
+      profileImage: profilePhoto,
+      username: "idkwhoisrahul_04"
+    },
+    {
+      id: 4,
+      image: "https://images.unsplash.com/photo-1490772888775-55fceea286b8?w=400&h=400&fit=crop",
+      caption: "Breakfast of champions",
+      profileImage: profilePhoto,
+      username: "idkwhoisrahul_04"
+    },
+    {
+      id: 5,
+      image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
+      caption: "Mirror selfie vibes",
+      profileImage: profilePhoto,
+      username: "idkwhoisrahul_04"
+    },
+    {
+      id: 6,
+      image: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&h=400&fit=crop",
+      caption: "Cloud watching",
+      profileImage: profilePhoto,
+      username: "idkwhoisrahul_04"
+    },
+    {
+      id: 7,
+      image: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&h=400&fit=crop",
+      caption: "Golden hour",
+      profileImage: profilePhoto,
+      username: "idkwhoisrahul_04"
+    },
+    {
+      id: 8,
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
+      caption: "Tropical vibes",
+      profileImage: profilePhoto,
+      username: "idkwhoisrahul_04"
+    },
   ];
+
+  const handlePostClick = (post) => {
+    setSelectedPost(post);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPost(null);
+  };
 
   return (
     <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
@@ -106,21 +174,29 @@ export default function ProfilePage() {
         >
           {posts.map((post, index) => (
             <motion.div
-              key={index}
+              key={post.id}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.35 + index * 0.03, duration: 0.4 }}
+              onClick={() => handlePostClick(post)}
               className="aspect-square overflow-hidden bg-gray-900 cursor-pointer group"
             >
               <img
-                src={post}
-                alt={`Post ${index + 1}`}
+                src={post.image}
+                alt={`Post ${post.id + 1}`}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
             </motion.div>
           ))}
         </motion.div>
       </div>
+
+      {/* Post Detail Modal */}
+      <PostDetailModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        post={selectedPost}
+      />
     </div>
   );
 }

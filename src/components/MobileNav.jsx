@@ -5,7 +5,7 @@ import profilePhoto from "../assets/profile-photo.jpg";
 import homeIcon from "../assets/home_mobnav_icon.png";
 import exploreIcon from "../assets/explore_mobnav_icon.png";
 import messageIcon from "../assets/message_mobnav_icon.png";
-import shopIcon from "../assets/shop_mobnav_icon.png";
+import communitiesIcon from "../assets/communities.svg";
 
 export default function MobileNav({ activeView, setActiveView }) {
   const navItems = [
@@ -13,7 +13,7 @@ export default function MobileNav({ activeView, setActiveView }) {
     { id: "explore", icon: exploreIcon, view: "explore" },
     { id: "profile", icon: profilePhoto, view: "profile", isProfile: true },
     { id: "messages", icon: messageIcon, view: "messages" },
-    { id: "communities", icon: shopIcon, view: "communities", isCommunities: true },
+    { id: "communities", icon: communitiesIcon, view: "communities", isCommunities: true },
   ];
 
   const handleNavClick = (view) => {

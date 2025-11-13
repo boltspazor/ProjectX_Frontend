@@ -2,6 +2,7 @@
 // Normal icons
 import homeIcon from "../assets/home.svg";
 import exploreIcon from "../assets/explore.svg";
+import communitiesIcon from "../assets/communities.svg";
 import messageIcon from "../assets/message.svg";
 import profileIcon from "../assets/profile.svg";
 import logoutIcon from "../assets/logout.svg";
@@ -23,7 +24,7 @@ export default function Sidebar({ activeView, setActiveView }) {
   const items = [
     { label: "Home", value: "home", icon: homeIcon, iconActive: homeIconActive },
     { label: "Explore", value: "explore", icon: exploreIcon, iconActive: exploreIconActive },
-    { label: "Communities", value: "communities", icon: exploreIcon, iconActive: exploreIconActive },
+    { label: "Communities", value: "communities", icon: communitiesIcon, iconActive: communitiesIcon },
     { label: "Messages", value: "messages", icon: messageIcon, iconActive: messageIconActive },
     { label: "Profile", value: "profile", icon: profileIcon, iconActive: profileIconActive },
   ];
