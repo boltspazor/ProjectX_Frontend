@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { X } from "lucide-react";
 
 export default function NotificationsPage({ setActiveView }) {
   const [notifications, setNotifications] = useState({
@@ -235,7 +236,16 @@ export default function NotificationsPage({ setActiveView }) {
 
       {/* Desktop Header */}
       <div className="hidden md:block border-b border-gray-800 px-6 py-4">
-        <h1 className="text-2xl font-semibold text-white">Notifications</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold text-white">Notifications</h1>
+          <button
+            onClick={() => setActiveView(null)}
+            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+            title="Close"
+          >
+            <X className="h-6 w-6 text-gray-400 hover:text-white" />
+          </button>
+        </div>
       </div>
 
       {/* Content */}
