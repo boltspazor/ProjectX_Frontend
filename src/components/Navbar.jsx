@@ -41,6 +41,7 @@ export default function Navbar({ setActiveView, onCreatePostClick }) {
         <img
           src={bell}
           alt="Notifications"
+          onClick={() => setActiveView("notifications")}
           className="h-5 w-5 md:h-6 md:w-6 cursor-pointer opacity-90 hover:opacity-100 transition"
         />
 
