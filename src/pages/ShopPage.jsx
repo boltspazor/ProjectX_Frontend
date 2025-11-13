@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import profilePhoto from "../assets/profile-photo.jpg";
@@ -204,4 +203,3 @@ export default function ShopPage() {
     </main>
   );
 }
-

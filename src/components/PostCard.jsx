@@ -48,6 +48,8 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
               src={profileImage}
               alt="profile"
               className="h-9 w-9 rounded-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
             <span className="text-sm font-medium">{username}</span>
           </div>
@@ -58,6 +60,8 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
               src={postImage}
               alt="post"
               className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
           </div>
 
@@ -116,6 +120,8 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
             src={postImage}
             alt="post"
             className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         </div>
 
@@ -127,6 +133,8 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
               src={profileImage}
               alt="profile"
               className="h-7 w-7 rounded-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
             <span className="text-sm font-medium">{username}</span>
           </div>

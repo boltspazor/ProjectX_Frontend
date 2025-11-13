@@ -144,6 +144,8 @@ export default function NotificationsPage({ setActiveView }) {
             src={notification.avatar}
             alt="Profile"
             className="w-10 h-10 rounded-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         )}
       </div>
@@ -257,4 +259,3 @@ export default function NotificationsPage({ setActiveView }) {
     </div>
   );
 }
-

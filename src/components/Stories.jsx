@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import StoryViewer from "./StoryViewer";
 import profilePhoto from "../assets/profile-photo.jpg";
@@ -103,6 +102,8 @@ export default function Stories() {
                   src={profilePhoto}
                   alt="Your story"
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               
@@ -139,6 +140,8 @@ export default function Stories() {
                         src={story.image}
                         alt={story.username}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                       {/* Arrow Overlay on last story when more content available */}
                       {shouldShowArrow && (

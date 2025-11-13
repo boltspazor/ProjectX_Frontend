@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // Normal icons
 import homeIcon from "../assets/home.svg";
 import exploreIcon from "../assets/explore.svg";

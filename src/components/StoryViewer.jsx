@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Heart, Send } from "lucide-react";
@@ -212,6 +211,8 @@ export default function StoryViewer({ stories, initialIndex, onClose }) {
                     alt={currentStory.username}
                     className="w-full h-full object-cover select-none"
                     draggable="false"
+                    loading="eager"
+                    decoding="async"
                   />
                   
                   {/* Pause Indicator */}
@@ -302,6 +303,8 @@ export default function StoryViewer({ stories, initialIndex, onClose }) {
                         src={story.image}
                         alt={story.username}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
                     <p className="text-xs text-gray-400 mt-1 truncate">{story.username}</p>
