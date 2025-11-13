@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import MobileNav from "./components/MobileNav";
@@ -7,13 +7,97 @@ import ExplorePage from "./pages/ExplorePage";
 import MessagesPage from "./pages/MessagesPage";
 import ProfilePage from "./pages/ProfilePage";
 import ShopPage from "./pages/ShopPage";
-import CreatePost from "./components/CreatePost"; // ✅ import the new component
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import CreatePost from "./components/CreatePost";
 import CommunitiesPage from "./pages/CommunitiesPage";
 import NotificationsPage from "./pages/NotificationsPage";
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authView, setAuthView] = useState("login"); // "login" or "signup"
+
+  // Check for existing valid token on mount
+  useEffect(() => {
+    const checkAuthToken = () => {
+      const token = localStorage.getItem("authToken");
+      const tokenExpiry = localStorage.getItem("tokenExpiry");
+
+      if (token && tokenExpiry) {
+        const expiryTime = parseInt(tokenExpiry, 10);
+        const currentTime = Date.now();
+
+        // Check if token is still valid (within 2 hours)
+        if (currentTime < expiryTime) {
+          setIsAuthenticated(true);
+        } else {
+          // Token expired, clear storage
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("tokenExpiry");
+          setIsAuthenticated(false);
+        }
+      }
+    };
+
+    checkAuthToken();
+  }, []);
+
+  // Handle login
+  const handleLogin = () => {
+    // Generate a simple token (in production, this would come from backend)
+    const token = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const expiryTime = Date.now() + (2 * 60 * 60 * 1000); // 2 hours from now
+
+    // Store token and expiry in localStorage
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("tokenExpiry", expiryTime.toString());
+
+    setIsAuthenticated(true);
+  };
+
+  // Handle signup
+  const handleSignup = () => {
+    // Generate a simple token (in production, this would come from backend)
+    const token = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const expiryTime = Date.now() + (2 * 60 * 60 * 1000); // 2 hours from now
+
+    // Store token and expiry in localStorage
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("tokenExpiry", expiryTime.toString());
+
+    setIsAuthenticated(true);
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    // Clear token from localStorage
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("tokenExpiry");
+    setIsAuthenticated(false);
+    setActiveView("home");
+    setAuthView("login");
+  };
+
+  // If not authenticated, show login/signup
+  if (!isAuthenticated) {
+    if (authView === "login") {
+      return (
+        <LoginPage
+          onLogin={handleLogin}
+          onSwitchToSignup={() => setAuthView("signup")}
+        />
+      );
+    } else {
+      return (
+        <SignupPage
+          onSignup={handleSignup}
+          onSwitchToLogin={() => setAuthView("login")}
+        />
+      );
+    }
+  }
 
   // ✅ include createPost view
   const renderView = () => {
@@ -27,7 +111,7 @@ export default function App() {
       case "communities":
         return <CommunitiesPage />;
       case "profile":
-        return <ProfilePage />;
+        return <ProfilePage onLogout={handleLogout} />;
       case "shop":
         return <ShopPage />;
       case "notifications":
@@ -52,7 +136,7 @@ export default function App() {
 
       {/* Sidebar + Main Content layout */}
       <div className="flex flex-1 overflow-hidden pb-14 md:pb-0">
-        <Sidebar activeView={activeView} setActiveView={setActiveView} />
+        <Sidebar activeView={activeView} setActiveView={setActiveView} onLogout={handleLogout} />
 
         <div className="flex-1 md:ml-80 overflow-hidden">
           {renderView()}

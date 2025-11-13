@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // Normal icons
 import homeIcon from "../assets/home.svg";
 import exploreIcon from "../assets/explore.svg";
@@ -19,7 +18,7 @@ import profilePhoto from "../assets/profile-photo.jpg";
 import LogoutConfirmationModal from "./LogoutConfirmationModal";
 import React, { useState } from "react";
 
-export default function Sidebar({ activeView, setActiveView }) {
+export default function Sidebar({ activeView, setActiveView, onLogout }) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const items = [
     { label: "Home", value: "home", icon: homeIcon, iconActive: homeIconActive },
@@ -34,10 +33,11 @@ export default function Sidebar({ activeView, setActiveView }) {
   }
 
   const handleLogout = () => {
-    // Handle logout logic here
-    console.log("User logged out");
-    // You can add actual logout logic here, like clearing tokens, redirecting, etc.
-    // For example: localStorage.clear(); window.location.href = '/login';
+    // Clear token and redirect to login
+    if (onLogout) {
+      onLogout();
+    }
+    setIsLogoutModalOpen(false);
   };
 
   const handleLogoutClick = () => {
