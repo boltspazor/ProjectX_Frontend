@@ -8,6 +8,7 @@ import MessagesPage from "./pages/MessagesPage";
 import ProfilePage from "./pages/ProfilePage";
 import ShopPage from "./pages/ShopPage";
 import CreatePost from "./components/CreatePost"; // ✅ import the new component
+import CommunitiesPage from "./pages/CommunitiesPage";
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
@@ -22,6 +23,8 @@ export default function App() {
         return <ExplorePage />;
       case "messages":
         return <MessagesPage />;
+      case "communities":
+        return <CommunitiesPage />;
       case "profile":
         return <ProfilePage />;
       case "shop":

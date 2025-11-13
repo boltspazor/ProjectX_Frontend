@@ -23,6 +23,7 @@ export default function Sidebar({ activeView, setActiveView }) {
   const items = [
     { label: "Home", value: "home", icon: homeIcon, iconActive: homeIconActive },
     { label: "Explore", value: "explore", icon: exploreIcon, iconActive: exploreIconActive },
+    { label: "Communities", value: "communities", icon: exploreIcon, iconActive: exploreIconActive },
     { label: "Messages", value: "messages", icon: messageIcon, iconActive: messageIconActive },
     { label: "Profile", value: "profile", icon: profileIcon, iconActive: profileIconActive },
   ];
