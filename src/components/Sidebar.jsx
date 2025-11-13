@@ -98,31 +98,6 @@ export default function Sidebar({ activeView, setActiveView }) {
           );
         })}
 
-        {/* Communities Section */}
-        <div className="pt-6 border-t border-gray-700">
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-2">Your Communities</h3>
-          <div className="space-y-2">
-            {[
-              { name: "Music Lovers", members: "2.3k", image: "https://i.pravatar.cc/100?img=50" },
-              { name: "Tech Enthusiasts", members: "5.1k", image: "https://i.pravatar.cc/100?img=51" },
-              { name: "Photography", members: "1.8k", image: "https://i.pravatar.cc/100?img=52" },
-            ].map((community, idx) => (
-              <button
-                key={idx}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-800/50 transition-all duration-300 group"
-              >
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-                  <img src={community.image} alt={community.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 text-left min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{community.name}</p>
-                  <p className="text-xs text-gray-400">{community.members} members</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Logout */}
         <button
           className="group relative w-full rounded-xl p-[2px] border border-gray-600 hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600 transition-all duration-300 mt-6"
