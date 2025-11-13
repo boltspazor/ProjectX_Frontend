@@ -9,6 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import ShopPage from "./pages/ShopPage";
 import CreatePost from "./components/CreatePost"; // ✅ import the new component
 import CommunitiesPage from "./pages/CommunitiesPage";
+import NotificationsPage from "./pages/NotificationsPage";
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
@@ -29,6 +30,8 @@ export default function App() {
         return <ProfilePage />;
       case "shop":
         return <ShopPage />;
+      case "notifications":
+        return <NotificationsPage setActiveView={setActiveView} />;
       case "createPost":
         // Legacy full page view - will be handled by modal now
         return <HomePage />;
