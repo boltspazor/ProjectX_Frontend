@@ -1,0 +1,272 @@
+import React, { useState } from "react";
+import { ArrowLeft, Globe, Eye, Lock, Upload } from "lucide-react";
+import { addCommunity } from "../data/communitiesData";
+
+export default function CreateCommunity({ setActiveView }) {
+  const [communityName, setCommunityName] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedTopics, setSelectedTopics] = useState([]);
+  const [communityType, setCommunityType] = useState("restricted");
+  const [bannerPreview, setBannerPreview] = useState(null);
+  const [iconPreview, setIconPreview] = useState(null);
+
+  const topics = ["Art", "Cooking", "Coding", "Law", "Business", "Design", "Finance", "Music", "Dance", "Technology", "Cars", "Food", "Places"];
+
+  const handleTopicToggle = (topic) => {
+    setSelectedTopics((prev) =>
+      prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic]
+    );
+  };
+
+  const handleBannerUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBannerPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleIconUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setIconPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Validate that at least one topic is selected
+    if (selectedTopics.length === 0) {
+      alert("Please select at least one topic");
+      return;
+    }
+
+    // Create new community object
+    const newCommunity = {
+      name: communityName,
+      description: description,
+      banner: bannerPreview || "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+      cover: bannerPreview || "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
+      icon: iconPreview || "https://i.pravatar.cc/100?img=60",
+      avatar: iconPreview || "https://i.pravatar.cc/100?img=60",
+      type: communityType.charAt(0).toUpperCase() + communityType.slice(1),
+      topics: selectedTopics,
+      rules: [
+        "Be respectful to all members",
+        "No spam or self-promotion",
+        "Keep discussions relevant to the community",
+        "Share your knowledge and experiences",
+      ],
+    };
+
+    // Add community to data store
+    const createdCommunity = addCommunity(newCommunity);
+
+    // Navigate to the newly created community detail page
+    setActiveView("communityDetail", createdCommunity.id);
+  };
+
+  return (
+    <div className="min-h-screen w-full bg-[#0b0b0b] px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <button
+            onClick={() => setActiveView("communities")}
+            className="p-2 hover:bg-gray-800 rounded-full transition"
+          >
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </button>
+          <h1 className="text-xl md:text-2xl font-semibold text-white">Create Community</h1>
+        </div>
+
+        {/* Main Title */}
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-8">
+          Tell us about your community
+        </h2>
+
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Left Column - Community Details */}
+            <div className="space-y-6">
+              {/* Community Name */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Community Name <span className="text-orange-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={communityName}
+                  onChange={(e) => setCommunityName(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  placeholder="Enter community name"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Description <span className="text-orange-500">*</span>
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                  rows={6}
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition resize-none"
+                  placeholder="Describe your community"
+                />
+              </div>
+
+              {/* Community Banner */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Community Banner
+                </label>
+                <label className="block w-full h-32 bg-gray-900 border-2 border-dashed border-orange-500 rounded-lg cursor-pointer hover:border-orange-400 transition flex items-center justify-center">
+                  {bannerPreview ? (
+                    <img
+                      src={bannerPreview}
+                      alt="Banner preview"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <Upload className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+                      <span className="text-sm text-gray-400">Upload Image</span>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleBannerUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {/* Community Icon */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Community Icon
+                </label>
+                <label className="block w-24 h-24 bg-gray-900 border-2 border-dashed border-orange-500 rounded-full cursor-pointer hover:border-orange-400 transition flex items-center justify-center overflow-hidden">
+                  {iconPreview ? (
+                    <img
+                      src={iconPreview}
+                      alt="Icon preview"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <Upload className="w-5 h-5 text-orange-500" />
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleIconUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* Right Column - Topics and Type */}
+            <div className="space-y-6">
+              {/* Add Topics */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-3">
+                  Add Topics <span className="text-orange-500">*</span>
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {topics.map((topic) => (
+                    <button
+                      key={topic}
+                      type="button"
+                      onClick={() => handleTopicToggle(topic)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                        selectedTopics.includes(topic)
+                          ? "bg-orange-500 text-white border-2 border-orange-500"
+                          : "bg-gray-900 text-gray-300 border-2 border-gray-700 hover:border-gray-600"
+                      }`}
+                    >
+                      {topic}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Community Type */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-3">
+                  Community Type <span className="text-orange-500">*</span>
+                </label>
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setCommunityType("public")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition ${
+                      communityType === "public"
+                        ? "bg-orange-500/20 border-orange-500 text-white"
+                        : "bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-600"
+                    }`}
+                  >
+                    <Globe className="w-5 h-5" />
+                    <span className="font-medium">Public</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setCommunityType("restricted")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition ${
+                      communityType === "restricted"
+                        ? "bg-orange-500/20 border-orange-500 text-white"
+                        : "bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-600"
+                    }`}
+                  >
+                    <Eye className="w-5 h-5" />
+                    <span className="font-medium">Restricted</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setCommunityType("private")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition ${
+                      communityType === "private"
+                        ? "bg-orange-500/20 border-orange-500 text-white"
+                        : "bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-600"
+                    }`}
+                  >
+                    <Lock className="w-5 h-5" />
+                    <span className="font-medium">Private</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end mt-8">
+            <button
+              type="submit"
+              className="px-6 py-3 bg-gradient-to-r from-orange-500 via-orange-500 to-orange-600 hover:from-orange-600 hover:via-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition"
+            >
+              Create Community
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+

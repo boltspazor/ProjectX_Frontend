@@ -1,43 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 
-export default function Comments({ isOpen, onClose, variant = "sidebar" }) {
+export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [] }) {
   const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      username: "john_doe",
-      text: "This is amazing! 🔥",
-      likes: 12,
-      liked: false,
-      image: "https://i.pravatar.cc/100?img=20"
-    },
-    {
-      id: 2,
-      username: "jane_smith",
-      text: "Love this content!",
-      likes: 8,
-      liked: false,
-      image: "https://i.pravatar.cc/100?img=21"
-    },
-    {
-      id: 3,
-      username: "mike_ross",
-      text: "Keep it up! 💪",
-      likes: 15,
-      liked: true,
-      image: "https://i.pravatar.cc/100?img=22"
-    },
-    {
-      id: 4,
-      username: "adarsh_69",
-      text: "Keep it up! 💪",
-      likes: 257,
-      liked: false,
-      image: "https://i.pravatar.cc/100?img=22"
+  const [comments, setComments] = useState(initialComments);
+
+  // Reset comments when modal opens/closes or initialComments changes
+  useEffect(() => {
+    if (isOpen) {
+      setComments(initialComments);
     }
-  ]);
+  }, [isOpen, initialComments]);
 
   const handleLikeComment = (commentId) => {
     setComments(comments.map(comment =>
@@ -84,8 +58,13 @@ export default function Comments({ isOpen, onClose, variant = "sidebar" }) {
 
       {/* Comments List */}
       <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 md:space-y-5 scrollbar-hide">
-        <AnimatePresence>
-          {comments.map((comment, index) => (
+        {comments.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full py-12">
+            <p className="text-gray-400 text-center">No comments yet. Be the first to comment!</p>
+          </div>
+        ) : (
+          <AnimatePresence>
+            {comments.map((comment, index) => (
             <motion.div
               key={comment.id}
               initial={{ opacity: 0, y: 20 }}
@@ -122,7 +101,8 @@ export default function Comments({ isOpen, onClose, variant = "sidebar" }) {
               </div>
             </motion.div>
           ))}
-        </AnimatePresence>
+          </AnimatePresence>
+        )}
       </div>
 
       {/* Comment Input */}

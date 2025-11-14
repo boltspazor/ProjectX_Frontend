@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import StoryViewer from "./StoryViewer";
 import profilePhoto from "../assets/profile-photo.jpg";
 
-export default function Stories() {
+export default function Stories({ onAddStory }) {
   const scrollContainerRef = useRef(null);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -94,6 +94,7 @@ export default function Stories() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
             className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0 py-1"
+            onClick={onAddStory}
           >
             <div className="relative w-14 h-14 md:w-16 md:h-16 cursor-pointer group">
               {/* Profile Picture */}
