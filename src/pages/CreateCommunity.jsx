@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ArrowLeft, Globe, Eye, Lock, Upload } from "lucide-react";
+import { addCommunity } from "../data/communitiesData";
 
 export default function CreateCommunity({ setActiveView }) {
   const [communityName, setCommunityName] = useState("");
@@ -48,17 +49,29 @@ export default function CreateCommunity({ setActiveView }) {
       return;
     }
 
-    // Handle form submission
-    console.log({
-      communityName,
-      description,
-      selectedTopics,
-      communityType,
-      bannerPreview,
-      iconPreview,
-    });
-    // Navigate back to communities page
-    setActiveView("communities");
+    // Create new community object
+    const newCommunity = {
+      name: communityName,
+      description: description,
+      banner: bannerPreview || "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+      cover: bannerPreview || "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
+      icon: iconPreview || "https://i.pravatar.cc/100?img=60",
+      avatar: iconPreview || "https://i.pravatar.cc/100?img=60",
+      type: communityType.charAt(0).toUpperCase() + communityType.slice(1),
+      topics: selectedTopics,
+      rules: [
+        "Be respectful to all members",
+        "No spam or self-promotion",
+        "Keep discussions relevant to the community",
+        "Share your knowledge and experiences",
+      ],
+    };
+
+    // Add community to data store
+    const createdCommunity = addCommunity(newCommunity);
+
+    // Navigate to the newly created community detail page
+    setActiveView("communityDetail", createdCommunity.id);
   };
 
   return (

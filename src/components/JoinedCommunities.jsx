@@ -1,45 +1,23 @@
 import React from "react";
+import { communitiesData } from "../data/communitiesData";
 
-const joinedCommunities = [
-  {
-    id: 1,
-    name: "Music Lovers",
-    description: "Weekly jam sessions, playlist drops, and gear swaps.",
-    members: "2.3K members",
-    cover: "https://images.unsplash.com/photo-1485579149621-3123dd979885?auto=format&fit=crop&w=800&q=80",
-    avatar: "https://i.pravatar.cc/100?img=50",
-    badges: ["Live Sessions", "Events"],
-  },
-  {
-    id: 2,
-    name: "Tech Enthusiasts",
-    description: "Build, break, and ship together with the latest in tech.",
-    members: "5.1K members",
-    cover: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
-    avatar: "https://i.pravatar.cc/100?img=51",
-    badges: ["Hackathons", "AI"],
-  },
-  {
-    id: 3,
-    name: "Photography Club",
-    description: "Share your shots, get feedback, and plan photo walks.",
-    members: "1.8K members",
-    cover: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80",
-    avatar: "https://i.pravatar.cc/100?img=52",
-    badges: ["Critique", "Workshops"],
-  },
-  {
-    id: 4,
-    name: "Design Playground",
-    description: "UI drops, Figma files, and daily inspiration threads.",
-    members: "3.4K members",
-    cover: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
-    avatar: "https://i.pravatar.cc/100?img=53",
-    badges: ["Figma", "Inspiration"],
-  },
-];
+// Use shared communities data
+const joinedCommunities = communitiesData.map((community) => ({
+  id: community.id,
+  name: community.name,
+  description: community.description,
+  members: community.members,
+  cover: community.cover,
+  avatar: community.avatar,
+  badges: community.badges,
+}));
 
 export default function JoinedCommunities({ setActiveView }) {
+  const handleCommunityClick = (communityId) => {
+    if (setActiveView) {
+      setActiveView("communityDetail", communityId);
+    }
+  };
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
@@ -69,7 +47,8 @@ export default function JoinedCommunities({ setActiveView }) {
         {joinedCommunities.map((community) => (
           <article
             key={community.id}
-            className="group relative rounded-3xl border border-gray-800 bg-[#121212] transition-all duration-500 hover:border-orange-500 hover:shadow-[0_0_35px_rgba(249,115,22,0.15)]"
+            onClick={() => handleCommunityClick(community.id)}
+            className="group relative rounded-3xl border border-gray-800 bg-[#121212] transition-all duration-500 hover:border-orange-500 hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] cursor-pointer"
           >
             <div className="relative h-40 overflow-hidden rounded-t-3xl">
               <img
@@ -118,7 +97,13 @@ export default function JoinedCommunities({ setActiveView }) {
               </div>
 
               <div className="mt-6 flex items-center justify-between gap-3">
-                <button className="flex-1 rounded-xl border border-gray-700 px-4 py-2 text-sm text-gray-300 transition-all duration-300 hover:border-orange-500 hover:text-white">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCommunityClick(community.id);
+                  }}
+                  className="flex-1 rounded-xl border border-gray-700 px-4 py-2 text-sm text-gray-300 transition-all duration-300 hover:border-orange-500 hover:text-white"
+                >
                   View latest posts
                 </button>
                 <button className="rounded-xl bg-[#1f1f1f] px-4 py-2 text-sm text-gray-200 transition-all duration-300 hover:bg-orange-500 hover:text-black">

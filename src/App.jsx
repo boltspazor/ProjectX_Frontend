@@ -12,10 +12,12 @@ import SignupPage from "./pages/SignupPage";
 import CreatePost from "./components/CreatePost";
 import CommunitiesPage from "./pages/CommunitiesPage";
 import CreateCommunity from "./pages/CreateCommunity";
+import CommunityDetailPage from "./pages/CommunityDetailPage";
 import NotificationsPage from "./pages/NotificationsPage";
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
+  const [selectedCommunityId, setSelectedCommunityId] = useState(null);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authView, setAuthView] = useState("login"); // "login" or "signup"
@@ -100,6 +102,12 @@ export default function App() {
     }
   }
 
+  // Handle view changes with community ID
+  const handleViewChange = (view, communityId = null) => {
+    setActiveView(view);
+    setSelectedCommunityId(communityId);
+  };
+
   // ✅ include createPost view
   const renderView = () => {
     switch (activeView) {
@@ -110,9 +118,11 @@ export default function App() {
       case "messages":
         return <MessagesPage />;
       case "communities":
-        return <CommunitiesPage setActiveView={setActiveView} />;
+        return <CommunitiesPage setActiveView={handleViewChange} />;
       case "createCommunity":
-        return <CreateCommunity setActiveView={setActiveView} />;
+        return <CreateCommunity setActiveView={handleViewChange} />;
+      case "communityDetail":
+        return <CommunityDetailPage setActiveView={handleViewChange} communityId={selectedCommunityId} />;
       case "profile":
         return <ProfilePage onLogout={handleLogout} />;
       case "shop":
@@ -139,7 +149,7 @@ export default function App() {
 
       {/* Sidebar + Main Content layout */}
       <div className="flex flex-1 overflow-hidden pb-14 md:pb-0">
-        <Sidebar activeView={activeView} setActiveView={setActiveView} onLogout={handleLogout} />
+        <Sidebar activeView={activeView} setActiveView={handleViewChange} onLogout={handleLogout} />
 
         <div className="flex-1 md:ml-80 overflow-hidden">
           {renderView()}
@@ -147,7 +157,7 @@ export default function App() {
       </div>
 
       {/* Mobile bottom navigation */}
-      <MobileNav activeView={activeView} setActiveView={setActiveView} />
+      <MobileNav activeView={activeView} setActiveView={handleViewChange} />
 
       {/* Create Post Modal */}
       <CreatePost
