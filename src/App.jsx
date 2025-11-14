@@ -11,6 +11,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import CreatePost from "./components/CreatePost";
 import CommunitiesPage from "./pages/CommunitiesPage";
+import CreateCommunity from "./pages/CreateCommunity";
 import NotificationsPage from "./pages/NotificationsPage";
 
 export default function App() {
@@ -109,7 +110,9 @@ export default function App() {
       case "messages":
         return <MessagesPage />;
       case "communities":
-        return <CommunitiesPage />;
+        return <CommunitiesPage setActiveView={setActiveView} />;
+      case "createCommunity":
+        return <CreateCommunity setActiveView={setActiveView} />;
       case "profile":
         return <ProfilePage onLogout={handleLogout} />;
       case "shop":

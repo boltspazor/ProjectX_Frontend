@@ -39,7 +39,7 @@ const joinedCommunities = [
   },
 ];
 
-export default function JoinedCommunities() {
+export default function JoinedCommunities({ setActiveView }) {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
@@ -56,7 +56,10 @@ export default function JoinedCommunities() {
           <button className="px-4 py-2 rounded-lg border border-gray-700 bg-[#161616] text-sm text-gray-300 hover:border-orange-500 hover:text-white transition-all duration-300">
             Discover more
           </button>
-          <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-orange-500 via-orange-500 to-orange-600 text-sm font-medium text-black hover:shadow-[0_0_24px_rgba(249,115,22,0.35)] transition-all duration-300">
+          <button 
+            onClick={() => setActiveView("createCommunity")}
+            className="px-4 py-2 rounded-lg bg-gradient-to-r from-orange-500 via-orange-500 to-orange-600 text-sm font-medium text-black hover:shadow-[0_0_24px_rgba(249,115,22,0.35)] transition-all duration-300"
+          >
             Create community
           </button>
         </div>
