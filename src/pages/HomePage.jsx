@@ -3,7 +3,7 @@ import Stories from "../components/Stories";
 import PostCard from "../components/PostCard";
 import Comments from "../components/Comments";
 
-export default function HomePage() {
+export default function HomePage({ setActiveView }) {
   const [activePostId, setActivePostId] = useState(null);
 
   const handleCommentClick = (postId) => {
@@ -14,12 +14,18 @@ export default function HomePage() {
     setActivePostId(null);
   };
 
+  const handleAddStory = () => {
+    if (setActiveView) {
+      setActiveView("addStory");
+    }
+  };
+
   return (
     <main className="flex-1 overflow-y-auto h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]">
       <div className="p-4 md:p-8">
         {/* Stories Section - Centered */}
         <div className="w-full flex justify-center mb-6">
-          <Stories />
+          <Stories onAddStory={handleAddStory} />
         </div>
 
         {/* Posts Section with Comments */}

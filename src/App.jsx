@@ -14,6 +14,7 @@ import CommunitiesPage from "./pages/CommunitiesPage";
 import CreateCommunity from "./pages/CreateCommunity";
 import CommunityDetailPage from "./pages/CommunityDetailPage";
 import NotificationsPage from "./pages/NotificationsPage";
+import AddStoryPage from "./pages/AddStoryPage";
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
@@ -112,7 +113,7 @@ export default function App() {
   const renderView = () => {
     switch (activeView) {
       case "home":
-        return <HomePage />;
+        return <HomePage setActiveView={handleViewChange} />;
       case "explore":
         return <ExplorePage />;
       case "messages":
@@ -129,11 +130,13 @@ export default function App() {
         return <ShopPage />;
       case "notifications":
         return <NotificationsPage setActiveView={setActiveView} />;
+      case "addStory":
+        return <AddStoryPage setActiveView={handleViewChange} />;
       case "createPost":
         // Legacy full page view - will be handled by modal now
-        return <HomePage />;
+        return <HomePage setActiveView={handleViewChange} />;
       default:
-        return <HomePage />;
+        return <HomePage setActiveView={handleViewChange} />;
     }
   };
 
@@ -142,22 +145,33 @@ export default function App() {
     setIsCreatePostOpen(true);
   };
 
+  // Full screen for story page
+  const isStoryPage = activeView === "addStory";
+
   return (
     <div className="bg-black text-white min-h-screen flex flex-col">
-      {/* ✅ Pass handleCreatePostClick to Navbar */}
-      <Navbar setActiveView={setActiveView} onCreatePostClick={handleCreatePostClick} />
+      {/* Hide Navbar/Sidebar for Story Page */}
+      {!isStoryPage && (
+        <>
+          {/* ✅ Pass handleCreatePostClick to Navbar */}
+          <Navbar setActiveView={setActiveView} onCreatePostClick={handleCreatePostClick} />
 
-      {/* Sidebar + Main Content layout */}
-      <div className="flex flex-1 overflow-hidden pb-14 md:pb-0">
-        <Sidebar activeView={activeView} setActiveView={handleViewChange} onLogout={handleLogout} />
+          {/* Sidebar + Main Content layout */}
+          <div className="flex flex-1 overflow-hidden pb-14 md:pb-0">
+            <Sidebar activeView={activeView} setActiveView={handleViewChange} onLogout={handleLogout} />
 
-        <div className="flex-1 md:ml-80 overflow-hidden">
-          {renderView()}
-        </div>
-      </div>
+            <div className="flex-1 md:ml-80 overflow-hidden">
+              {renderView()}
+            </div>
+          </div>
 
-      {/* Mobile bottom navigation */}
-      <MobileNav activeView={activeView} setActiveView={handleViewChange} />
+          {/* Mobile bottom navigation */}
+          <MobileNav activeView={activeView} setActiveView={handleViewChange} />
+        </>
+      )}
+
+      {/* Story Page - Full Screen */}
+      {isStoryPage && renderView()}
 
       {/* Create Post Modal */}
       <CreatePost
