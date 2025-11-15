@@ -218,5 +218,3 @@ export const addPostToCommunity = (communityId, postData) => {
   community.posts.push(newPost);
   return newPost;
 };
-
-

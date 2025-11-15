@@ -579,4 +579,3 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
     </div>
   );
 }
-

@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import profilePhoto from "../assets/profile-photo.jpg";
 import PostDetailModal from "../components/PostDetailModal";
 import LogoutConfirmationModal from "../components/LogoutConfirmationModal";
+import ProfileSettingsPage from "./ProfileSettingsPage";
 
 export default function ProfilePage({ onLogout }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Sample post images - 9 posts in a 3x3 grid
   const posts = [
@@ -98,15 +100,30 @@ export default function ProfilePage({ onLogout }) {
     setIsLogoutModalOpen(false);
   };
 
+  // Show settings page if active
+  if (showSettings) {
+    return <ProfileSettingsPage onBack={() => setShowSettings(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
       {/* Profile Content */}
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        {/* Logout Button - Mobile Only */}
-        <div className="flex justify-end mb-4 md:hidden">
+        {/* Action Buttons - Top Right */}
+        <div className="flex justify-end gap-2 mb-4">
+          {/* Settings Button - Always visible */}
+          <button
+            onClick={() => setShowSettings(true)}
+            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+            title="Settings"
+          >
+            <Settings className="h-5 w-5 text-gray-400 hover:text-white" />
+          </button>
+          
+          {/* Logout Button - Mobile Only */}
           <button
             onClick={handleLogoutClick}
-            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-800 rounded-full transition-colors md:hidden"
             title="Logout"
           >
             <LogOut className="h-5 w-5 text-red-500" />
