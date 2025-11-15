@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, Bookmark } from "lucide-react";
+import { saveDraft, getDrafts, loadDraft, deleteDraft } from "../utils/drafts";
 
 export default function CreatePost({ setActiveView, isOpen, onClose }) {
   const [step, setStep] = useState("upload"); // "upload", "caption", "preview"
@@ -9,6 +10,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose }) {
   const [previewCaption, setPreviewCaption] = useState("");
   const [uploadedImage, setUploadedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [currentDraftId, setCurrentDraftId] = useState(null); // Track if editing a draft
+  const [showDrafts, setShowDrafts] = useState(false);
   const fileInputRef = useRef(null);
 
   // Mock recent images - replace with actual data
@@ -54,8 +57,58 @@ export default function CreatePost({ setActiveView, isOpen, onClose }) {
   const handlePost = () => {
     // Handle post submission
     console.log("Posting:", { image: uploadedImage, caption: previewCaption });
+    
+    // Delete draft if it was a saved draft
+    if (currentDraftId) {
+      deleteDraft(currentDraftId);
+    }
+    
     // Reset and close
     handleClose();
+  };
+
+  const handleSaveDraft = () => {
+    const existingDrafts = getDrafts();
+    
+    // Check if we're at the limit and this is a new draft (not updating existing)
+    if (!currentDraftId && existingDrafts.length >= 5) {
+      // This will be handled by saveDraft (removes oldest), but show a message
+      const confirmSave = window.confirm(
+        "You've reached the limit of 5 drafts. The oldest draft will be removed to save this new one. Continue?"
+      );
+      if (!confirmSave) return;
+    }
+    
+    const draftData = {
+      id: currentDraftId || undefined, // Use existing ID if editing
+      prompt,
+      caption: caption || previewCaption,
+      imagePreview, // Store as base64
+      step, // Save current step
+      createdAt: currentDraftId ? undefined : new Date().toISOString(), // Only set on first save
+    };
+    
+    const savedDraft = saveDraft(draftData);
+    if (savedDraft) {
+      setCurrentDraftId(savedDraft.id);
+      // Show success message or indicator
+      const message = currentDraftId ? "Draft updated!" : "Draft saved!";
+      alert(message);
+      // Refresh drafts if shown
+      if (showDrafts) {
+        setShowDrafts(true);
+      }
+    }
+  };
+
+  const handleLoadDraft = (draft) => {
+    setCurrentDraftId(draft.id);
+    setPrompt(draft.prompt || "");
+    setCaption(draft.caption || "");
+    setPreviewCaption(draft.caption || "");
+    setImagePreview(draft.imagePreview || null);
+    setStep(draft.step || "upload");
+    setShowDrafts(false);
   };
 
   const handleRegenerate = () => {
@@ -71,6 +124,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose }) {
     setPreviewCaption("");
     setUploadedImage(null);
     setImagePreview(null);
+    setCurrentDraftId(null);
+    setShowDrafts(false);
     if (onClose) {
       onClose();
     } else {
@@ -129,6 +184,11 @@ export default function CreatePost({ setActiveView, isOpen, onClose }) {
                   handlePost={handlePost}
                   handleRegenerate={handleRegenerate}
                   handleClose={handleClose}
+                  handleSaveDraft={handleSaveDraft}
+                  handleLoadDraft={handleLoadDraft}
+                  showDrafts={showDrafts}
+                  setShowDrafts={setShowDrafts}
+                  currentDraftId={currentDraftId}
                   setStep={setStep}
                   setImagePreview={setImagePreview}
                   setUploadedImage={setUploadedImage}
@@ -161,6 +221,11 @@ export default function CreatePost({ setActiveView, isOpen, onClose }) {
           handlePost={handlePost}
           handleRegenerate={handleRegenerate}
           handleClose={handleClose}
+          handleSaveDraft={handleSaveDraft}
+          handleLoadDraft={handleLoadDraft}
+          showDrafts={showDrafts}
+          setShowDrafts={setShowDrafts}
+          currentDraftId={currentDraftId}
           setStep={setStep}
           setImagePreview={setImagePreview}
           setUploadedImage={setUploadedImage}
@@ -187,11 +252,22 @@ function CreatePostContent({
   handlePost,
   handleRegenerate,
   handleClose,
+  handleSaveDraft,
+  handleLoadDraft,
+  showDrafts,
+  setShowDrafts,
+  currentDraftId,
   setStep,
   setImagePreview,
   setUploadedImage,
   isFullPage = false,
 }) {
+  const [drafts, setDrafts] = useState(getDrafts());
+  
+  // Refresh drafts list when needed
+  useEffect(() => {
+    setDrafts(getDrafts());
+  }, [showDrafts, currentDraftId]);
 
   return (
     <>
@@ -212,7 +288,86 @@ function CreatePostContent({
             Create a Post
           </h2>
         </div>
+        
+        {/* Drafts Button */}
+        <button
+          onClick={() => setShowDrafts(!showDrafts)}
+          className="p-2 hover:bg-gray-800 rounded-full transition relative"
+          title="Drafts"
+        >
+          <Bookmark className="w-5 h-5 text-gray-400 hover:text-orange-500" />
+          {drafts.length > 0 && (
+            <span className="absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full"></span>
+          )}
+        </button>
       </div>
+
+      {/* Drafts List */}
+      <AnimatePresence>
+        {showDrafts && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden border-b border-gray-800 bg-[#1a1a1a]"
+          >
+            <div className="p-4 space-y-2 max-h-48 overflow-y-auto">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-gray-300">Saved Drafts</h3>
+                <span className="text-xs text-gray-500">{drafts.length}/5</span>
+              </div>
+              {drafts.length > 0 ? (
+                drafts.map((draft) => (
+                  <div key={draft.id} className="flex items-start gap-2">
+                    <button
+                      onClick={() => handleLoadDraft(draft)}
+                      className="flex-1 text-left p-3 rounded-lg bg-[#0f0f0f] hover:bg-[#121212] border border-gray-800 hover:border-orange-500/50 transition"
+                    >
+                      <div className="flex items-start gap-3">
+                        {draft.imagePreview && (
+                          <img
+                            src={draft.imagePreview}
+                            alt="Draft"
+                            className="w-12 h-12 rounded object-cover flex-shrink-0"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-white truncate">{draft.caption || "No caption"}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(draft.updatedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm("Delete this draft?")) {
+                          deleteDraft(draft.id);
+                          if (currentDraftId === draft.id) {
+                            setCurrentDraftId(null);
+                          }
+                          const remainingDrafts = getDrafts();
+                          setDrafts(remainingDrafts);
+                          if (remainingDrafts.length === 0) {
+                            setShowDrafts(false);
+                          }
+                        }
+                      }}
+                      className="p-2 hover:bg-red-500/20 rounded-lg transition text-gray-400 hover:text-red-500"
+                      title="Delete draft"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-400 text-center py-4">No saved drafts</p>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
@@ -385,6 +540,17 @@ function CreatePostContent({
                   </span>
                 </button>
               </div>
+
+              {/* Save Draft Button */}
+              {(caption || imagePreview) && (
+                <button
+                  onClick={handleSaveDraft}
+                  className="w-full flex items-center justify-center gap-2 border-2 border-gray-700 hover:border-orange-500 text-gray-300 hover:text-orange-500 font-medium py-3 px-6 rounded-lg transition"
+                >
+                  <Bookmark className="w-4 h-4" />
+                  {currentDraftId ? "Update Draft" : "Save as Draft"}
+                </button>
+              )}
             </motion.div>
           )}
 
@@ -430,6 +596,15 @@ function CreatePostContent({
                   Regenerate
                 </button>
               </div>
+
+              {/* Save Draft Button */}
+              <button
+                onClick={handleSaveDraft}
+                className="w-full flex items-center justify-center gap-2 border-2 border-gray-700 hover:border-orange-500 text-gray-300 hover:text-orange-500 font-medium py-3 px-6 rounded-lg transition"
+              >
+                <Bookmark className="w-4 h-4" />
+                {currentDraftId ? "Update Draft" : "Save as Draft"}
+              </button>
             </motion.div>
           )}
         </AnimatePresence>

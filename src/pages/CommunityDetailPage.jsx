@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ArrowLeft, Globe, Pencil, Heart } from "lucide-react";
+import { ArrowLeft, Globe, Pencil, Heart, Bookmark, X } from "lucide-react";
 import PostCard from "../components/PostCard";
 import ShareModal from "../components/ShareModal";
 import Comments from "../components/Comments";
 import commentIcon from "../assets/comment.svg";
 import messageIcon from "../assets/message.svg";
+import { motion, AnimatePresence } from "framer-motion";
 import { getCommunityById, addPostToCommunity } from "../data/communitiesData";
+import { saveCommunityDraft, getCommunityDrafts, loadCommunityDraft, deleteCommunityDraft } from "../utils/drafts";
 
 export default function CommunityDetailPage({ setActiveView, communityId }) {
   const [isJoined, setIsJoined] = useState(false);
@@ -391,6 +393,8 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
   const [content, setContent] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [currentDraftId, setCurrentDraftId] = useState(null);
+  const [showDrafts, setShowDrafts] = useState(false);
   const fileInputRef = useRef(null);
 
   // Available categories (can use community topics or general categories)
@@ -423,8 +427,57 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
         category: selectedCategory,
         image: imagePreview,
       });
+      
+      // Delete draft if it was a saved draft
+      if (currentDraftId && community?.id) {
+        deleteCommunityDraft(community.id, currentDraftId);
+      }
     }
     handleClose();
+  };
+
+  const handleSaveDraft = () => {
+    if (!community?.id) return;
+    
+    const existingDrafts = getCommunityDrafts(community.id);
+    
+    // Check if we're at the limit and this is a new draft (not updating existing)
+    if (!currentDraftId && existingDrafts.length >= 5) {
+      // This will be handled by saveCommunityDraft (removes oldest), but show a message
+      const confirmSave = window.confirm(
+        "You've reached the limit of 5 drafts for this community. The oldest draft will be removed to save this new one. Continue?"
+      );
+      if (!confirmSave) return;
+    }
+    
+    const draftData = {
+      id: currentDraftId || undefined,
+      title: title.trim(),
+      content: content.trim(),
+      category: selectedCategory,
+      imagePreview, // Store as base64
+      step,
+      createdAt: currentDraftId ? undefined : new Date().toISOString(),
+    };
+    
+    const savedDraft = saveCommunityDraft(community.id, draftData);
+    if (savedDraft) {
+      setCurrentDraftId(savedDraft.id);
+      const message = currentDraftId ? "Draft updated!" : "Draft saved!";
+      alert(message);
+      // Refresh drafts list
+      setDrafts(getCommunityDrafts(community.id));
+    }
+  };
+
+  const handleLoadDraft = (draft) => {
+    setCurrentDraftId(draft.id);
+    setTitle(draft.title || "");
+    setContent(draft.content || "");
+    setSelectedCategory(draft.category || null);
+    setImagePreview(draft.imagePreview || null);
+    setStep(draft.step || "upload");
+    setShowDrafts(false);
   };
 
   const handleClose = () => {
@@ -433,11 +486,22 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
     setContent("");
     setSelectedCategory(null);
     setImagePreview(null);
+    setCurrentDraftId(null);
+    setShowDrafts(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
     onClose();
   };
+
+  // Get drafts for this community - make it reactive
+  const [drafts, setDrafts] = useState(community?.id ? getCommunityDrafts(community.id) : []);
+  
+  useEffect(() => {
+    if (community?.id) {
+      setDrafts(getCommunityDrafts(community.id));
+    }
+  }, [showDrafts, currentDraftId, community?.id]);
 
   if (!isOpen) return null;
 
@@ -454,15 +518,99 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h2 className="text-xl font-semibold text-white">Create Post</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-white transition"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Drafts Button */}
+            <button
+              onClick={() => setShowDrafts(!showDrafts)}
+              className="p-2 hover:bg-gray-800 rounded-full transition relative"
+              title="Drafts"
+            >
+              <Bookmark className="w-5 h-5 text-gray-400 hover:text-orange-500" />
+              {drafts.length > 0 && (
+                <span className="absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full"></span>
+              )}
+            </button>
+            
+            <button
+              onClick={handleClose}
+              className="text-gray-400 hover:text-white transition p-2 hover:bg-gray-800 rounded-full"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
+
+        {/* Drafts List */}
+        <AnimatePresence>
+          {showDrafts && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden border-b border-gray-800 bg-[#1a1a1a]"
+            >
+              <div className="p-4 space-y-2 max-h-48 overflow-y-auto">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-300">Saved Drafts</h3>
+                  <span className="text-xs text-gray-500">{drafts.length}/5</span>
+                </div>
+                {drafts.length > 0 ? (
+                  drafts.map((draft) => (
+                    <div key={draft.id} className="flex items-start gap-2">
+                      <button
+                        onClick={() => handleLoadDraft(draft)}
+                        className="flex-1 text-left p-3 rounded-lg bg-[#0f0f0f] hover:bg-[#121212] border border-gray-800 hover:border-orange-500/50 transition"
+                      >
+                        <div className="flex items-start gap-3">
+                          {draft.imagePreview && (
+                            <img
+                              src={draft.imagePreview}
+                              alt="Draft"
+                              className="w-12 h-12 rounded object-cover flex-shrink-0"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-white truncate">{draft.title || "No title"}</p>
+                            <p className="text-xs text-gray-400 truncate mt-1">{draft.content || "No content"}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {new Date(draft.updatedAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm("Delete this draft?")) {
+                            if (community?.id) {
+                              deleteCommunityDraft(community.id, draft.id);
+                              const remainingDrafts = getCommunityDrafts(community.id);
+                              setDrafts(remainingDrafts);
+                              if (remainingDrafts.length === 0) {
+                                setShowDrafts(false);
+                              }
+                            }
+                            if (currentDraftId === draft.id) {
+                              setCurrentDraftId(null);
+                            }
+                          }
+                        }}
+                        className="p-2 hover:bg-red-500/20 rounded-lg transition text-gray-400 hover:text-red-500"
+                        title="Delete draft"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-400 text-center py-4">No saved drafts</p>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
@@ -557,20 +705,33 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setStep("upload")}
-                  className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={handlePost}
-                  disabled={!title.trim()}
-                  className="flex-1 px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg font-medium transition"
-                >
-                  Post
-                </button>
+              <div className="flex flex-col gap-3 pt-2">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setStep("upload")}
+                    className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={handlePost}
+                    disabled={!title.trim()}
+                    className="flex-1 px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg font-medium transition"
+                  >
+                    Post
+                  </button>
+                </div>
+                
+                {/* Save Draft Button */}
+                {(title.trim() || imagePreview) && (
+                  <button
+                    onClick={handleSaveDraft}
+                    className="w-full flex items-center justify-center gap-2 border-2 border-gray-700 hover:border-orange-500 text-gray-300 hover:text-orange-500 font-medium py-3 px-6 rounded-lg transition"
+                  >
+                    <Bookmark className="w-4 h-4" />
+                    {currentDraftId ? "Update Draft" : "Save as Draft"}
+                  </button>
+                )}
               </div>
             </div>
           )}
