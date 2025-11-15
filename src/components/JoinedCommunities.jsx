@@ -12,7 +12,7 @@ const joinedCommunities = communitiesData.map((community) => ({
   badges: community.badges,
 }));
 
-export default function JoinedCommunities({ setActiveView }) {
+export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
   const handleCommunityClick = (communityId) => {
     if (setActiveView) {
       setActiveView("communityDetail", communityId);
@@ -31,7 +31,10 @@ export default function JoinedCommunities({ setActiveView }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="px-4 py-2 rounded-lg border border-gray-700 bg-[#161616] text-sm text-gray-300 hover:border-orange-500 hover:text-white transition-all duration-300">
+          <button 
+            onClick={onDiscoverClick}
+            className="px-4 py-2 rounded-lg border border-gray-700 bg-[#161616] text-sm text-gray-300 hover:border-orange-500 hover:text-white transition-all duration-300"
+          >
             Discover more
           </button>
           <button 
