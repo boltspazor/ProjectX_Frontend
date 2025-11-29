@@ -16,6 +16,8 @@ import logoutIconActive from "../assets/logout-active.svg";
 // Profile photo
 import profilePhoto from "../assets/profile-photo.jpg";
 import LogoutConfirmationModal from "./LogoutConfirmationModal";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 import React, { useState } from "react";
 
 export default function Sidebar({ activeView, setActiveView, onLogout }) {
@@ -50,7 +52,14 @@ export default function Sidebar({ activeView, setActiveView, onLogout }) {
       {/* Profile Image */}
         <div className="relative w-28 h-28 mx-auto mb-6">
           <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 rounded-full blur-lg opacity-90"></div>
-          <img src={profilePhoto} className="relative w-28 h-28 rounded-full object-cover border-2 border-gray-900" alt="Profile" />
+          <div className="relative w-28 h-28 rounded-full border-2 border-gray-900 overflow-hidden">
+            <LiveProfilePhoto
+              imageSrc={profilePhoto}
+              videoSrc={getProfileVideoUrl(profilePhoto, "idkwhoisrahul_04")}
+              alt="Profile"
+              className="w-full h-full"
+            />
+          </div>
         </div>
 
         <h2 className="text-lg font-semibold text-center">idkwhoisrahul_04</h2>

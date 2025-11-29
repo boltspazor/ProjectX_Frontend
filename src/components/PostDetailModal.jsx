@@ -5,6 +5,8 @@ import ShareModal from "./ShareModal";
 import commentIcon from "../assets/comment.svg";
 import messageIcon from "../assets/message.svg";
 import profilePhoto from "../assets/profile-photo.jpg";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function PostDetailModal({ isOpen, onClose, post }) {
   const [liked, setLiked] = useState(false);
@@ -138,11 +140,14 @@ export default function PostDetailModal({ isOpen, onClose, post }) {
               <div className="w-full md:w-1/2 flex flex-col bg-[#111] max-h-[70vh] md:max-h-full">
                 {/* User Info Header */}
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 flex-shrink-0">
-                  <img
-                    src={profileImage}
-                    alt="profile"
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
+                  <div className="h-10 w-10 rounded-full overflow-hidden flex-shrink-0">
+                    <LiveProfilePhoto
+                      imageSrc={profileImage}
+                      videoSrc={getProfileVideoUrl(profileImage, username)}
+                      alt="profile"
+                      className="h-10 w-10 rounded-full"
+                    />
+                  </div>
                   <span className="text-sm font-semibold">{username}</span>
                 </div>
 
@@ -160,11 +165,14 @@ export default function PostDetailModal({ isOpen, onClose, post }) {
                   <div className="px-4 py-4 space-y-4">
                     {comments.map((comment) => (
                       <div key={comment.id} className="flex items-start gap-3">
-                        <img
-                          src={comment.image}
-                          alt={comment.username}
-                          className="h-8 w-8 rounded-full object-cover flex-shrink-0"
-                        />
+                        <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
+                          <LiveProfilePhoto
+                            imageSrc={comment.image}
+                            videoSrc={getProfileVideoUrl(comment.image, comment.username)}
+                            alt={comment.username}
+                            className="h-8 w-8 rounded-full"
+                          />
+                        </div>
                         <div className="flex-1">
                           <p className="text-sm">
                             <span className="font-semibold mr-2">{comment.username}</span>

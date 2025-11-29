@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Send } from "lucide-react";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function Messages() {
   const [activeChat, setActiveChat] = useState(null);
@@ -56,11 +58,14 @@ export default function Messages() {
                 >
                   {/* Profile Picture */}
                   <div className="relative flex-shrink-0">
-                    <img
-                      src={chat.image}
-                      alt={chat.username}
-                      className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover"
-                    />
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden">
+                      <LiveProfilePhoto
+                        imageSrc={chat.image}
+                        videoSrc={getProfileVideoUrl(chat.image, chat.username)}
+                        alt={chat.username}
+                        className="w-12 h-12 md:w-14 md:h-14 rounded-full"
+                      />
+                    </div>
                     {chat.unread && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-red-500 rounded-full border-2 border-black"></div>
                     )}
@@ -97,11 +102,14 @@ export default function Messages() {
               >
                 <ArrowLeft className="w-5 h-5 text-white" />
               </button>
-              <img
-                src={activeChat.image}
-                alt={activeChat.username}
-                className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
-              />
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex-shrink-0">
+                <LiveProfilePhoto
+                  imageSrc={activeChat.image}
+                  videoSrc={getProfileVideoUrl(activeChat.image, activeChat.username)}
+                  alt={activeChat.username}
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full"
+                />
+              </div>
               <h2 className="font-semibold text-base md:text-lg text-white">
                 {activeChat.username}
               </h2>

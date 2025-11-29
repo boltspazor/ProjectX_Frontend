@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function ShareModal({ isOpen, onClose }) {
   const [selectedFriends, setSelectedFriends] = useState(new Set());
@@ -125,14 +127,19 @@ export default function ShareModal({ isOpen, onClose }) {
                     >
                       {/* Profile Picture */}
                       <div className="relative flex-shrink-0">
-                        <img
-                          src={friend.image}
-                          alt={friend.username}
-                          className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border-2 transition-all"
+                        <div 
+                          className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 transition-all"
                           style={{
                             borderColor: isSelected ? '#f97316' : 'transparent',
                           }}
-                        />
+                        >
+                          <LiveProfilePhoto
+                            imageSrc={friend.image}
+                            videoSrc={getProfileVideoUrl(friend.image, friend.username)}
+                            alt={friend.username}
+                            className="w-12 h-12 md:w-14 md:h-14 rounded-full"
+                          />
+                        </div>
                         {isSelected && (
                           <motion.div
                             initial={{ scale: 0 }}

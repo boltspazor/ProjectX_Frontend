@@ -277,7 +277,7 @@ function CreatePostContent({
           <button
             onClick={handleClose}
             className="w-8 h-8 flex items-center justify-center hover:bg-gray-800 rounded-full transition"
-          >
+        >
             {isFullPage ? (
               <ArrowLeft className="w-5 h-5 text-white" />
             ) : (
@@ -288,7 +288,7 @@ function CreatePostContent({
             Create a Post
           </h2>
         </div>
-        
+
         {/* Drafts Button */}
         <button
           onClick={() => setShowDrafts(!showDrafts)}
@@ -384,13 +384,13 @@ function CreatePostContent({
             >
               {/* Prompt Input */}
               <div>
-                <input
-                  type="text"
-                  placeholder="Enter your prompt"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
+        <input
+          type="text"
+          placeholder="Enter your prompt"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
                   className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg px-4 py-3 text-sm md:text-base focus:outline-none focus:border-orange-500 placeholder-gray-400 text-white"
-                />
+        />
               </div>
 
               {/* Generate Button - Only show if prompt is entered */}
@@ -400,17 +400,17 @@ function CreatePostContent({
                   className="w-full relative rounded-lg p-[1.5px] bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:opacity-90 transition"
                 >
                   <span className="block w-full bg-[#0f0f0f] rounded-lg py-3 text-sm md:text-base font-medium text-white">
-                    Generate for 100 Credits
-                  </span>
-                </button>
+            Generate for 100 Credits
+          </span>
+        </button>
               )}
 
-              {/* Divider */}
+        {/* Divider */}
               <div className="flex items-center gap-4 my-6">
                 <div className="flex-1 h-px bg-gray-800"></div>
                 <span className="text-gray-400 text-xs uppercase tracking-wider">or</span>
                 <div className="flex-1 h-px bg-gray-800"></div>
-              </div>
+        </div>
 
               {/* Upload Image */}
               <div>
@@ -435,7 +435,7 @@ function CreatePostContent({
                       </svg>
                     </div>
                     <span className="text-gray-300 text-sm md:text-base font-medium">
-                      Upload Image
+          Upload Image
                     </span>
                   </div>
                   <input
@@ -445,7 +445,7 @@ function CreatePostContent({
                     onChange={handleImageUpload}
                     className="hidden"
                   />
-                </label>
+        </label>
               </div>
 
               {/* Recents Section */}

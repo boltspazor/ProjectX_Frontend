@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [] }) {
   const [newComment, setNewComment] = useState("");
@@ -72,11 +74,14 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
               transition={{ delay: index * 0.05, duration: 0.3 }}
               className="flex gap-3 md:gap-4"
             >
-              <img
-                src={comment.image}
-                alt={comment.username}
-                className="w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0 object-cover border border-gray-700"
-              />
+              <div className="w-9 h-9 md:w-10 md:h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-700">
+                <LiveProfilePhoto
+                  imageSrc={comment.image}
+                  videoSrc={getProfileVideoUrl(comment.image, comment.username)}
+                  alt={comment.username}
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-full"
+                />
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="bg-[#1a1a1a] rounded-2xl px-4 py-2.5 md:px-5 md:py-3 hover:bg-[#1f1f1f] transition-colors">
                   <p className="font-semibold text-sm md:text-base text-white mb-1">{comment.username}</p>
@@ -113,11 +118,14 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
         className="border-t border-gray-800 p-3 md:p-5 bg-[#0f0f0f] flex-shrink-0"
       >
         <div className="flex gap-2 md:gap-4 items-center">
-          <img
-            src="https://i.pravatar.cc/100?img=30"
-            alt="Your profile"
-            className="w-8 h-8 md:w-10 md:h-10 rounded-full flex-shrink-0 object-cover border border-gray-700"
-          />
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-700">
+            <LiveProfilePhoto
+              imageSrc="https://i.pravatar.cc/100?img=30"
+              videoSrc={getProfileVideoUrl("https://i.pravatar.cc/100?img=30", "idkwhoisrahul_04")}
+              alt="Your profile"
+              className="w-8 h-8 md:w-10 md:h-10 rounded-full"
+            />
+          </div>
           <div className="flex-1 flex gap-2 items-center min-w-0">
             <input
               type="text"

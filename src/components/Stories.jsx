@@ -3,6 +3,8 @@ import { ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import StoryViewer from "./StoryViewer";
 import profilePhoto from "../assets/profile-photo.jpg";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function Stories({ onAddStory }) {
   const scrollContainerRef = useRef(null);
@@ -99,12 +101,11 @@ export default function Stories({ onAddStory }) {
             <div className="relative w-14 h-14 md:w-16 md:h-16 cursor-pointer group">
               {/* Profile Picture */}
               <div className="w-full h-full rounded-full border-2 border-gray-700 overflow-hidden">
-                <img
-                  src={profilePhoto}
+                <LiveProfilePhoto
+                  imageSrc={profilePhoto}
+                  videoSrc={getProfileVideoUrl(profilePhoto, "idkwhoisrahul_04")}
                   alt="Your story"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  decoding="async"
+                  className="w-full h-full rounded-full"
                 />
               </div>
               

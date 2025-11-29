@@ -5,6 +5,8 @@ import profilePhoto from "../assets/profile-photo.jpg";
 import PostDetailModal from "../components/PostDetailModal";
 import LogoutConfirmationModal from "../components/LogoutConfirmationModal";
 import ProfileSettingsPage from "./ProfileSettingsPage";
+import LiveProfilePhoto from "../components/LiveProfilePhoto";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function ProfilePage({ onLogout }) {
   const [selectedPost, setSelectedPost] = useState(null);
@@ -139,12 +141,11 @@ export default function ProfilePage({ onLogout }) {
             transition={{ duration: 0.5 }}
             className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-gray-800"
           >
-            <img
-              src={profilePhoto}
+            <LiveProfilePhoto
+              imageSrc={profilePhoto}
+              videoSrc={getProfileVideoUrl(profilePhoto, "idkwhoisrahul_04")}
               alt="Profile"
-              className="w-full h-full object-cover"
-              loading="lazy"
-              decoding="async"
+              className="w-full h-full rounded-full"
             />
           </motion.div>
 
