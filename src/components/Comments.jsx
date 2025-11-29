@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import LiveProfilePhoto from "./LiveProfilePhoto";
-import { getProfileVideoUrl } from "../utils/profileVideos";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [] }) {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState(initialComments);
+  const { profilePhoto, profileVideo, username } = useUserProfile();
 
   // Reset comments when modal opens/closes or initialComments changes
   useEffect(() => {
@@ -27,11 +28,11 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
     if (newComment.trim()) {
       const newCommentObj = {
         id: comments.length + 1,
-        username: "idkwhoisrahul_04",
+        username: username,
         text: newComment,
         likes: 0,
         liked: false,
-        image: "https://i.pravatar.cc/100?img=30"
+        image: profilePhoto
       };
       setComments([...comments, newCommentObj]);
       setNewComment("");
@@ -120,8 +121,8 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
         <div className="flex gap-2 md:gap-4 items-center">
           <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-700">
             <LiveProfilePhoto
-              imageSrc="https://i.pravatar.cc/100?img=30"
-              videoSrc={getProfileVideoUrl("https://i.pravatar.cc/100?img=30", "idkwhoisrahul_04")}
+              imageSrc={profilePhoto}
+              videoSrc={profileVideo}
               alt="Your profile"
               className="w-8 h-8 md:w-10 md:h-10 rounded-full"
             />

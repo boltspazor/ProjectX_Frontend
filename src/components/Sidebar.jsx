@@ -13,15 +13,14 @@ import messageIconActive from "../assets/message-active.svg";
 import profileIconActive from "../assets/profile-active.svg";
 import logoutIconActive from "../assets/logout-active.svg";
 
-// Profile photo
-import profilePhoto from "../assets/profile-photo.jpg";
 import LogoutConfirmationModal from "./LogoutConfirmationModal";
 import LiveProfilePhoto from "./LiveProfilePhoto";
-import { getProfileVideoUrl } from "../utils/profileVideos";
+import { useUserProfile } from "../hooks/useUserProfile";
 import React, { useState } from "react";
 
 export default function Sidebar({ activeView, setActiveView, onLogout }) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const { profilePhoto, profileVideo, username } = useUserProfile();
   const items = [
     { label: "Home", value: "home", icon: homeIcon, iconActive: homeIconActive },
     { label: "Explore", value: "explore", icon: exploreIcon, iconActive: exploreIconActive },
@@ -55,14 +54,14 @@ export default function Sidebar({ activeView, setActiveView, onLogout }) {
           <div className="relative w-28 h-28 rounded-full border-2 border-gray-900 overflow-hidden">
             <LiveProfilePhoto
               imageSrc={profilePhoto}
-              videoSrc={getProfileVideoUrl(profilePhoto, "idkwhoisrahul_04")}
+              videoSrc={profileVideo}
               alt="Profile"
               className="w-full h-full"
             />
           </div>
         </div>
 
-        <h2 className="text-lg font-semibold text-center">idkwhoisrahul_04</h2>
+        <h2 className="text-lg font-semibold text-center">{username}</h2>
         <p className="text-sm text-gray-400 text-center mb-8">Rahul Chauhan</p>
 
         {/* Stats */}

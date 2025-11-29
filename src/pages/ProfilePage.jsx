@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { LogOut, Settings } from "lucide-react";
-import profilePhoto from "../assets/profile-photo.jpg";
+import profilePhotoDefault from "../assets/profile-photo.jpg";
 import PostDetailModal from "../components/PostDetailModal";
 import LogoutConfirmationModal from "../components/LogoutConfirmationModal";
 import ProfileSettingsPage from "./ProfileSettingsPage";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
-import { getProfileVideoUrl } from "../utils/profileVideos";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function ProfilePage({ onLogout }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const { profilePhoto, profileVideo, username, profile } = useUserProfile();
 
   // Sample post images - 9 posts in a 3x3 grid
   const posts = [
@@ -21,63 +22,63 @@ export default function ProfilePage({ onLogout }) {
       image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop",
       caption: "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.",
       profileImage: profilePhoto,
-      username: "idkwhoisrahul_04"
+      username: username
     },
     {
       id: 1,
       image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop",
       caption: "Sunset vibes 🌅",
       profileImage: profilePhoto,
-      username: "idkwhoisrahul_04"
+      username: username
     },
     {
       id: 2,
       image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
       caption: "Palm trees and paradise",
       profileImage: profilePhoto,
-      username: "idkwhoisrahul_04"
+      username: username
     },
     {
       id: 3,
       image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=400&fit=crop",
       caption: "Beach day 🏖️",
       profileImage: profilePhoto,
-      username: "idkwhoisrahul_04"
+      username: username
     },
     {
       id: 4,
       image: "https://images.unsplash.com/photo-1490772888775-55fceea286b8?w=400&h=400&fit=crop",
       caption: "Breakfast of champions",
       profileImage: profilePhoto,
-      username: "idkwhoisrahul_04"
+      username: username
     },
     {
       id: 5,
       image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
       caption: "Mirror selfie vibes",
       profileImage: profilePhoto,
-      username: "idkwhoisrahul_04"
+      username: username
     },
     {
       id: 6,
       image: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&h=400&fit=crop",
       caption: "Cloud watching",
       profileImage: profilePhoto,
-      username: "idkwhoisrahul_04"
+      username: username
     },
     {
       id: 7,
       image: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&h=400&fit=crop",
       caption: "Golden hour",
       profileImage: profilePhoto,
-      username: "idkwhoisrahul_04"
+      username: username
     },
     {
       id: 8,
       image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
       caption: "Tropical vibes",
       profileImage: profilePhoto,
-      username: "idkwhoisrahul_04"
+      username: username
     },
   ];
 
@@ -143,7 +144,7 @@ export default function ProfilePage({ onLogout }) {
           >
             <LiveProfilePhoto
               imageSrc={profilePhoto}
-              videoSrc={getProfileVideoUrl(profilePhoto, "idkwhoisrahul_04")}
+              videoSrc={profileVideo}
               alt="Profile"
               className="w-full h-full rounded-full"
             />
@@ -158,7 +159,7 @@ export default function ProfilePage({ onLogout }) {
               transition={{ delay: 0.1, duration: 0.5 }}
               className="text-xl md:text-2xl font-semibold text-white mb-2"
             >
-              idkwhoisrahul_04
+              {username}
             </motion.h2>
 
             {/* Full Name */}
@@ -178,7 +179,7 @@ export default function ProfilePage({ onLogout }) {
               transition={{ delay: 0.2, duration: 0.5 }}
               className="text-white mb-6 text-sm md:text-base"
             >
-              Wish I was half as interesting as my bio
+              {profile?.bio || "Wish I was half as interesting as my bio"}
             </motion.p>
 
             {/* Stats */}

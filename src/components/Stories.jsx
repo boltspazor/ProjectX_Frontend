@@ -2,15 +2,15 @@ import React, { useRef, useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import StoryViewer from "./StoryViewer";
-import profilePhoto from "../assets/profile-photo.jpg";
 import LiveProfilePhoto from "./LiveProfilePhoto";
-import { getProfileVideoUrl } from "../utils/profileVideos";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function Stories({ onAddStory }) {
   const scrollContainerRef = useRef(null);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [selectedStoryIndex, setSelectedStoryIndex] = useState(null);
+  const { profilePhoto, profileVideo } = useUserProfile();
 
   const stories = [
     { id: 1, username: "shresque", image: "https://i.pravatar.cc/100?img=1" },
@@ -103,7 +103,7 @@ export default function Stories({ onAddStory }) {
               <div className="w-full h-full rounded-full border-2 border-gray-700 overflow-hidden">
                 <LiveProfilePhoto
                   imageSrc={profilePhoto}
-                  videoSrc={getProfileVideoUrl(profilePhoto, "idkwhoisrahul_04")}
+                  videoSrc={profileVideo}
                   alt="Your story"
                   className="w-full h-full rounded-full"
                 />
