@@ -1,11 +1,16 @@
-import React, { useState } from "react";
-import { ArrowLeft, Camera } from "lucide-react";
-import profilePhoto from "../assets/profile-photo.jpg";
+import React, { useState, useRef, useEffect } from "react";
+import { ArrowLeft, Camera, Video, Upload, X } from "lucide-react";
+import profilePhotoDefault from "../assets/profile-photo.jpg";
+import LiveProfilePhoto from "../components/LiveProfilePhoto";
+import { getUserProfile, saveUserProfile } from "../utils/userProfile";
 
 export default function ProfileSettingsPage({ onBack }) {
+  // Load saved profile or use defaults
+  const savedProfile = getUserProfile();
+  
   const [formData, setFormData] = useState({
-    username: "idkwhoisrahul_04",
-    bio: "Wish I was half as interesting as my bio",
+    username: savedProfile?.username || "idkwhoisrahul_04",
+    bio: savedProfile?.bio || "Wish I was half as interesting as my bio",
     email: "rahul@example.com",
     phone: "",
     gender: ""
@@ -17,6 +22,17 @@ export default function ProfileSettingsPage({ onBack }) {
     messages: true,
     followRequests: true
   });
+  
+  // Preview states (not saved until "Save Changes" is clicked)
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState(
+    savedProfile?.profilePhoto || profilePhotoDefault
+  );
+  const [profileVideoPreview, setProfileVideoPreview] = useState(
+    savedProfile?.profileVideo || null
+  );
+  
+  const photoInputRef = useRef(null);
+  const videoInputRef = useRef(null);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -30,6 +46,65 @@ export default function ProfileSettingsPage({ onBack }) {
       ...notifications,
       [key]: !notifications[key]
     });
+  };
+
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result;
+        // Only update preview, don't save yet
+        setProfilePhotoPreview(dataUrl);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert("Please select a valid image file.");
+    }
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  };
+
+  const handleVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('video/')) {
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Video file size should be less than 10MB.");
+        e.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result;
+        // Only update preview, don't save yet
+        setProfileVideoPreview(dataUrl);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert("Please select a valid video file.");
+    }
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  };
+
+  const handleRemoveVideo = () => {
+    // Only update preview, don't save yet
+    setProfileVideoPreview(null);
+  };
+
+  const handleSaveChanges = () => {
+    // Save all changes at once when "Save Changes" is clicked
+    const profileData = {
+      profilePhoto: profilePhotoPreview,
+      profileVideo: profileVideoPreview,
+      username: formData.username,
+      bio: formData.bio,
+      fullName: "Rahul Chauhan"
+    };
+    
+    saveUserProfile(profileData);
+    alert("Profile updated successfully!");
   };
 
   return (
@@ -58,14 +133,26 @@ export default function ProfileSettingsPage({ onBack }) {
                 Profile Picture
               </label>
               <div className="relative w-32 h-32 mx-auto md:mx-0">
-                <img
-                  src={profilePhoto}
-                  alt="Profile"
-                  className="w-full h-full rounded-full object-cover border-2 border-gray-800"
-                  loading="lazy"
-                  decoding="async"
+                <div className="w-full h-full rounded-full overflow-hidden border-2 border-gray-800">
+                  <LiveProfilePhoto
+                    imageSrc={profilePhotoPreview}
+                    videoSrc={profileVideoPreview}
+                    alt="Profile"
+                    className="w-full h-full rounded-full"
+                  />
+                </div>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
                 />
-                <button className="absolute bottom-0 right-0 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors border-2 border-black">
+                <button 
+                  onClick={() => photoInputRef.current?.click()}
+                  className="absolute bottom-0 right-0 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors border-2 border-black cursor-pointer"
+                  title="Upload profile photo"
+                >
                   <Camera className="h-5 w-5 text-white" />
                 </button>
               </div>
@@ -88,6 +175,54 @@ export default function ProfileSettingsPage({ onBack }) {
                   <p className="font-bold">512</p>
                   <p className="text-gray-400 text-xs">Following</p>
                 </div>
+              </div>
+            </div>
+
+            {/* Live Profile Video */}
+            <div>
+              <label className="block text-sm font-medium text-orange-500 mb-3">
+                Live Profile Video
+              </label>
+              <div className="space-y-3">
+                {profileVideoPreview ? (
+                  <div className="relative">
+                    <div className="w-full max-w-xs mx-auto md:mx-0 rounded-lg overflow-hidden border-2 border-gray-800">
+                      <video
+                        src={profileVideoPreview}
+                        className="w-full h-auto max-h-48 object-cover"
+                        controls
+                        muted
+                      />
+                    </div>
+                    <button
+                      onClick={handleRemoveVideo}
+                      className="mt-2 w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                    >
+                      <X className="h-4 w-4" />
+                      Remove Video
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-gray-700 rounded-lg p-6 text-center">
+                    <Video className="h-12 w-12 text-gray-500 mx-auto mb-3" />
+                    <p className="text-sm text-gray-400 mb-3">No live profile video uploaded</p>
+                    <input
+                      ref={videoInputRef}
+                      type="file"
+                      accept="video/*"
+                      onChange={handleVideoUpload}
+                      className="hidden"
+                    />
+                    <button
+                      onClick={() => videoInputRef.current?.click()}
+                      className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Upload Video (Max 10MB)
+                    </button>
+                    <p className="text-xs text-gray-500 mt-2">Video will play on hover</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -166,6 +301,16 @@ export default function ProfileSettingsPage({ onBack }) {
 
           {/* Right Column */}
           <div className="space-y-6">
+            {/* Save Changes Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleSaveChanges}
+                className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-colors"
+              >
+                Save Changes
+              </button>
+            </div>
+
             {/* Account Type */}
             <div>
               <label className="block text-sm font-medium text-orange-500 mb-3">

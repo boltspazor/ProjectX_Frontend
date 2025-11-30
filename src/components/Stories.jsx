@@ -2,13 +2,15 @@ import React, { useRef, useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import StoryViewer from "./StoryViewer";
-import profilePhoto from "../assets/profile-photo.jpg";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function Stories({ onAddStory }) {
   const scrollContainerRef = useRef(null);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [selectedStoryIndex, setSelectedStoryIndex] = useState(null);
+  const { profilePhoto, profileVideo } = useUserProfile();
 
   const stories = [
     { id: 1, username: "shresque", image: "https://i.pravatar.cc/100?img=1" },
@@ -99,12 +101,11 @@ export default function Stories({ onAddStory }) {
             <div className="relative w-14 h-14 md:w-16 md:h-16 cursor-pointer group">
               {/* Profile Picture */}
               <div className="w-full h-full rounded-full border-2 border-gray-700 overflow-hidden">
-                <img
-                  src={profilePhoto}
+                <LiveProfilePhoto
+                  imageSrc={profilePhoto}
+                  videoSrc={profileVideo}
                   alt="Your story"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  decoding="async"
+                  className="w-full h-full rounded-full"
                 />
               </div>
               

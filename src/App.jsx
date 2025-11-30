@@ -156,16 +156,16 @@ export default function App() {
           {/* ✅ Pass handleCreatePostClick to Navbar */}
           <Navbar setActiveView={setActiveView} onCreatePostClick={handleCreatePostClick} />
 
-          {/* Sidebar + Main Content layout */}
-          <div className="flex flex-1 overflow-hidden pb-14 md:pb-0">
+      {/* Sidebar + Main Content layout */}
+      <div className="flex flex-1 overflow-hidden pb-14 md:pb-0">
             <Sidebar activeView={activeView} setActiveView={handleViewChange} onLogout={handleLogout} />
 
-            <div className="flex-1 md:ml-80 overflow-hidden">
-              {renderView()}
-            </div>
-          </div>
+        <div className="flex-1 md:ml-80 overflow-hidden">
+          {renderView()}
+        </div>
+      </div>
 
-          {/* Mobile bottom navigation */}
+      {/* Mobile bottom navigation */}
           <MobileNav activeView={activeView} setActiveView={handleViewChange} />
         </>
       )}

@@ -8,6 +8,8 @@ import messageIcon from "../assets/message.svg";
 import { motion, AnimatePresence } from "framer-motion";
 import { getCommunityById, addPostToCommunity } from "../data/communitiesData";
 import { saveCommunityDraft, getCommunityDrafts, loadCommunityDraft, deleteCommunityDraft } from "../utils/drafts";
+import LiveProfilePhoto from "../components/LiveProfilePhoto";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function CommunityDetailPage({ setActiveView, communityId }) {
   const [isJoined, setIsJoined] = useState(false);
@@ -260,11 +262,14 @@ export default function CommunityDetailPage({ setActiveView, communityId }) {
               <div className="space-y-3">
                 {community.moderators.map((mod) => (
                   <div key={mod.id} className="flex items-center gap-3">
-                    <img
-                      src={mod.avatar}
-                      alt={mod.username}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
+                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                      <LiveProfilePhoto
+                        imageSrc={mod.avatar}
+                        videoSrc={getProfileVideoUrl(mod.avatar, mod.username)}
+                        alt={mod.username}
+                        className="w-8 h-8 rounded-full"
+                      />
+                    </div>
                     <span className="text-sm text-gray-300">{mod.username}...</span>
                   </div>
                 ))}
@@ -284,9 +289,14 @@ export default function CommunityDetailPage({ setActiveView, communityId }) {
                   {/* Post Header */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <img
-                        src={post.avatar}
-                        alt={post.username}
+                      <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                        <LiveProfilePhoto
+                          imageSrc={post.avatar}
+                          videoSrc={getProfileVideoUrl(post.avatar, post.username)}
+                          alt={post.username}
+                          className="w-10 h-10 rounded-full"
+                        />
+                      </div>
                         className="w-10 h-10 rounded-full object-cover"
                       />
                       <span className="text-white font-medium">{post.username}</span>

@@ -4,6 +4,8 @@ import ShareModal from "./ShareModal";
 import commentIcon from "../assets/comment.svg";
 import messageIcon from "../assets/message.svg";
 import postSampleImage from "../assets/post-sample.jpg";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function PostCard({ variant = "grid", postId, onCommentClick, isActive }) {
   const [liked, setLiked] = useState(false);
@@ -44,13 +46,14 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
         >
           {/* User Info Header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 flex-shrink-0">
-            <img
-              src={profileImage}
-              alt="profile"
-              className="h-9 w-9 rounded-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
+            <div className="h-9 w-9 rounded-full overflow-hidden flex-shrink-0">
+              <LiveProfilePhoto
+                imageSrc={profileImage}
+                videoSrc={getProfileVideoUrl(profileImage, username)}
+                alt="profile"
+                className="h-9 w-9 rounded-full"
+              />
+            </div>
             <span className="text-sm font-medium">{username}</span>
           </div>
 
@@ -129,13 +132,14 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
         <div className="flex justify-between items-center px-3 py-3">
           {/* User Info */}
           <div className="flex items-center gap-3">
-            <img
-              src={profileImage}
-              alt="profile"
-              className="h-7 w-7 rounded-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
+            <div className="h-7 w-7 rounded-full overflow-hidden flex-shrink-0">
+              <LiveProfilePhoto
+                imageSrc={profileImage}
+                videoSrc={getProfileVideoUrl(profileImage, username)}
+                alt="profile"
+                className="h-7 w-7 rounded-full"
+              />
+            </div>
             <span className="text-sm font-medium">{username}</span>
           </div>
 

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
+import LiveProfilePhoto from "../components/LiveProfilePhoto";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function NotificationsPage({ setActiveView }) {
   const [notifications, setNotifications] = useState({
@@ -140,13 +142,14 @@ export default function NotificationsPage({ setActiveView }) {
             </svg>
           </div>
         ) : (
-          <img
-            src={notification.avatar}
-            alt="Profile"
-            className="w-10 h-10 rounded-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
+          <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+            <LiveProfilePhoto
+              imageSrc={notification.avatar}
+              videoSrc={getProfileVideoUrl(notification.avatar, null)}
+              alt="Profile"
+              className="w-10 h-10 rounded-full"
+            />
+          </div>
         )}
       </div>
 

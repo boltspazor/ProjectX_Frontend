@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import profilePhoto from "../assets/profile-photo.jpg";
+import LiveProfilePhoto from "../components/LiveProfilePhoto";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function ShopPage() {
   const [activeTab, setActiveTab] = useState("store");
+  const { profilePhoto, profileVideo } = useUserProfile();
 
   return (
     <main className="flex-1 overflow-y-auto h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]">
@@ -164,11 +166,14 @@ export default function ShopPage() {
                         <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">700 Credits</p>
                       </div>
                       <div className="flex items-center gap-3 md:gap-4">
-                        <img
-                          src={profilePhoto}
-                          alt="Profile"
-                          className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover border-2 border-gray-700 flex-shrink-0"
-                        />
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden border-2 border-gray-700 flex-shrink-0">
+                          <LiveProfilePhoto
+                            imageSrc={profilePhoto}
+                            videoSrc={profileVideo}
+                            alt="Profile"
+                            className="w-8 h-8 md:w-10 md:h-10 rounded-full"
+                          />
+                        </div>
                         <div className="text-left md:text-right">
                           <p className="text-white font-medium text-sm md:text-base">Rahul Chauhan</p>
                           <p className="text-gray-400 text-xs md:text-sm">UPI ID: rahul@okaxisbank</p>
