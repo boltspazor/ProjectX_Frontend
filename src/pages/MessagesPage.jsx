@@ -3,7 +3,7 @@ import { ArrowLeft, Send } from "lucide-react";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function MessagesPage() {
+export default function MessagesPage({ onViewUserProfile }) {
   const [activeChat, setActiveChat] = useState(null);
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([
@@ -79,9 +79,15 @@ export default function MessagesPage() {
                   {/* Chat Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-semibold text-sm md:text-base text-white truncate">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onViewUserProfile && onViewUserProfile(chat.username);
+                        }}
+                        className="font-semibold text-sm md:text-base text-white truncate hover:opacity-70 transition-opacity cursor-pointer"
+                      >
                         {chat.username}
-                      </h3>
+                      </button>
                       <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
                         {chat.time}
                       </span>
@@ -115,9 +121,12 @@ export default function MessagesPage() {
                   className="w-10 h-10 md:w-12 md:h-12 rounded-full"
               />
               </div>
-              <h2 className="font-semibold text-base md:text-lg text-white">
+              <button
+                onClick={() => onViewUserProfile && onViewUserProfile(activeChat.username)}
+                className="font-semibold text-base md:text-lg text-white hover:opacity-70 transition-opacity cursor-pointer"
+              >
                 {activeChat.username}
-              </h2>
+              </button>
             </div>
 
             {/* Messages Area */}

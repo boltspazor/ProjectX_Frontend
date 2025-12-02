@@ -5,7 +5,7 @@ import PostDetailModal from "../components/PostDetailModal";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function OtherUserProfilePage({ username: viewedUsername, setActiveView }) {
+export default function OtherUserProfilePage({ username: viewedUsername, setActiveView, onViewUserProfile }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -17,77 +17,97 @@ export default function OtherUserProfilePage({ username: viewedUsername, setActi
     bio: "Living life one adventure at a time 🌍✨",
     profilePhoto: "https://i.pravatar.cc/200",
     profileVideo: getProfileVideoUrl("https://i.pravatar.cc/200", viewedUsername || "sheryanne_xoxo"),
-    posts: 21,
+    posts: 9,
     followers: 738,
     following: 512,
   };
 
-  // Sample post images - 9 posts in a 3x3 grid
-  const posts = [
+  // Sample posts data - in a real app, this would be fetched from backend filtered by username
+  // For now, we create sample posts for the viewed user
+  const allSamplePosts = [
     {
       id: 0,
+      username: "sheryanne_xoxo",
       image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop",
       caption: "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.",
-      profileImage: userData.profilePhoto,
-      username: userData.username
+      profileImage: "https://i.pravatar.cc/200",
     },
     {
       id: 1,
+      username: "sheryanne_xoxo",
       image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop",
       caption: "Sunset vibes 🌅",
-      profileImage: userData.profilePhoto,
-      username: userData.username
+      profileImage: "https://i.pravatar.cc/200",
     },
     {
       id: 2,
+      username: "sheryanne_xoxo",
       image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
       caption: "Palm trees and paradise",
-      profileImage: userData.profilePhoto,
-      username: userData.username
+      profileImage: "https://i.pravatar.cc/200",
     },
     {
       id: 3,
+      username: "sheryanne_xoxo",
       image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=400&fit=crop",
       caption: "Beach day 🏖️",
-      profileImage: userData.profilePhoto,
-      username: userData.username
+      profileImage: "https://i.pravatar.cc/200",
     },
     {
       id: 4,
+      username: "sheryanne_xoxo",
       image: "https://images.unsplash.com/photo-1490772888775-55fceea286b8?w=400&h=400&fit=crop",
       caption: "Breakfast of champions",
-      profileImage: userData.profilePhoto,
-      username: userData.username
+      profileImage: "https://i.pravatar.cc/200",
     },
     {
       id: 5,
+      username: "sheryanne_xoxo",
       image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
       caption: "Mirror selfie vibes",
-      profileImage: userData.profilePhoto,
-      username: userData.username
+      profileImage: "https://i.pravatar.cc/200",
     },
     {
       id: 6,
+      username: "sheryanne_xoxo",
       image: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&h=400&fit=crop",
       caption: "Cloud watching",
-      profileImage: userData.profilePhoto,
-      username: userData.username
+      profileImage: "https://i.pravatar.cc/200",
     },
     {
       id: 7,
+      username: "sheryanne_xoxo",
       image: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&h=400&fit=crop",
       caption: "Golden hour",
-      profileImage: userData.profilePhoto,
-      username: userData.username
+      profileImage: "https://i.pravatar.cc/200",
     },
     {
       id: 8,
+      username: "sheryanne_xoxo",
       image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
       caption: "Tropical vibes",
-      profileImage: userData.profilePhoto,
-      username: userData.username
+      profileImage: "https://i.pravatar.cc/200",
+    },
+    // Sample posts for other users (these won't show for sheryanne_xoxo)
+    {
+      id: 100,
+      username: "john_doe",
+      image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop",
+      caption: "Different user post",
+      profileImage: "https://i.pravatar.cc/100?img=1",
     },
   ];
+
+  // Filter posts to show only posts by this user
+  const posts = allSamplePosts
+    .filter(post => post.username === userData.username)
+    .map(post => ({
+      ...post,
+      profileImage: userData.profilePhoto,
+    }));
+
+  // Update posts count based on filtered posts
+  userData.posts = posts.length;
 
   const handlePostClick = (post) => {
     setSelectedPost(post);
@@ -270,6 +290,7 @@ export default function OtherUserProfilePage({ username: viewedUsername, setActi
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         post={selectedPost}
+        onViewUserProfile={onViewUserProfile}
       />
     </div>
   );

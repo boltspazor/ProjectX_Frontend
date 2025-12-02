@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function ShareModal({ isOpen, onClose }) {
+export default function ShareModal({ isOpen, onClose, onViewUserProfile }) {
   const [selectedFriends, setSelectedFriends] = useState(new Set());
 
   // Sample friends data
@@ -155,9 +155,15 @@ export default function ShareModal({ isOpen, onClose }) {
 
                       {/* Friend Info */}
                       <div className="flex-1 text-left min-w-0">
-                        <p className="font-semibold text-sm md:text-base text-white truncate">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onViewUserProfile && onViewUserProfile(friend.username);
+                          }}
+                          className="font-semibold text-sm md:text-base text-white truncate hover:opacity-70 transition-opacity cursor-pointer text-left w-full"
+                        >
                           {friend.username}
-                        </p>
+                        </button>
                         <p className="text-xs md:text-sm text-gray-400 truncate">
                           {friend.name}
                         </p>

@@ -11,7 +11,7 @@ import { saveCommunityDraft, getCommunityDrafts, loadCommunityDraft, deleteCommu
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function CommunityDetailPage({ setActiveView, communityId }) {
+export default function CommunityDetailPage({ setActiveView, communityId, onViewUserProfile }) {
   const [isJoined, setIsJoined] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
@@ -270,7 +270,12 @@ export default function CommunityDetailPage({ setActiveView, communityId }) {
                         className="w-8 h-8 rounded-full"
                       />
                     </div>
-                    <span className="text-sm text-gray-300">{mod.username}...</span>
+                    <button
+                      onClick={() => onViewUserProfile && onViewUserProfile(mod.username)}
+                      className="text-sm text-gray-300 hover:opacity-70 transition-opacity cursor-pointer"
+                    >
+                      {mod.username}...
+                    </button>
                   </div>
                 ))}
               </div>
@@ -299,7 +304,12 @@ export default function CommunityDetailPage({ setActiveView, communityId }) {
                       </div>
                         className="w-10 h-10 rounded-full object-cover"
                       />
-                      <span className="text-white font-medium">{post.username}</span>
+                      <button
+                        onClick={() => onViewUserProfile && onViewUserProfile(post.username)}
+                        className="text-white font-medium hover:opacity-70 transition-opacity cursor-pointer"
+                      >
+                        {post.username}
+                      </button>
                     </div>
                     {/* Category Badge (Reddit-style) */}
                     {post.category && (
@@ -374,6 +384,7 @@ export default function CommunityDetailPage({ setActiveView, communityId }) {
                     onClose={handleCloseComments}
                     variant="overlay"
                     initialComments={post.commentsList || []}
+                    onViewUserProfile={onViewUserProfile}
                   />
                 </div>
               );
@@ -383,7 +394,7 @@ export default function CommunityDetailPage({ setActiveView, communityId }) {
       </div>
 
       {/* Share Modal */}
-      <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
+      <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} onViewUserProfile={onViewUserProfile} />
 
       {/* Create Post Modal */}
       <CreateCommunityPost

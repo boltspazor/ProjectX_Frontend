@@ -118,7 +118,7 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
       </div>
 
         {/* Share Modal */}
-        <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
+        <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} onViewUserProfile={onViewUserProfile} />
       </>
     );
   }

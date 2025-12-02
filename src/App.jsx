@@ -142,7 +142,7 @@ export default function App() {
       case "addStory":
         return <AddStoryPage setActiveView={handleViewChange} />;
       case "userProfile":
-        return <OtherUserProfilePage username={viewedUsername} setActiveView={handleViewChange} />;
+        return <OtherUserProfilePage username={viewedUsername} setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
       case "createPost":
         // Legacy full page view - will be handled by modal now
         return <HomePage setActiveView={handleViewChange} />;
