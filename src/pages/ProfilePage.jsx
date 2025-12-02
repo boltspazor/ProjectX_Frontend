@@ -5,18 +5,22 @@ import profilePhotoDefault from "../assets/profile-photo.jpg";
 import PostDetailModal from "../components/PostDetailModal";
 import LogoutConfirmationModal from "../components/LogoutConfirmationModal";
 import ProfileSettingsPage from "./ProfileSettingsPage";
+import FollowersFollowingModal from "../components/FollowersFollowingModal";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function ProfilePage({ onLogout }) {
+export default function ProfilePage({ onLogout, onViewUserProfile }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [followersModalOpen, setFollowersModalOpen] = useState(false);
+  const [followersModalType, setFollowersModalType] = useState("followers");
   const { profilePhoto, profileVideo, username, profile } = useUserProfile();
-
-  // Sample post images - 9 posts in a 3x3 grid
-  const posts = [
+  
+  // Posts state - counts will be dynamic based on this array length
+  const [posts, setPosts] = useState([
     {
       id: 0,
       image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop",
@@ -80,7 +84,30 @@ export default function ProfilePage({ onLogout }) {
       profileImage: profilePhoto,
       username: username
     },
-  ];
+  ]);
+
+  // Followers and Following lists - counts will be dynamic based on these array lengths
+  const [followersList, setFollowersList] = useState([
+    { username: "sheryanne_xoxo", fullName: "Sheryanne Smith", image: "https://i.pravatar.cc/100?img=10", isFollowing: false },
+    { username: "john_doe", fullName: "John Doe", image: "https://i.pravatar.cc/100?img=1", isFollowing: true },
+    { username: "jane_smith", fullName: "Jane Smith", image: "https://i.pravatar.cc/100?img=2", isFollowing: false },
+    { username: "mike_ross", fullName: "Mike Ross", image: "https://i.pravatar.cc/100?img=3", isFollowing: true },
+    { username: "sarah_jones", fullName: "Sarah Jones", image: "https://i.pravatar.cc/100?img=4", isFollowing: false },
+    { username: "david_wilson", fullName: "David Wilson", image: "https://i.pravatar.cc/100?img=5", isFollowing: true },
+  ]);
+  
+  const [followingList, setFollowingList] = useState([
+    { username: "sheryanne_xoxo", fullName: "Sheryanne Smith", image: "https://i.pravatar.cc/100?img=10", isFollowing: true },
+    { username: "pxhf_12", fullName: "Pxhf User", image: "https://i.pravatar.cc/100?img=11", isFollowing: true },
+    { username: "xsd_hgf", fullName: "Xsd User", image: "https://i.pravatar.cc/100?img=12", isFollowing: true },
+    { username: "shane_xd", fullName: "Shane XD", image: "https://i.pravatar.cc/100?img=13", isFollowing: true },
+    { username: "garvv_pvt", fullName: "Garvv Private", image: "https://i.pravatar.cc/100?img=14", isFollowing: true },
+  ]);
+
+  // Dynamic counts based on array lengths
+  const postsCount = posts.length;
+  const followersCount = followersList.length;
+  const followingCount = followingList.length;
 
   const handlePostClick = (post) => {
     setSelectedPost(post);
@@ -101,6 +128,49 @@ export default function ProfilePage({ onLogout }) {
       onLogout();
     }
     setIsLogoutModalOpen(false);
+  };
+
+  const handleFollowersClick = () => {
+    setFollowersModalType("followers");
+    setFollowersModalOpen(true);
+  };
+
+  const handleFollowingClick = () => {
+    setFollowersModalType("following");
+    setFollowersModalOpen(true);
+  };
+
+  const handleFollow = (targetUsername) => {
+    // Update followers list (if following back)
+    setFollowersList(followersList.map(user => 
+      user.username === targetUsername ? { ...user, isFollowing: true } : user
+    ));
+    
+    // Add to following list if not already there
+    const isInFollowing = followingList.find(u => u.username === targetUsername);
+    if (!isInFollowing) {
+      const userToAdd = followersList.find(u => u.username === targetUsername) || {
+        username: targetUsername,
+        fullName: targetUsername,
+        image: `https://i.pravatar.cc/100?u=${encodeURIComponent(targetUsername)}`,
+        isFollowing: true
+      };
+      setFollowingList([...followingList, userToAdd]);
+    } else {
+      setFollowingList(followingList.map(user => 
+        user.username === targetUsername ? { ...user, isFollowing: true } : user
+      ));
+    }
+  };
+
+  const handleUnfollow = (targetUsername) => {
+    // Update followers list
+    setFollowersList(followersList.map(user => 
+      user.username === targetUsername ? { ...user, isFollowing: false } : user
+    ));
+    
+    // Remove from following list
+    setFollowingList(followingList.filter(u => u.username !== targetUsername));
   };
 
   // Show settings page if active
@@ -190,23 +260,29 @@ export default function ProfilePage({ onLogout }) {
               className="flex items-center justify-center gap-4 md:gap-6 text-base md:text-lg"
             >
               <div className="text-center">
-                <p className="font-bold text-white">21</p>
+                <p className="font-bold text-white">{postsCount}</p>
                 <p className="text-gray-400 text-xs md:text-sm">Posts</p>
               </div>
 
               <div className="h-6 w-px bg-gray-700"></div>
 
-              <div className="text-center">
-                <p className="font-bold text-white">738</p>
+              <button
+                onClick={handleFollowersClick}
+                className="text-center hover:opacity-70 transition-opacity cursor-pointer"
+              >
+                <p className="font-bold text-white">{followersCount}</p>
                 <p className="text-gray-400 text-xs md:text-sm">Followers</p>
-              </div>
+              </button>
 
               <div className="h-6 w-px bg-gray-700"></div>
 
-              <div className="text-center">
-                <p className="font-bold text-white">512</p>
+              <button
+                onClick={handleFollowingClick}
+                className="text-center hover:opacity-70 transition-opacity cursor-pointer"
+              >
+                <p className="font-bold text-white">{followingCount}</p>
                 <p className="text-gray-400 text-xs md:text-sm">Following</p>
-              </div>
+              </button>
             </motion.div>
           </div>
         </div>
@@ -244,6 +320,7 @@ export default function ProfilePage({ onLogout }) {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         post={selectedPost}
+        onViewUserProfile={onViewUserProfile}
       />
 
       {/* Logout Confirmation Modal */}
@@ -251,6 +328,19 @@ export default function ProfilePage({ onLogout }) {
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirm={handleLogoutConfirm}
+      />
+
+      {/* Followers/Following Modal */}
+      <FollowersFollowingModal
+        isOpen={followersModalOpen}
+        onClose={() => setFollowersModalOpen(false)}
+        type={followersModalType}
+        followersList={followersList}
+        followingList={followingList}
+        onFollow={handleFollow}
+        onUnfollow={handleUnfollow}
+        onViewUserProfile={onViewUserProfile}
+        currentUsername={username}
       />
     </div>
   );

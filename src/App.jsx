@@ -148,7 +148,7 @@ export default function App() {
       case "communityDetail":
         return <CommunityDetailPage setActiveView={handleViewChange} communityId={selectedCommunityId} onViewUserProfile={handleViewUserProfile} />;
       case "profile":
-        return <ProfilePage onLogout={handleLogout} />;
+        return <ProfilePage onLogout={handleLogout} onViewUserProfile={handleViewUserProfile} />;
       case "shop":
         return <ShopPage />;
       case "notifications":

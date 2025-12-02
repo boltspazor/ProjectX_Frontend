@@ -2,112 +2,86 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import PostDetailModal from "../components/PostDetailModal";
+import FollowersFollowingModal from "../components/FollowersFollowingModal";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function OtherUserProfilePage({ username: viewedUsername, setActiveView, onViewUserProfile }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [followersModalOpen, setFollowersModalOpen] = useState(false);
+  const [followersModalType, setFollowersModalType] = useState("followers");
+  const { username: currentUsername } = useUserProfile();
 
+  const viewedUser = viewedUsername || "sheryanne_xoxo";
+  
   // Sample user data - in a real app, this would be fetched based on username
   const userData = {
-    username: viewedUsername || "sheryanne_xoxo",
+    username: viewedUser,
     fullName: "Sheryanne Smith",
     bio: "Living life one adventure at a time 🌍✨",
     profilePhoto: "https://i.pravatar.cc/200",
-    profileVideo: getProfileVideoUrl("https://i.pravatar.cc/200", viewedUsername || "sheryanne_xoxo"),
-    posts: 9,
-    followers: 738,
-    following: 512,
+    profileVideo: getProfileVideoUrl("https://i.pravatar.cc/200", viewedUser),
   };
-
-  // Sample posts data - in a real app, this would be fetched from backend filtered by username
-  // For now, we create sample posts for the viewed user
-  const allSamplePosts = [
+  
+  // Posts state - counts will be dynamic based on this array length
+  const [posts, setPosts] = useState([
     {
       id: 0,
-      username: "sheryanne_xoxo",
+      username: viewedUser,
       image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop",
       caption: "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.",
-      profileImage: "https://i.pravatar.cc/200",
+      profileImage: userData.profilePhoto,
     },
     {
       id: 1,
-      username: "sheryanne_xoxo",
+      username: viewedUser,
       image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop",
       caption: "Sunset vibes 🌅",
-      profileImage: "https://i.pravatar.cc/200",
+      profileImage: userData.profilePhoto,
     },
     {
       id: 2,
-      username: "sheryanne_xoxo",
+      username: viewedUser,
       image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
       caption: "Palm trees and paradise",
-      profileImage: "https://i.pravatar.cc/200",
+      profileImage: userData.profilePhoto,
     },
     {
       id: 3,
-      username: "sheryanne_xoxo",
+      username: viewedUser,
       image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=400&fit=crop",
       caption: "Beach day 🏖️",
-      profileImage: "https://i.pravatar.cc/200",
+      profileImage: userData.profilePhoto,
     },
     {
       id: 4,
-      username: "sheryanne_xoxo",
+      username: viewedUser,
       image: "https://images.unsplash.com/photo-1490772888775-55fceea286b8?w=400&h=400&fit=crop",
       caption: "Breakfast of champions",
-      profileImage: "https://i.pravatar.cc/200",
-    },
-    {
-      id: 5,
-      username: "sheryanne_xoxo",
-      image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
-      caption: "Mirror selfie vibes",
-      profileImage: "https://i.pravatar.cc/200",
-    },
-    {
-      id: 6,
-      username: "sheryanne_xoxo",
-      image: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&h=400&fit=crop",
-      caption: "Cloud watching",
-      profileImage: "https://i.pravatar.cc/200",
-    },
-    {
-      id: 7,
-      username: "sheryanne_xoxo",
-      image: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&h=400&fit=crop",
-      caption: "Golden hour",
-      profileImage: "https://i.pravatar.cc/200",
-    },
-    {
-      id: 8,
-      username: "sheryanne_xoxo",
-      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
-      caption: "Tropical vibes",
-      profileImage: "https://i.pravatar.cc/200",
-    },
-    // Sample posts for other users (these won't show for sheryanne_xoxo)
-    {
-      id: 100,
-      username: "john_doe",
-      image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop",
-      caption: "Different user post",
-      profileImage: "https://i.pravatar.cc/100?img=1",
-    },
-  ];
-
-  // Filter posts to show only posts by this user
-  const posts = allSamplePosts
-    .filter(post => post.username === userData.username)
-    .map(post => ({
-      ...post,
       profileImage: userData.profilePhoto,
-    }));
+    },
+  ]);
 
-  // Update posts count based on filtered posts
-  userData.posts = posts.length;
+  // Followers and Following lists - counts will be dynamic based on these array lengths
+  const [followersList, setFollowersList] = useState([
+    { username: "idkwhoisrahul_04", fullName: "Rahul Chauhan", image: "https://i.pravatar.cc/100?img=1", isFollowing: true },
+    { username: "john_doe", fullName: "John Doe", image: "https://i.pravatar.cc/100?img=2", isFollowing: false },
+    { username: "jane_smith", fullName: "Jane Smith", image: "https://i.pravatar.cc/100?img=3", isFollowing: true },
+  ]);
+  
+  const [followingList, setFollowingList] = useState([
+    { username: "idkwhoisrahul_04", fullName: "Rahul Chauhan", image: "https://i.pravatar.cc/100?img=1", isFollowing: true },
+    { username: "pxhf_12", fullName: "Pxhf User", image: "https://i.pravatar.cc/100?img=11", isFollowing: true },
+  ]);
+
+  // Dynamic counts based on array lengths
+  const postsCount = posts.length;
+  const followersCount = followersList.length;
+  const followingCount = followingList.length;
+
 
   const handlePostClick = (post) => {
     setSelectedPost(post);
@@ -120,8 +94,59 @@ export default function OtherUserProfilePage({ username: viewedUsername, setActi
   };
 
   const handleFollow = () => {
-    setIsFollowing(!isFollowing);
-    // In a real app, this would make an API call to follow/unfollow
+    const newFollowingState = !isFollowing;
+    setIsFollowing(newFollowingState);
+    
+    // Update follower count when following/unfollowing
+    if (newFollowingState) {
+      // Add current user to their followers list if not already there
+      const currentUserInFollowers = followersList.find(u => u.username === currentUsername);
+      if (!currentUserInFollowers) {
+        setFollowersList([...followersList, {
+          username: currentUsername,
+          fullName: "You",
+          image: "https://i.pravatar.cc/100",
+          isFollowing: true
+        }]);
+      }
+    } else {
+      // Remove current user from their followers list
+      setFollowersList(followersList.filter(u => u.username !== currentUsername));
+    }
+  };
+
+  const handleFollowersClick = () => {
+    setFollowersModalType("followers");
+    setFollowersModalOpen(true);
+  };
+
+  const handleFollowingClick = () => {
+    setFollowersModalType("following");
+    setFollowersModalOpen(true);
+  };
+
+  const handleFollowUser = (targetUsername) => {
+    // Update followers list
+    setFollowersList(followersList.map(user => 
+      user.username === targetUsername ? { ...user, isFollowing: true } : user
+    ));
+    
+    // Update following list
+    setFollowingList(followingList.map(user => 
+      user.username === targetUsername ? { ...user, isFollowing: true } : user
+    ));
+  };
+
+  const handleUnfollowUser = (targetUsername) => {
+    // Update followers list
+    setFollowersList(followersList.map(user => 
+      user.username === targetUsername ? { ...user, isFollowing: false } : user
+    ));
+    
+    // Update following list
+    setFollowingList(followingList.map(user => 
+      user.username === targetUsername ? { ...user, isFollowing: false } : user
+    ));
   };
 
   const handleMessage = () => {
@@ -210,23 +235,29 @@ export default function OtherUserProfilePage({ username: viewedUsername, setActi
               className="flex items-center justify-center gap-4 md:gap-6 text-base md:text-lg mb-6"
             >
               <div className="text-center">
-                <p className="font-bold text-white">{userData.posts}</p>
+                <p className="font-bold text-white">{postsCount}</p>
                 <p className="text-gray-400 text-xs md:text-sm">Posts</p>
               </div>
 
               <div className="h-6 w-px bg-gray-700"></div>
 
-              <div className="text-center">
-                <p className="font-bold text-white">{userData.followers}</p>
+              <button
+                onClick={handleFollowersClick}
+                className="text-center hover:opacity-70 transition-opacity cursor-pointer"
+              >
+                <p className="font-bold text-white">{followersCount}</p>
                 <p className="text-gray-400 text-xs md:text-sm">Followers</p>
-              </div>
+              </button>
 
               <div className="h-6 w-px bg-gray-700"></div>
 
-              <div className="text-center">
-                <p className="font-bold text-white">{userData.following}</p>
+              <button
+                onClick={handleFollowingClick}
+                className="text-center hover:opacity-70 transition-opacity cursor-pointer"
+              >
+                <p className="font-bold text-white">{followingCount}</p>
                 <p className="text-gray-400 text-xs md:text-sm">Following</p>
-              </div>
+              </button>
             </motion.div>
 
             {/* Follow and Message Buttons */}
@@ -291,6 +322,19 @@ export default function OtherUserProfilePage({ username: viewedUsername, setActi
         onClose={handleCloseModal}
         post={selectedPost}
         onViewUserProfile={onViewUserProfile}
+      />
+
+      {/* Followers/Following Modal */}
+      <FollowersFollowingModal
+        isOpen={followersModalOpen}
+        onClose={() => setFollowersModalOpen(false)}
+        type={followersModalType}
+        followersList={followersList}
+        followingList={followingList}
+        onFollow={handleFollowUser}
+        onUnfollow={handleUnfollowUser}
+        onViewUserProfile={onViewUserProfile}
+        currentUsername={currentUsername}
       />
     </div>
   );
