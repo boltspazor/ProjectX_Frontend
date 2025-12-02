@@ -4,7 +4,7 @@ import { Heart } from "lucide-react";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { useUserProfile } from "../hooks/useUserProfile";
 
-export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [] }) {
+export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [], onViewUserProfile }) {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState(initialComments);
   const { profilePhoto, profileVideo, username } = useUserProfile();
@@ -85,7 +85,12 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
               </div>
               <div className="flex-1 min-w-0">
                 <div className="bg-[#1a1a1a] rounded-2xl px-4 py-2.5 md:px-5 md:py-3 hover:bg-[#1f1f1f] transition-colors">
-                  <p className="font-semibold text-sm md:text-base text-white mb-1">{comment.username}</p>
+                  <button
+                    onClick={() => onViewUserProfile && onViewUserProfile(comment.username)}
+                    className="font-semibold text-sm md:text-base text-white mb-1 hover:opacity-70 transition-opacity cursor-pointer"
+                  >
+                    {comment.username}
+                  </button>
                   <p className="text-sm md:text-base text-gray-300 leading-relaxed break-words">{comment.text}</p>
                     </div>
                 <div className="flex items-center gap-4 md:gap-5 mt-2 px-2">

@@ -122,23 +122,23 @@ export default function App() {
   const renderView = () => {
     switch (activeView) {
       case "home":
-        return <HomePage setActiveView={handleViewChange} />;
+        return <HomePage setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
       case "explore":
-        return <ExplorePage />;
+        return <ExplorePage onViewUserProfile={handleViewUserProfile} />;
       case "messages":
-        return <MessagesPage />;
+        return <MessagesPage onViewUserProfile={handleViewUserProfile} />;
       case "communities":
-        return <CommunitiesPage setActiveView={handleViewChange} />;
+        return <CommunitiesPage setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
       case "createCommunity":
         return <CreateCommunity setActiveView={handleViewChange} />;
       case "communityDetail":
-        return <CommunityDetailPage setActiveView={handleViewChange} communityId={selectedCommunityId} />;
+        return <CommunityDetailPage setActiveView={handleViewChange} communityId={selectedCommunityId} onViewUserProfile={handleViewUserProfile} />;
       case "profile":
         return <ProfilePage onLogout={handleLogout} />;
       case "shop":
         return <ShopPage />;
       case "notifications":
-        return <NotificationsPage setActiveView={setActiveView} />;
+        return <NotificationsPage setActiveView={setActiveView} onViewUserProfile={handleViewUserProfile} />;
       case "addStory":
         return <AddStoryPage setActiveView={handleViewChange} />;
       case "userProfile":

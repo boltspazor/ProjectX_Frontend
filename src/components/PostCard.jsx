@@ -7,7 +7,7 @@ import postSampleImage from "../assets/post-sample.jpg";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function PostCard({ variant = "grid", postId, onCommentClick, isActive }) {
+export default function PostCard({ variant = "grid", postId, onCommentClick, isActive, onViewUserProfile }) {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(234);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -54,7 +54,12 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
                 className="h-9 w-9 rounded-full"
           />
             </div>
-          <span className="text-sm font-medium">{username}</span>
+          <button
+            onClick={() => onViewUserProfile && onViewUserProfile(username)}
+            className="text-sm font-medium hover:opacity-70 transition-opacity cursor-pointer"
+          >
+            {username}
+          </button>
         </div>
 
           {/* Post Image - 4:3 aspect ratio (Instagram standard) */}
@@ -101,7 +106,12 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
         {/* Caption */}
         <div className="px-4 pb-4 flex-shrink-0">
           <p className="text-sm">
-            <span className="font-semibold mr-2">{username}</span>
+            <button
+              onClick={() => onViewUserProfile && onViewUserProfile(username)}
+              className="font-semibold mr-2 hover:opacity-70 transition-opacity cursor-pointer"
+            >
+              {username}
+            </button>
             <span className="text-gray-300">{caption}</span>
           </p>
         </div>
@@ -140,7 +150,12 @@ export default function PostCard({ variant = "grid", postId, onCommentClick, isA
                 className="h-7 w-7 rounded-full"
           />
             </div>
-          <span className="text-sm font-medium">{username}</span>
+          <button
+            onClick={() => onViewUserProfile && onViewUserProfile(username)}
+            className="text-sm font-medium hover:opacity-70 transition-opacity cursor-pointer"
+          >
+            {username}
+          </button>
         </div>
 
         {/* Actions */}
