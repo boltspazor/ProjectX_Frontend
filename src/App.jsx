@@ -15,10 +15,12 @@ import CreateCommunity from "./pages/CreateCommunity";
 import CommunityDetailPage from "./pages/CommunityDetailPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AddStoryPage from "./pages/AddStoryPage";
+import OtherUserProfilePage from "./pages/OtherUserProfilePage";
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
   const [selectedCommunityId, setSelectedCommunityId] = useState(null);
+  const [viewedUsername, setViewedUsername] = useState(null);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authView, setAuthView] = useState("login"); // "login" or "signup"
@@ -103,10 +105,17 @@ export default function App() {
     }
   }
 
-  // Handle view changes with community ID
-  const handleViewChange = (view, communityId = null) => {
+  // Handle view changes with community ID or username
+  const handleViewChange = (view, communityId = null, username = null) => {
     setActiveView(view);
     setSelectedCommunityId(communityId);
+    setViewedUsername(username);
+  };
+  
+  // Handle viewing user profile
+  const handleViewUserProfile = (username) => {
+    setActiveView("userProfile");
+    setViewedUsername(username);
   };
 
   // ✅ include createPost view
@@ -132,6 +141,8 @@ export default function App() {
         return <NotificationsPage setActiveView={setActiveView} />;
       case "addStory":
         return <AddStoryPage setActiveView={handleViewChange} />;
+      case "userProfile":
+        return <OtherUserProfilePage username={viewedUsername} setActiveView={handleViewChange} />;
       case "createPost":
         // Legacy full page view - will be handled by modal now
         return <HomePage setActiveView={handleViewChange} />;
