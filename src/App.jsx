@@ -21,6 +21,7 @@ export default function App() {
   const [activeView, setActiveView] = useState("home");
   const [selectedCommunityId, setSelectedCommunityId] = useState(null);
   const [viewedUsername, setViewedUsername] = useState(null);
+  const [selectedChatUsername, setSelectedChatUsername] = useState(null);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authView, setAuthView] = useState("login"); // "login" or "signup"
@@ -106,16 +107,29 @@ export default function App() {
   }
 
   // Handle view changes with community ID or username
-  const handleViewChange = (view, communityId = null, username = null) => {
+  const handleViewChange = (view, communityId = null, username = null, chatUsername = null) => {
     setActiveView(view);
     setSelectedCommunityId(communityId);
     setViewedUsername(username);
+    // Set or clear selectedChatUsername based on whether we're navigating to messages
+    if (view === "messages" && chatUsername !== undefined) {
+      setSelectedChatUsername(chatUsername);
+    } else if (view !== "messages") {
+      // Clear selectedChatUsername when navigating away from messages
+      setSelectedChatUsername(null);
+    }
   };
   
   // Handle viewing user profile
   const handleViewUserProfile = (username) => {
     setActiveView("userProfile");
     setViewedUsername(username);
+  };
+
+  // Handle opening message with specific user
+  const handleOpenMessage = (username) => {
+    setActiveView("messages");
+    setSelectedChatUsername(username);
   };
 
   // ✅ include createPost view
@@ -126,7 +140,7 @@ export default function App() {
       case "explore":
         return <ExplorePage onViewUserProfile={handleViewUserProfile} />;
       case "messages":
-        return <MessagesPage onViewUserProfile={handleViewUserProfile} />;
+        return <MessagesPage onViewUserProfile={handleViewUserProfile} selectedChatUsername={selectedChatUsername} />;
       case "communities":
         return <CommunitiesPage setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
       case "createCommunity":

@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function MessagesPage({ onViewUserProfile }) {
+export default function MessagesPage({ onViewUserProfile, selectedChatUsername }) {
   const [activeChat, setActiveChat] = useState(null);
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([
@@ -24,6 +24,36 @@ export default function MessagesPage({ onViewUserProfile }) {
     { id: 6, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=15", time: "4d", unread: false },
     { id: 7, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=16", time: "5d", unread: false },
   ];
+
+  // Auto-open chat when selectedChatUsername is provided
+  useEffect(() => {
+    if (selectedChatUsername) {
+      // Check if chat already exists (case-insensitive comparison)
+      const existingChat = chats.find(chat => 
+        chat.username.toLowerCase() === selectedChatUsername.toLowerCase() ||
+        chat.username === selectedChatUsername
+      );
+      
+      if (existingChat) {
+        // Open existing chat
+        setActiveChat(existingChat);
+      } else {
+        // Create new chat entry for this user
+        const newChat = {
+          id: Date.now(), // Use timestamp for unique ID
+          username: selectedChatUsername,
+          lastMessage: "No messages yet",
+          image: `https://i.pravatar.cc/100?u=${encodeURIComponent(selectedChatUsername)}`,
+          time: "now",
+          unread: false,
+        };
+        setActiveChat(newChat);
+        // Reset messages for new chat
+        setMessages([]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChatUsername]);
 
   const handleSendMessage = () => {
     if (messageInput.trim()) {

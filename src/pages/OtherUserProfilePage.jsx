@@ -127,8 +127,8 @@ export default function OtherUserProfilePage({ username: viewedUsername, setActi
   const handleMessage = () => {
     // Navigate to messages page and open chat with this user
     if (setActiveView) {
-      setActiveView("messages");
-      // In a real app, you'd also pass the username to open the specific chat
+      const usernameToMessage = viewedUsername || userData.username;
+      setActiveView("messages", null, null, usernameToMessage);
     }
   };
 
