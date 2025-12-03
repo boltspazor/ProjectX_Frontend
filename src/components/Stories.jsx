@@ -107,7 +107,7 @@ export default function Stories({ onAddStory }) {
                   alt="Your story"
                   className="w-full h-full rounded-full"
                 />
-              </div>
+        </div>
               
               {/* Plus Icon Overlay */}
               <div className="absolute bottom-0 right-0 w-5 h-5 md:w-6 md:h-6 bg-orange-500 rounded-full border-2 border-black flex items-center justify-center group-hover:bg-orange-600 transition-all duration-200 group-hover:scale-110">
@@ -119,7 +119,7 @@ export default function Stories({ onAddStory }) {
             <span className="text-xs text-gray-400 whitespace-nowrap">Your Story</span>
           </motion.div>
 
-          {/* Story Items */}
+        {/* Story Items */}
           {stories.map((story, index) => {
             const isLastStory = index === stories.length - 1;
             const shouldShowArrow = isLastStory && showRightArrow;
@@ -138,10 +138,10 @@ export default function Stories({ onAddStory }) {
                     onClick={() => setSelectedStoryIndex(index)}
                   >
                     <div className="w-full h-full rounded-full border-2 border-black overflow-hidden relative">
-                      <img
-                        src={story.image}
-                        alt={story.username}
-                        className="w-full h-full object-cover"
+                <img
+                  src={story.image}
+                  alt={story.username}
+                  className="w-full h-full object-cover"
                         loading="lazy"
                         decoding="async"
                       />
@@ -159,15 +159,15 @@ export default function Stories({ onAddStory }) {
                         </motion.div>
                       )}
                     </div>
-                  </div>
-                </div>
+              </div>
+            </div>
                 <span className="text-xs text-white max-w-[70px] md:max-w-[80px] truncate text-center">
-                  {story.username}
-                </span>
+              {story.username}
+            </span>
               </motion.div>
             );
           })}
-        </div>
+          </div>
 
         {/* Right Arrow Button - Always visible when more content */}
         {showRightArrow && (

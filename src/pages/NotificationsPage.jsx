@@ -4,14 +4,15 @@ import { X } from "lucide-react";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function NotificationsPage({ setActiveView }) {
+export default function NotificationsPage({ setActiveView, onViewUserProfile }) {
   const [notifications, setNotifications] = useState({
     today: [
       {
         id: 1,
         type: "follow",
         avatar: "https://i.pravatar.cc/100?img=50",
-        message: "pxhf_12 started following you",
+        username: "pxhf_12",
+        message: "started following you",
         action: "Follow Back",
         actionType: "follow_back",
         isFollowing: false,
@@ -20,14 +21,16 @@ export default function NotificationsPage({ setActiveView }) {
         id: 2,
         type: "story_like",
         avatar: "https://i.pravatar.cc/100?img=51",
-        message: "xsd_hgf and 12 others liked your story",
+        username: "xsd_hgf",
+        message: "and 12 others liked your story",
         action: null,
       },
       {
         id: 3,
         type: "comment",
         avatar: "https://i.pravatar.cc/100?img=52",
-        message: "shane_xd commented on your post: padhle bhai..",
+        username: "shane_xd",
+        message: "commented on your post: padhle bhai..",
         action: null,
       },
     ],
@@ -36,7 +39,8 @@ export default function NotificationsPage({ setActiveView }) {
         id: 4,
         type: "follow_request",
         avatar: "https://i.pravatar.cc/100?img=53",
-        message: "garvv_pvt requested to follow you",
+        username: "garvv_pvt",
+        message: "requested to follow you",
         action: "Confirm",
         actionType: "confirm_request",
         showDismiss: true,
@@ -45,7 +49,8 @@ export default function NotificationsPage({ setActiveView }) {
         id: 5,
         type: "follow_request",
         avatar: "https://i.pravatar.cc/100?img=54",
-        message: "masooom requested to follow you",
+        username: "masooom",
+        message: "requested to follow you",
         action: "Confirm",
         actionType: "confirm_request",
         showDismiss: true,
@@ -56,7 +61,8 @@ export default function NotificationsPage({ setActiveView }) {
         id: 6,
         type: "follow",
         avatar: "https://i.pravatar.cc/100?img=51",
-        message: "xsd_hgf started following you",
+        username: "xsd_hgf",
+        message: "started following you",
         action: "Following",
         actionType: "following",
         isFollowing: true,
@@ -65,7 +71,8 @@ export default function NotificationsPage({ setActiveView }) {
         id: 7,
         type: "follow_request",
         avatar: "https://i.pravatar.cc/100?img=53",
-        message: "garvv_pvt requested to follow you",
+        username: "garvv_pvt",
+        message: "requested to follow you",
         action: "Confirm",
         actionType: "confirm_request",
         showDismiss: true,
@@ -155,7 +162,22 @@ export default function NotificationsPage({ setActiveView }) {
 
       {/* Message */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-white leading-relaxed">{notification.message}</p>
+        <p className="text-sm text-white leading-relaxed">
+          {notification.username ? (
+            <>
+              <button
+                onClick={() => onViewUserProfile && onViewUserProfile(notification.username)}
+                className="font-semibold hover:opacity-70 transition-opacity cursor-pointer"
+              >
+                {notification.username}
+              </button>
+              {" "}
+              {notification.message.replace(notification.username, "").trim()}
+            </>
+          ) : (
+            notification.message
+          )}
+        </p>
       </div>
 
       {/* Action Button */}

@@ -8,7 +8,7 @@ import profilePhoto from "../assets/profile-photo.jpg";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function PostDetailModal({ isOpen, onClose, post }) {
+export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfile }) {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(234);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -148,7 +148,12 @@ export default function PostDetailModal({ isOpen, onClose, post }) {
                       className="h-10 w-10 rounded-full"
                     />
                   </div>
-                  <span className="text-sm font-semibold">{username}</span>
+                  <button
+                    onClick={() => onViewUserProfile && onViewUserProfile(username)}
+                    className="text-sm font-semibold hover:opacity-70 transition-opacity cursor-pointer"
+                  >
+                    {username}
+                  </button>
                 </div>
 
                 {/* Comments Section - Scrollable */}
@@ -156,7 +161,12 @@ export default function PostDetailModal({ isOpen, onClose, post }) {
                   {/* Caption */}
                   <div className="px-4 py-3 border-b border-gray-800">
                     <p className="text-sm">
-                      <span className="font-semibold mr-2">{username}</span>
+                      <button
+                        onClick={() => onViewUserProfile && onViewUserProfile(username)}
+                        className="font-semibold mr-2 hover:opacity-70 transition-opacity cursor-pointer"
+                      >
+                        {username}
+                      </button>
                       <span className="text-gray-300">{caption}</span>
                     </p>
                   </div>
@@ -175,7 +185,12 @@ export default function PostDetailModal({ isOpen, onClose, post }) {
                         </div>
                         <div className="flex-1">
                           <p className="text-sm">
-                            <span className="font-semibold mr-2">{comment.username}</span>
+                            <button
+                              onClick={() => onViewUserProfile && onViewUserProfile(comment.username)}
+                              className="font-semibold mr-2 hover:opacity-70 transition-opacity cursor-pointer"
+                            >
+                              {comment.username}
+                            </button>
                             <span className="text-gray-300">{comment.text}</span>
                           </p>
                           <div className="flex items-center gap-4 mt-1">
@@ -252,7 +267,7 @@ export default function PostDetailModal({ isOpen, onClose, post }) {
           </div>
 
           {/* Share Modal */}
-          <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
+          <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} onViewUserProfile={onViewUserProfile} />
         </>
       )}
     </AnimatePresence>

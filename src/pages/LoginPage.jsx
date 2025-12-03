@@ -6,6 +6,11 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordError, setForgotPasswordError] = useState("");
+  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
   const particlesRef = useRef(null);
   const backgroundElementsRef = useRef(null);
   const gridBackgroundRef = useRef(null);
@@ -289,20 +294,73 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     }
   };
 
-  // Handle Enter key press
+  const handleForgotPassword = (e) => {
+    e.preventDefault();
+    setShowForgotPassword(true);
+    setForgotPasswordError("");
+    setForgotPasswordSuccess(false);
+    setForgotPasswordEmail("");
+  };
+
+  const handleForgotPasswordSubmit = async (e) => {
+    e.preventDefault();
+    setForgotPasswordError("");
+    setForgotPasswordSuccess(false);
+
+    if (!forgotPasswordEmail.trim()) {
+      setForgotPasswordError("Please enter your email address");
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(forgotPasswordEmail)) {
+      setForgotPasswordError("Please enter a valid email address");
+      return;
+    }
+
+    setIsSendingReset(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      setIsSendingReset(false);
+      setForgotPasswordSuccess(true);
+      // Reset form after showing success message
+      setTimeout(() => {
+        setForgotPasswordEmail("");
+      }, 100);
+    }, 1500);
+  };
+
+  const closeForgotPasswordModal = () => {
+    setShowForgotPassword(false);
+    setForgotPasswordEmail("");
+    setForgotPasswordError("");
+    setForgotPasswordSuccess(false);
+  };
+
+  // Handle Enter key press and Escape key for modal
   useEffect(() => {
     const handleKeyPress = (e) => {
-      if (e.key === "Enter" && (e.target.tagName === "INPUT")) {
+      if (e.key === "Enter" && (e.target.tagName === "INPUT") && !showForgotPassword) {
         const form = document.getElementById("loginForm");
         if (form) {
           form.requestSubmit();
         }
       }
+      // Close forgot password modal on Escape key
+      if (e.key === "Escape" && showForgotPassword) {
+        closeForgotPasswordModal();
+      }
     };
     
     document.addEventListener("keypress", handleKeyPress);
-    return () => document.removeEventListener("keypress", handleKeyPress);
-  }, []);
+    document.addEventListener("keydown", handleKeyPress);
+    return () => {
+      document.removeEventListener("keypress", handleKeyPress);
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [showForgotPassword]);
 
   const createSuccessParticles = () => {
     const controller = document.querySelector(".controller");
@@ -1170,6 +1228,376 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
             gap: 20px;
           }
         }
+
+        /* Forgot Password Modal Styles */
+        .forgot-password-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(4px);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 10000;
+          animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        .forgot-password-modal {
+          background: #0f0f0f;
+          border: 1px solid #262626;
+          border-radius: 16px;
+          padding: 32px;
+          max-width: 420px;
+          width: 90%;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+          position: relative;
+          animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+          from {
+            transform: translateY(20px) scale(0.96);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+          }
+        }
+
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+          color: #ffffff;
+          font-size: 20px;
+          font-weight: 600;
+          margin: 0;
+        }
+
+        .modal-close-btn {
+          background: transparent;
+          border: none;
+          color: #9ca3af;
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          font-size: 24px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          line-height: 1;
+          padding: 0;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+        }
+
+        .modal-close-btn:hover {
+          background: rgba(255, 255, 255, 0.05);
+          color: #ffffff;
+        }
+
+        .modal-close-btn:active {
+          transform: scale(0.95);
+        }
+
+        .forgot-password-modal .input-group {
+          margin-bottom: 20px;
+        }
+
+        .forgot-password-modal .input-group label {
+          color: #d1d5db;
+          font-size: 13px;
+          font-weight: 500;
+          margin-bottom: 8px;
+          display: block;
+        }
+
+        .forgot-password-modal .input-field {
+          width: 100%;
+          padding: 12px 16px;
+          background: #1a1a1a;
+          border: 1px solid #262626;
+          border-radius: 8px;
+          color: #ffffff;
+          font-size: 15px;
+          transition: all 0.2s ease;
+          -webkit-appearance: none;
+          touch-action: manipulation;
+        }
+
+        .forgot-password-modal .input-field:focus {
+          outline: none;
+          border-color: #fb923c;
+          background: #1f1f1f;
+        }
+
+        .forgot-password-modal .input-field::placeholder {
+          color: #6b7280;
+        }
+
+        .forgot-password-modal .input-field:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .forgot-password-modal .error-message {
+          color: #ef4444;
+          font-size: 13px;
+          margin-top: 8px;
+          padding-left: 20px;
+          padding-right: 0;
+          position: relative;
+          display: block;
+          animation: errorFadeIn 0.3s ease;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
+
+        .forgot-password-modal .error-message::before {
+          content: '⚠';
+          position: absolute;
+          left: 0;
+          font-size: 14px;
+          top: 0;
+          line-height: 1.5;
+          width: 18px;
+          flex-shrink: 0;
+        }
+
+        @keyframes errorFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-5px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .forgot-password-modal .success-message {
+          color: #10b981;
+          font-size: 13px;
+          margin-top: 8px;
+          padding-left: 20px;
+          padding-right: 0;
+          position: relative;
+          display: block;
+          animation: slideDown 0.3s ease;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
+
+        .forgot-password-modal .success-message::before {
+          content: "✓";
+          position: absolute;
+          left: 0;
+          top: 0;
+          color: #10b981;
+          font-weight: bold;
+          font-size: 14px;
+          line-height: 1.5;
+          width: 18px;
+          flex-shrink: 0;
+          display: inline-block;
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .forgot-password-modal .button-group {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-top: 24px;
+        }
+
+        .forgot-password-modal .btn {
+          padding: 14px 25px;
+          border: none;
+          border-radius: 10px;
+          font-size: 16px;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          position: relative;
+          overflow: hidden;
+          z-index: 1;
+          width: 100%;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+          min-height: 48px;
+        }
+
+        .forgot-password-modal .btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 0;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.1);
+          transition: transform 0.4s ease;
+          z-index: -1;
+        }
+
+        .forgot-password-modal .btn:hover::before {
+          transform: scaleX(1);
+          transform-origin: left;
+        }
+
+        .forgot-password-modal .btn::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          transition: width 0.6s, height 0.6s;
+          z-index: -1;
+        }
+
+        .forgot-password-modal .btn:active::after {
+          width: 300px;
+          height: 300px;
+        }
+
+        .forgot-password-modal .btn.login-btn {
+          background: linear-gradient(45deg, #ff5722, #ff9800);
+          color: white;
+          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+        }
+
+        .forgot-password-modal .btn.login-btn:hover {
+          background: linear-gradient(45deg, #e64a19, #f57c00);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(255, 87, 34, 0.6);
+        }
+
+        .forgot-password-modal .btn.signup-btn {
+          background: transparent;
+          color: #ff5722;
+          border: 2px solid #ff5722;
+        }
+
+        .forgot-password-modal .btn.signup-btn:hover {
+          background: rgba(255, 87, 34, 0.1);
+          transform: translateY(-3px);
+          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+        }
+
+        .forgot-password-modal .btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          transform: none !important;
+        }
+
+        .forgot-password-modal .btn.login-btn:disabled:not(.loading) {
+          opacity: 0.5;
+        }
+
+        .forgot-password-modal .btn.login-btn.loading {
+          position: relative;
+        }
+
+        .forgot-password-modal .btn.login-btn.loading span {
+          opacity: 0;
+        }
+
+        .forgot-password-modal .btn.login-btn.loading::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 20px;
+          height: 20px;
+          border: 3px solid rgba(255, 255, 255, 0.3);
+          border-top-color: white;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+          background: transparent;
+        }
+
+        @keyframes spin {
+          to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+          .forgot-password-modal {
+            padding: 30px 25px;
+            max-width: 95%;
+          }
+
+          .modal-header h2 {
+            font-size: 20px;
+          }
+
+          .modal-close-btn {
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .forgot-password-modal {
+            padding: 25px 20px;
+            border-radius: 15px;
+          }
+
+          .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+          }
+
+          .modal-header h2 {
+            font-size: 18px;
+            letter-spacing: 1px;
+          }
+
+          .forgot-password-modal .input-field {
+            padding: 12px 14px;
+            font-size: 16px;
+          }
+
+          .forgot-password-modal .button-group {
+            margin-top: 20px;
+            gap: 10px;
+          }
+        }
       `}</style>
 
       <div className="login-page-body">
@@ -1277,10 +1705,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
             <div className="forgot-password">
               <a
                 href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  // TODO: Implement forgot password functionality
-                }}
+                onClick={handleForgotPassword}
                 tabIndex={0}
               >
                 FORGOT PASSWORD?
@@ -1288,6 +1713,68 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
             </div>
           </div>
         </div>
+
+        {/* Forgot Password Modal */}
+        {showForgotPassword && (
+          <div className="forgot-password-modal-overlay" onClick={closeForgotPasswordModal}>
+            <div className="forgot-password-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Reset Password</h2>
+                <button className="modal-close-btn" onClick={closeForgotPasswordModal} aria-label="Close">
+                  ×
+                </button>
+              </div>
+              
+              <form onSubmit={handleForgotPasswordSubmit}>
+                <div className="input-group">
+                  <label htmlFor="reset-email">Email Address</label>
+                  <input
+                    id="reset-email"
+                    type="email"
+                    className="input-field"
+                    placeholder="Enter your email"
+                    value={forgotPasswordEmail}
+                    onChange={(e) => {
+                      setForgotPasswordEmail(e.target.value);
+                      setForgotPasswordError("");
+                    }}
+                    autoFocus
+                    disabled={isSendingReset || forgotPasswordSuccess}
+                  />
+                  {forgotPasswordError && (
+                    <div className="error-message" role="alert">
+                      {forgotPasswordError}
+                    </div>
+                  )}
+                  {forgotPasswordSuccess && (
+                    <div className="success-message" role="alert">
+                      Password reset link has been sent to your email!
+                    </div>
+                  )}
+                </div>
+
+                <div className="button-group">
+                  <button
+                    type="submit"
+                    className={`btn login-btn ${isSendingReset ? "loading" : ""}`}
+                    disabled={isSendingReset || forgotPasswordSuccess || !forgotPasswordEmail.trim()}
+                    aria-busy={isSendingReset}
+                  >
+                    <span>{isSendingReset ? "SENDING..." : forgotPasswordSuccess ? "SENT!" : "SEND RESET LINK"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="btn signup-btn"
+                    onClick={closeForgotPasswordModal}
+                    disabled={isSendingReset}
+                  >
+                    CANCEL
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
     </div>
     </>
   );

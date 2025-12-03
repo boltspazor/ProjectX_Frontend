@@ -21,6 +21,35 @@ import React, { useState } from "react";
 export default function Sidebar({ activeView, setActiveView, onLogout }) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const { profilePhoto, profileVideo, username } = useUserProfile();
+  
+  // Same initial data as ProfilePage to keep counts in sync
+  // These match exactly what ProfilePage has
+  const posts = [
+    { id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 },
+    { id: 5 }, { id: 6 }, { id: 7 }, { id: 8 },
+  ];
+  
+  const followersList = [
+    { username: "sheryanne_xoxo" },
+    { username: "john_doe" },
+    { username: "jane_smith" },
+    { username: "mike_ross" },
+    { username: "sarah_jones" },
+    { username: "david_wilson" },
+  ];
+  
+  const followingList = [
+    { username: "sheryanne_xoxo" },
+    { username: "pxhf_12" },
+    { username: "xsd_hgf" },
+    { username: "shane_xd" },
+    { username: "garvv_pvt" },
+  ];
+  
+  // Dynamic counts based on array lengths - same calculation as ProfilePage
+  const postsCount = posts.length;
+  const followersCount = followersList.length;
+  const followingCount = followingList.length;
   const items = [
     { label: "Home", value: "home", icon: homeIcon, iconActive: homeIconActive },
     { label: "Explore", value: "explore", icon: exploreIcon, iconActive: exploreIconActive },
@@ -67,21 +96,21 @@ export default function Sidebar({ activeView, setActiveView, onLogout }) {
         {/* Stats */}
         <div className="flex justify-center text-center mb-10 text-sm">
           <div className="px-3">
-            <p className="font-bold">21</p>
+            <p className="font-bold">{postsCount}</p>
             <p className="text-gray-400 text-xs">Posts</p>
           </div>
 
           <div className="border-l border-gray-700 mx-2 h-5"></div>
 
           <div className="px-3">
-            <p className="font-bold">738</p>
+            <p className="font-bold">{followersCount}</p>
             <p className="text-gray-400 text-xs">Followers</p>
           </div>
 
           <div className="border-l border-gray-700 mx-2 h-5"></div>
 
           <div className="px-3">
-            <p className="font-bold">512</p>
+            <p className="font-bold">{followingCount}</p>
             <p className="text-gray-400 text-xs">Following</p>
           </div>
         </div>

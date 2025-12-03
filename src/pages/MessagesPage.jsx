@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function MessagesPage() {
+export default function MessagesPage({ onViewUserProfile, selectedChatUsername }) {
   const [activeChat, setActiveChat] = useState(null);
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([
@@ -24,6 +24,36 @@ export default function MessagesPage() {
     { id: 6, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=15", time: "4d", unread: false },
     { id: 7, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=16", time: "5d", unread: false },
   ];
+
+  // Auto-open chat when selectedChatUsername is provided
+  useEffect(() => {
+    if (selectedChatUsername) {
+      // Check if chat already exists (case-insensitive comparison)
+      const existingChat = chats.find(chat => 
+        chat.username.toLowerCase() === selectedChatUsername.toLowerCase() ||
+        chat.username === selectedChatUsername
+      );
+      
+      if (existingChat) {
+        // Open existing chat
+        setActiveChat(existingChat);
+      } else {
+        // Create new chat entry for this user
+        const newChat = {
+          id: Date.now(), // Use timestamp for unique ID
+          username: selectedChatUsername,
+          lastMessage: "No messages yet",
+          image: `https://i.pravatar.cc/100?u=${encodeURIComponent(selectedChatUsername)}`,
+          time: "now",
+          unread: false,
+        };
+        setActiveChat(newChat);
+        // Reset messages for new chat
+        setMessages([]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChatUsername]);
 
   const handleSendMessage = () => {
     if (messageInput.trim()) {
@@ -67,9 +97,9 @@ export default function MessagesPage() {
                       <LiveProfilePhoto
                         imageSrc={chat.image}
                         videoSrc={getProfileVideoUrl(chat.image, chat.username)}
-                        alt={chat.username}
+                      alt={chat.username}
                         className="w-12 h-12 md:w-14 md:h-14 rounded-full"
-                      />
+                    />
                     </div>
                     {chat.unread && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-red-500 rounded-full border-2 border-black"></div>
@@ -79,9 +109,15 @@ export default function MessagesPage() {
                   {/* Chat Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-semibold text-sm md:text-base text-white truncate">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onViewUserProfile && onViewUserProfile(chat.username);
+                        }}
+                        className="font-semibold text-sm md:text-base text-white truncate hover:opacity-70 transition-opacity cursor-pointer"
+                      >
                         {chat.username}
-                      </h3>
+                      </button>
                       <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
                         {chat.time}
                       </span>
@@ -111,13 +147,16 @@ export default function MessagesPage() {
                 <LiveProfilePhoto
                   imageSrc={activeChat.image}
                   videoSrc={getProfileVideoUrl(activeChat.image, activeChat.username)}
-                  alt={activeChat.username}
+                alt={activeChat.username}
                   className="w-10 h-10 md:w-12 md:h-12 rounded-full"
-                />
+              />
               </div>
-              <h2 className="font-semibold text-base md:text-lg text-white">
+              <button
+                onClick={() => onViewUserProfile && onViewUserProfile(activeChat.username)}
+                className="font-semibold text-base md:text-lg text-white hover:opacity-70 transition-opacity cursor-pointer"
+              >
                 {activeChat.username}
-              </h2>
+              </button>
             </div>
 
             {/* Messages Area */}

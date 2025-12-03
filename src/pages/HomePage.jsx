@@ -3,7 +3,7 @@ import Stories from "../components/Stories";
 import PostCard from "../components/PostCard";
 import Comments from "../components/Comments";
 
-export default function HomePage({ setActiveView }) {
+export default function HomePage({ setActiveView, onViewUserProfile }) {
   const [activePostId, setActivePostId] = useState(null);
 
   const handleCommentClick = (postId) => {
@@ -39,18 +39,19 @@ export default function HomePage({ setActiveView }) {
                 variant="feed"
                 onCommentClick={handleCommentClick}
                 isActive={activePostId === i}
+                onViewUserProfile={onViewUserProfile}
               />
             ))}
           </div>
 
           {/* Comments Section - Desktop only, side by side */}
             <div className="hidden md:block sticky top-0 h-fit">
-              <Comments isOpen={activePostId !== null} onClose={handleCloseComments} />
+              <Comments isOpen={activePostId !== null} onClose={handleCloseComments} onViewUserProfile={onViewUserProfile} />
             </div>
 
           {/* Comments Section - Mobile only, overlay */}
           <div className="md:hidden">
-            <Comments isOpen={activePostId !== null} onClose={handleCloseComments} />
+            <Comments isOpen={activePostId !== null} onClose={handleCloseComments} onViewUserProfile={onViewUserProfile} />
           </div>
         </div>
       </div>

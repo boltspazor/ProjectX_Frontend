@@ -4,7 +4,7 @@ import { Heart } from "lucide-react";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { useUserProfile } from "../hooks/useUserProfile";
 
-export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [] }) {
+export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [], onViewUserProfile }) {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState(initialComments);
   const { profilePhoto, profileVideo, username } = useUserProfile();
@@ -49,17 +49,17 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
         className="flex items-center justify-between p-4 md:p-5 border-b border-gray-800 flex-shrink-0 bg-[#0f0f0f]"
       >
         <h3 className="text-lg md:text-xl font-semibold text-white">Comments</h3>
-        <button
-          onClick={onClose}
+              <button
+                onClick={onClose}
           className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-gray-800 rounded-full"
-        >
+              >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
-        </button>
+              </button>
       </motion.div>
 
-      {/* Comments List */}
+            {/* Comments List */}
       <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 md:space-y-5 scrollbar-hide">
         {comments.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full py-12">
@@ -79,39 +79,44 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
                 <LiveProfilePhoto
                   imageSrc={comment.image}
                   videoSrc={getProfileVideoUrl(comment.image, comment.username)}
-                  alt={comment.username}
+                    alt={comment.username}
                   className="w-9 h-9 md:w-10 md:h-10 rounded-full"
-                />
+                  />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="bg-[#1a1a1a] rounded-2xl px-4 py-2.5 md:px-5 md:py-3 hover:bg-[#1f1f1f] transition-colors">
-                  <p className="font-semibold text-sm md:text-base text-white mb-1">{comment.username}</p>
-                  <p className="text-sm md:text-base text-gray-300 leading-relaxed break-words">{comment.text}</p>
-                </div>
-                <div className="flex items-center gap-4 md:gap-5 mt-2 px-2">
                   <button
-                    onClick={() => handleLikeComment(comment.id)}
-                    className="flex items-center gap-1.5 text-xs md:text-sm hover:scale-105 transition-transform group"
+                    onClick={() => onViewUserProfile && onViewUserProfile(comment.username)}
+                    className="font-semibold text-sm md:text-base text-white mb-1 hover:opacity-70 transition-opacity cursor-pointer"
                   >
+                    {comment.username}
+                  </button>
+                  <p className="text-sm md:text-base text-gray-300 leading-relaxed break-words">{comment.text}</p>
+                    </div>
+                <div className="flex items-center gap-4 md:gap-5 mt-2 px-2">
+                      <button
+                        onClick={() => handleLikeComment(comment.id)}
+                    className="flex items-center gap-1.5 text-xs md:text-sm hover:scale-105 transition-transform group"
+                      >
                     <Heart 
                       className={`h-4 w-4 md:h-5 md:w-5 transition-all group-hover:scale-110 ${
                         comment.liked ? 'fill-red-500 text-red-500' : 'text-gray-400 group-hover:text-gray-300'
                       }`}
-                    />
+                        />
                     <span className={comment.liked ? 'text-red-500 font-semibold' : 'text-gray-400 group-hover:text-gray-300'}>
-                      {comment.likes > 0 ? comment.likes.toLocaleString() : 'Like'}
-                    </span>
-                  </button>
+                          {comment.likes > 0 ? comment.likes.toLocaleString() : 'Like'}
+                        </span>
+                      </button>
                   <span className="text-xs md:text-sm text-gray-500">2h</span>
                 </div>
               </div>
             </motion.div>
-          ))}
+              ))}
           </AnimatePresence>
         )}
-      </div>
+            </div>
 
-      {/* Comment Input */}
+            {/* Comment Input */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -123,30 +128,30 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
             <LiveProfilePhoto
               imageSrc={profilePhoto}
               videoSrc={profileVideo}
-              alt="Your profile"
+                  alt="Your profile"
               className="w-8 h-8 md:w-10 md:h-10 rounded-full"
-            />
+                />
           </div>
           <div className="flex-1 flex gap-2 items-center min-w-0">
-            <input
-              type="text"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
-              placeholder="Add a comment..."
+                  <input
+                    type="text"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
+                    placeholder="Add a comment..."
               className="flex-1 min-w-0 bg-[#1a1a1a] border border-gray-700 text-white rounded-full px-3 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder-gray-500 transition-all"
-            />
+                  />
             <motion.button
-              onClick={handleSendComment}
-              disabled={!newComment.trim()}
+                    onClick={handleSendComment}
+                    disabled={!newComment.trim()}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="px-3 md:px-6 py-2 md:py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded-full text-xs md:text-base font-semibold transition-colors text-white flex-shrink-0"
-            >
-              Send
+                  >
+                    Send
             </motion.button>
-          </div>
-        </div>
+                </div>
+              </div>
       </motion.div>
     </>
   );
@@ -223,8 +228,8 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
               </motion.div>
             </div>
           )}
-        </>
-      )}
+          </>
+        )}
     </AnimatePresence>
   );
 }

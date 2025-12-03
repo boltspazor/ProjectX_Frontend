@@ -15,10 +15,13 @@ import CreateCommunity from "./pages/CreateCommunity";
 import CommunityDetailPage from "./pages/CommunityDetailPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AddStoryPage from "./pages/AddStoryPage";
+import OtherUserProfilePage from "./pages/OtherUserProfilePage";
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
   const [selectedCommunityId, setSelectedCommunityId] = useState(null);
+  const [viewedUsername, setViewedUsername] = useState(null);
+  const [selectedChatUsername, setSelectedChatUsername] = useState(null);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authView, setAuthView] = useState("login"); // "login" or "signup"
@@ -103,35 +106,57 @@ export default function App() {
     }
   }
 
-  // Handle view changes with community ID
-  const handleViewChange = (view, communityId = null) => {
+  // Handle view changes with community ID or username
+  const handleViewChange = (view, communityId = null, username = null, chatUsername = null) => {
     setActiveView(view);
     setSelectedCommunityId(communityId);
+    setViewedUsername(username);
+    // Set or clear selectedChatUsername based on whether we're navigating to messages
+    if (view === "messages" && chatUsername !== undefined) {
+      setSelectedChatUsername(chatUsername);
+    } else if (view !== "messages") {
+      // Clear selectedChatUsername when navigating away from messages
+      setSelectedChatUsername(null);
+    }
+  };
+  
+  // Handle viewing user profile
+  const handleViewUserProfile = (username) => {
+    setActiveView("userProfile");
+    setViewedUsername(username);
+  };
+
+  // Handle opening message with specific user
+  const handleOpenMessage = (username) => {
+    setActiveView("messages");
+    setSelectedChatUsername(username);
   };
 
   // ✅ include createPost view
   const renderView = () => {
     switch (activeView) {
       case "home":
-        return <HomePage setActiveView={handleViewChange} />;
+        return <HomePage setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
       case "explore":
-        return <ExplorePage />;
+        return <ExplorePage onViewUserProfile={handleViewUserProfile} />;
       case "messages":
-        return <MessagesPage />;
+        return <MessagesPage onViewUserProfile={handleViewUserProfile} selectedChatUsername={selectedChatUsername} />;
       case "communities":
-        return <CommunitiesPage setActiveView={handleViewChange} />;
+        return <CommunitiesPage setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
       case "createCommunity":
         return <CreateCommunity setActiveView={handleViewChange} />;
       case "communityDetail":
-        return <CommunityDetailPage setActiveView={handleViewChange} communityId={selectedCommunityId} />;
+        return <CommunityDetailPage setActiveView={handleViewChange} communityId={selectedCommunityId} onViewUserProfile={handleViewUserProfile} />;
       case "profile":
-        return <ProfilePage onLogout={handleLogout} />;
+        return <ProfilePage onLogout={handleLogout} onViewUserProfile={handleViewUserProfile} />;
       case "shop":
         return <ShopPage />;
       case "notifications":
-        return <NotificationsPage setActiveView={setActiveView} />;
+        return <NotificationsPage setActiveView={setActiveView} onViewUserProfile={handleViewUserProfile} />;
       case "addStory":
         return <AddStoryPage setActiveView={handleViewChange} />;
+      case "userProfile":
+        return <OtherUserProfilePage username={viewedUsername} setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
       case "createPost":
         // Legacy full page view - will be handled by modal now
         return <HomePage setActiveView={handleViewChange} />;

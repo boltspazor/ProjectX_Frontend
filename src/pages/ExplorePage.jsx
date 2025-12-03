@@ -7,7 +7,7 @@ import Accounts from "../components/Accounts";
 import Communities from "../components/Communities";
 import Comments from "../components/Comments";
 
-export default function ExplorePage() {
+export default function ExplorePage({ onViewUserProfile }) {
   const [activeTab, setActiveTab] = useState("Posts");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -121,6 +121,7 @@ export default function ExplorePage() {
                 postId={i}
                 onCommentClick={handleCommentClick}
                 isActive={activePostId === i}
+                onViewUserProfile={onViewUserProfile}
               />
             ))}
           </div>
@@ -130,6 +131,7 @@ export default function ExplorePage() {
             isOpen={activePostId !== null} 
             onClose={handleCloseComments}
             variant="overlay"
+            onViewUserProfile={onViewUserProfile}
           />
         </>
       )}

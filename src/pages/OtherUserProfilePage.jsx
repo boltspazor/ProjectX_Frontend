@@ -1,113 +1,87 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { LogOut, Settings } from "lucide-react";
-import profilePhotoDefault from "../assets/profile-photo.jpg";
+import { ArrowLeft, MessageCircle } from "lucide-react";
 import PostDetailModal from "../components/PostDetailModal";
-import LogoutConfirmationModal from "../components/LogoutConfirmationModal";
-import ProfileSettingsPage from "./ProfileSettingsPage";
 import FollowersFollowingModal from "../components/FollowersFollowingModal";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
-import { useUserProfile } from "../hooks/useUserProfile";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import { useUserProfile } from "../hooks/useUserProfile";
 
-export default function ProfilePage({ onLogout, onViewUserProfile }) {
+export default function OtherUserProfilePage({ username: viewedUsername, setActiveView, onViewUserProfile }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [followersModalOpen, setFollowersModalOpen] = useState(false);
   const [followersModalType, setFollowersModalType] = useState("followers");
-  const { profilePhoto, profileVideo, username, profile } = useUserProfile();
+  const { username: currentUsername } = useUserProfile();
+
+  const viewedUser = viewedUsername || "sheryanne_xoxo";
+  
+  // Sample user data - in a real app, this would be fetched based on username
+  const userData = {
+    username: viewedUser,
+    fullName: "Sheryanne Smith",
+    bio: "Living life one adventure at a time 🌍✨",
+    profilePhoto: "https://i.pravatar.cc/200",
+    profileVideo: getProfileVideoUrl("https://i.pravatar.cc/200", viewedUser),
+  };
   
   // Posts state - counts will be dynamic based on this array length
   const [posts, setPosts] = useState([
     {
       id: 0,
+      username: viewedUser,
       image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop",
       caption: "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.",
-      profileImage: profilePhoto,
-      username: username
+      profileImage: userData.profilePhoto,
     },
     {
       id: 1,
+      username: viewedUser,
       image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop",
       caption: "Sunset vibes 🌅",
-      profileImage: profilePhoto,
-      username: username
+      profileImage: userData.profilePhoto,
     },
     {
       id: 2,
+      username: viewedUser,
       image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
       caption: "Palm trees and paradise",
-      profileImage: profilePhoto,
-      username: username
+      profileImage: userData.profilePhoto,
     },
     {
       id: 3,
+      username: viewedUser,
       image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=400&fit=crop",
       caption: "Beach day 🏖️",
-      profileImage: profilePhoto,
-      username: username
+      profileImage: userData.profilePhoto,
     },
     {
       id: 4,
+      username: viewedUser,
       image: "https://images.unsplash.com/photo-1490772888775-55fceea286b8?w=400&h=400&fit=crop",
       caption: "Breakfast of champions",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 5,
-      image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
-      caption: "Mirror selfie vibes",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 6,
-      image: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&h=400&fit=crop",
-      caption: "Cloud watching",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 7,
-      image: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&h=400&fit=crop",
-      caption: "Golden hour",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 8,
-      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
-      caption: "Tropical vibes",
-      profileImage: profilePhoto,
-      username: username
+      profileImage: userData.profilePhoto,
     },
   ]);
 
   // Followers and Following lists - counts will be dynamic based on these array lengths
   const [followersList, setFollowersList] = useState([
-    { username: "sheryanne_xoxo", fullName: "Sheryanne Smith", image: "https://i.pravatar.cc/100?img=10", isFollowing: false },
-    { username: "john_doe", fullName: "John Doe", image: "https://i.pravatar.cc/100?img=1", isFollowing: true },
-    { username: "jane_smith", fullName: "Jane Smith", image: "https://i.pravatar.cc/100?img=2", isFollowing: false },
-    { username: "mike_ross", fullName: "Mike Ross", image: "https://i.pravatar.cc/100?img=3", isFollowing: true },
-    { username: "sarah_jones", fullName: "Sarah Jones", image: "https://i.pravatar.cc/100?img=4", isFollowing: false },
-    { username: "david_wilson", fullName: "David Wilson", image: "https://i.pravatar.cc/100?img=5", isFollowing: true },
+    { username: "idkwhoisrahul_04", fullName: "Rahul Chauhan", image: "https://i.pravatar.cc/100?img=1", isFollowing: true },
+    { username: "john_doe", fullName: "John Doe", image: "https://i.pravatar.cc/100?img=2", isFollowing: false },
+    { username: "jane_smith", fullName: "Jane Smith", image: "https://i.pravatar.cc/100?img=3", isFollowing: true },
   ]);
   
   const [followingList, setFollowingList] = useState([
-    { username: "sheryanne_xoxo", fullName: "Sheryanne Smith", image: "https://i.pravatar.cc/100?img=10", isFollowing: true },
+    { username: "idkwhoisrahul_04", fullName: "Rahul Chauhan", image: "https://i.pravatar.cc/100?img=1", isFollowing: true },
     { username: "pxhf_12", fullName: "Pxhf User", image: "https://i.pravatar.cc/100?img=11", isFollowing: true },
-    { username: "xsd_hgf", fullName: "Xsd User", image: "https://i.pravatar.cc/100?img=12", isFollowing: true },
-    { username: "shane_xd", fullName: "Shane XD", image: "https://i.pravatar.cc/100?img=13", isFollowing: true },
-    { username: "garvv_pvt", fullName: "Garvv Private", image: "https://i.pravatar.cc/100?img=14", isFollowing: true },
   ]);
 
   // Dynamic counts based on array lengths
   const postsCount = posts.length;
   const followersCount = followersList.length;
   const followingCount = followingList.length;
+
 
   const handlePostClick = (post) => {
     setSelectedPost(post);
@@ -119,15 +93,26 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
     setSelectedPost(null);
   };
 
-  const handleLogoutClick = () => {
-    setIsLogoutModalOpen(true);
-  };
-
-  const handleLogoutConfirm = () => {
-    if (onLogout) {
-      onLogout();
+  const handleFollow = () => {
+    const newFollowingState = !isFollowing;
+    setIsFollowing(newFollowingState);
+    
+    // Update follower count when following/unfollowing
+    if (newFollowingState) {
+      // Add current user to their followers list if not already there
+      const currentUserInFollowers = followersList.find(u => u.username === currentUsername);
+      if (!currentUserInFollowers) {
+        setFollowersList([...followersList, {
+          username: currentUsername,
+          fullName: "You",
+          image: "https://i.pravatar.cc/100",
+          isFollowing: true
+        }]);
+      }
+    } else {
+      // Remove current user from their followers list
+      setFollowersList(followersList.filter(u => u.username !== currentUsername));
     }
-    setIsLogoutModalOpen(false);
   };
 
   const handleFollowersClick = () => {
@@ -140,66 +125,56 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
     setFollowersModalOpen(true);
   };
 
-  const handleFollow = (targetUsername) => {
-    // Update followers list (if following back)
+  const handleFollowUser = (targetUsername) => {
+    // Update followers list
     setFollowersList(followersList.map(user => 
       user.username === targetUsername ? { ...user, isFollowing: true } : user
     ));
     
-    // Add to following list if not already there
-    const isInFollowing = followingList.find(u => u.username === targetUsername);
-    if (!isInFollowing) {
-      const userToAdd = followersList.find(u => u.username === targetUsername) || {
-        username: targetUsername,
-        fullName: targetUsername,
-        image: `https://i.pravatar.cc/100?u=${encodeURIComponent(targetUsername)}`,
-        isFollowing: true
-      };
-      setFollowingList([...followingList, userToAdd]);
-    } else {
-      setFollowingList(followingList.map(user => 
-        user.username === targetUsername ? { ...user, isFollowing: true } : user
-      ));
-    }
+    // Update following list
+    setFollowingList(followingList.map(user => 
+      user.username === targetUsername ? { ...user, isFollowing: true } : user
+    ));
   };
 
-  const handleUnfollow = (targetUsername) => {
+  const handleUnfollowUser = (targetUsername) => {
     // Update followers list
     setFollowersList(followersList.map(user => 
       user.username === targetUsername ? { ...user, isFollowing: false } : user
     ));
     
-    // Remove from following list
-    setFollowingList(followingList.filter(u => u.username !== targetUsername));
+    // Update following list
+    setFollowingList(followingList.map(user => 
+      user.username === targetUsername ? { ...user, isFollowing: false } : user
+    ));
   };
 
-  // Show settings page if active
-  if (showSettings) {
-    return <ProfileSettingsPage onBack={() => setShowSettings(false)} />;
-  }
+  const handleMessage = () => {
+    // Navigate to messages page and open chat with this user
+    if (setActiveView) {
+      const usernameToMessage = viewedUsername || userData.username;
+      setActiveView("messages", null, null, usernameToMessage);
+    }
+  };
+
+  const handleBack = () => {
+    if (setActiveView) {
+      setActiveView("home");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
       {/* Profile Content */}
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        {/* Action Buttons - Top Right */}
-        <div className="flex justify-end gap-2 mb-4">
-          {/* Settings Button - Always visible */}
+        {/* Back Button */}
+        <div className="flex items-center gap-4 mb-4">
           <button
-            onClick={() => setShowSettings(true)}
+            onClick={handleBack}
             className="p-2 hover:bg-gray-800 rounded-full transition-colors"
-            title="Settings"
+            title="Back"
           >
-            <Settings className="h-5 w-5 text-gray-400 hover:text-white" />
-          </button>
-          
-          {/* Logout Button - Mobile Only */}
-          <button
-            onClick={handleLogoutClick}
-            className="p-2 hover:bg-gray-800 rounded-full transition-colors md:hidden"
-            title="Logout"
-          >
-            <LogOut className="h-5 w-5 text-red-500" />
+            <ArrowLeft className="h-5 w-5 text-gray-400 hover:text-white" />
           </button>
         </div>
 
@@ -213,8 +188,8 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
             className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-gray-800"
           >
             <LiveProfilePhoto
-              imageSrc={profilePhoto}
-              videoSrc={profileVideo}
+              imageSrc={userData.profilePhoto}
+              videoSrc={userData.profileVideo}
               alt="Profile"
               className="w-full h-full rounded-full"
             />
@@ -229,7 +204,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               transition={{ delay: 0.1, duration: 0.5 }}
               className="text-xl md:text-2xl font-semibold text-white mb-2"
             >
-              {username}
+              {userData.username}
             </motion.h2>
 
             {/* Full Name */}
@@ -239,7 +214,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               transition={{ delay: 0.15, duration: 0.5 }}
               className="text-gray-300 mb-3"
             >
-              Rahul Chauhan
+              {userData.fullName}
             </motion.p>
 
             {/* Bio */}
@@ -249,7 +224,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               transition={{ delay: 0.2, duration: 0.5 }}
               className="text-white mb-6 text-sm md:text-base"
             >
-              {profile?.bio || "Wish I was half as interesting as my bio"}
+              {userData.bio}
             </motion.p>
 
             {/* Stats */}
@@ -257,7 +232,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.25, duration: 0.5 }}
-              className="flex items-center justify-center gap-4 md:gap-6 text-base md:text-lg"
+              className="flex items-center justify-center gap-4 md:gap-6 text-base md:text-lg mb-6"
             >
               <div className="text-center">
                 <p className="font-bold text-white">{postsCount}</p>
@@ -284,6 +259,32 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
                 <p className="text-gray-400 text-xs md:text-sm">Following</p>
               </button>
             </motion.div>
+
+            {/* Follow and Message Buttons */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="flex items-center gap-3 w-full max-w-md px-4"
+            >
+              <button
+                onClick={handleFollow}
+                className={`flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                  isFollowing
+                    ? "bg-gray-800 text-white hover:bg-gray-700 border border-gray-700"
+                    : "bg-orange-500 text-white hover:bg-orange-600"
+                }`}
+              >
+                {isFollowing ? "Following" : "Follow"}
+              </button>
+              <button
+                onClick={handleMessage}
+                className="flex-1 px-4 py-2 rounded-lg font-semibold text-sm bg-gray-800 text-white hover:bg-gray-700 border border-gray-700 transition-all flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Message
+              </button>
+            </motion.div>
           </div>
         </div>
 
@@ -291,7 +292,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
+          transition={{ delay: 0.35, duration: 0.5 }}
           className="grid grid-cols-3 gap-1 md:gap-2"
         >
           {posts.map((post, index) => (
@@ -299,7 +300,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               key={post.id}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.35 + index * 0.03, duration: 0.4 }}
+              transition={{ delay: 0.4 + index * 0.03, duration: 0.4 }}
               onClick={() => handlePostClick(post)}
               className="aspect-square overflow-hidden bg-gray-900 cursor-pointer group"
             >
@@ -323,13 +324,6 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
         onViewUserProfile={onViewUserProfile}
       />
 
-      {/* Logout Confirmation Modal */}
-      <LogoutConfirmationModal
-        isOpen={isLogoutModalOpen}
-        onClose={() => setIsLogoutModalOpen(false)}
-        onConfirm={handleLogoutConfirm}
-      />
-
       {/* Followers/Following Modal */}
       <FollowersFollowingModal
         isOpen={followersModalOpen}
@@ -337,11 +331,12 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
         type={followersModalType}
         followersList={followersList}
         followingList={followingList}
-        onFollow={handleFollow}
-        onUnfollow={handleUnfollow}
+        onFollow={handleFollowUser}
+        onUnfollow={handleUnfollowUser}
         onViewUserProfile={onViewUserProfile}
-        currentUsername={username}
+        currentUsername={currentUsername}
       />
     </div>
   );
 }
+
