@@ -22,24 +22,24 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
       if (!particlesRef.current) return;
       particlesRef.current.innerHTML = "";
       const particleCount = 25;
-      
+
       for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement("div");
         particle.className = "particle";
-        
+
         const size = Math.random() * 12 + 5;
         const left = Math.random() * 100;
         const animationDuration = Math.random() * 20 + 10;
         const animationDelay = Math.random() * 5;
         const hue = Math.random() * 30 + 15;
-        
+
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
         particle.style.left = `${left}%`;
         particle.style.animationDuration = `${animationDuration}s`;
         particle.style.animationDelay = `${animationDelay}s`;
         particle.style.background = `rgba(255, ${87 - hue}, ${34 - hue / 2}, 0.6)`;
-        
+
         particlesRef.current.appendChild(particle);
       }
     };
@@ -53,24 +53,24 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
       if (!backgroundElementsRef.current) return;
       backgroundElementsRef.current.innerHTML = "";
       const elementCount = 8;
-      
+
       for (let i = 0; i < elementCount; i++) {
         const element = document.createElement("div");
         element.className = "floating-element";
-        
+
         const size = Math.random() * 200 + 100;
         const left = Math.random() * 100;
         const top = Math.random() * 100;
         const animationDuration = Math.random() * 30 + 20;
         const animationDelay = Math.random() * 10;
-        
+
         element.style.width = `${size}px`;
         element.style.height = `${size}px`;
         element.style.left = `${left}%`;
         element.style.top = `${top}%`;
         element.style.animationDuration = `${animationDuration}s`;
         element.style.animationDelay = `${animationDelay}s`;
-        
+
         backgroundElementsRef.current.appendChild(element);
       }
     };
@@ -83,7 +83,7 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
     const createGridBackground = () => {
       if (!gridBackgroundRef.current) return;
       gridBackgroundRef.current.innerHTML = "";
-      
+
       // Create horizontal lines
       for (let i = 0; i < 20; i++) {
         const line = document.createElement("div");
@@ -92,7 +92,7 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
         line.style.animationDelay = `${Math.random() * 5}s`;
         gridBackgroundRef.current.appendChild(line);
       }
-      
+
       // Create vertical lines
       for (let i = 0; i < 20; i++) {
         const line = document.createElement("div");
@@ -101,25 +101,25 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
         line.style.animationDelay = `${Math.random() * 5}s`;
         gridBackgroundRef.current.appendChild(line);
       }
-      
+
       // Create pulse circles
       for (let i = 0; i < 5; i++) {
         const circle = document.createElement("div");
         circle.className = "pulse-circle";
-        
+
         const size = Math.random() * 200 + 100;
         const left = Math.random() * 100;
         const top = Math.random() * 100;
         const animationDuration = Math.random() * 10 + 5;
         const animationDelay = Math.random() * 5;
-        
+
         circle.style.width = `${size}px`;
         circle.style.height = `${size}px`;
         circle.style.left = `${left}%`;
         circle.style.top = `${top}%`;
         circle.style.animationDuration = `${animationDuration}s`;
         circle.style.animationDelay = `${animationDelay}s`;
-        
+
         gridBackgroundRef.current.appendChild(circle);
       }
     };
@@ -137,7 +137,7 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
           scanLineRef.current.style.animation = "scan 4s linear infinite";
         }, 10);
       }, 4000);
-      
+
       return () => clearInterval(interval);
     };
 
@@ -148,30 +148,30 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
   // D-pad button interactions
   useEffect(() => {
     const dpadButtons = document.querySelectorAll(".d-pad-btn");
-    
+
     const handleMouseDown = (e) => {
       e.target.style.transform = "scale(0.95)";
       e.target.style.background = "#ff5722";
     };
-    
+
     const handleMouseUp = (e) => {
       e.target.style.transform = "scale(1.08)";
       setTimeout(() => {
         e.target.style.background = "#555";
       }, 150);
     };
-    
+
     const handleMouseLeave = (e) => {
       e.target.style.transform = "scale(1)";
       e.target.style.background = "#555";
     };
-    
+
     dpadButtons.forEach((button) => {
       button.addEventListener("mousedown", handleMouseDown);
       button.addEventListener("mouseup", handleMouseUp);
       button.addEventListener("mouseleave", handleMouseLeave);
     });
-    
+
     return () => {
       dpadButtons.forEach((button) => {
         button.removeEventListener("mousedown", handleMouseDown);
@@ -184,25 +184,25 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
   // Action button interactions
   useEffect(() => {
     const actionButtons = document.querySelectorAll(".action-btn");
-    
+
     const handleMouseDown = (e) => {
       e.target.style.transform = "scale(0.9)";
     };
-    
+
     const handleMouseUp = (e) => {
       e.target.style.transform = "scale(1.15)";
     };
-    
+
     const handleMouseLeave = (e) => {
       e.target.style.transform = "scale(1)";
     };
-    
+
     actionButtons.forEach((button) => {
       button.addEventListener("mousedown", handleMouseDown);
       button.addEventListener("mouseup", handleMouseUp);
       button.addEventListener("mouseleave", handleMouseLeave);
     });
-    
+
     return () => {
       actionButtons.forEach((button) => {
         button.removeEventListener("mousedown", handleMouseDown);
@@ -215,30 +215,38 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
   // Input focus effects
   useEffect(() => {
     const inputFields = document.querySelectorAll(".input-field");
-    
+
     const handleFocus = (e) => {
-      const label = e.target.parentElement.querySelector("label");
+      let label = e.target.parentElement.querySelector("label");
+      // For password fields with nested structure, check parent's parent
+      if (!label && e.target.parentElement.parentElement) {
+        label = e.target.parentElement.parentElement.querySelector("label");
+      }
       if (label) {
         label.style.color = "#ff5722";
         label.style.transform = "translateY(-5px) scale(0.9)";
       }
     };
-    
+
     const handleBlur = (e) => {
       if (!e.target.value) {
-        const label = e.target.parentElement.querySelector("label");
+        let label = e.target.parentElement.querySelector("label");
+        // For password fields with nested structure, check parent's parent
+        if (!label && e.target.parentElement.parentElement) {
+          label = e.target.parentElement.parentElement.querySelector("label");
+        }
         if (label) {
           label.style.color = "#ccc";
           label.style.transform = "translateY(0) scale(1)";
         }
       }
     };
-    
+
     inputFields.forEach((input) => {
       input.addEventListener("focus", handleFocus);
       input.addEventListener("blur", handleBlur);
     });
-    
+
     return () => {
       inputFields.forEach((input) => {
         input.removeEventListener("focus", handleFocus);
@@ -258,31 +266,31 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
-    
+
     if (!formData.name.trim()) {
       setError("Please enter your name");
       triggerErrorAnimation();
       return;
     }
-    
+
     if (!formData.username.trim()) {
       setError("Please enter a username");
       triggerErrorAnimation();
       return;
     }
-    
+
     if (!formData.email.trim()) {
       setError("Please enter your email");
       triggerErrorAnimation();
       return;
     }
-    
+
     if (!formData.password.trim()) {
       setError("Please enter a password");
       triggerErrorAnimation();
       return;
     }
-    
+
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters");
       triggerErrorAnimation();
@@ -302,10 +310,10 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
       controller.style.animation = "none";
       controller.style.transform = "scale(1.05) rotateY(10deg)";
       createSuccessParticles();
-      
+
       setTimeout(() => {
         setIsLoading(false);
-      onSignup();
+        onSignup();
       }, 800);
     }
   };
@@ -330,7 +338,7 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
         }
       }
     };
-    
+
     document.addEventListener("keypress", handleKeyPress);
     return () => document.removeEventListener("keypress", handleKeyPress);
   }, []);
@@ -338,24 +346,24 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
   const createSuccessParticles = () => {
     const controller = document.querySelector(".controller");
     if (!controller) return;
-    
+
     const rect = controller.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    
+
     for (let i = 0; i < 15; i++) {
       const particle = document.createElement("div");
       particle.className = "particle";
       particle.style.position = "fixed";
       particle.style.zIndex = "100";
-      
+
       const size = Math.random() * 8 + 4;
       const angle = Math.random() * Math.PI * 2;
       const distance = Math.random() * 100 + 50;
       const duration = Math.random() * 1 + 0.5;
       const endX = Math.cos(angle) * distance;
       const endY = Math.sin(angle) * distance;
-      
+
       // Create unique animation for each particle
       const animationName = `successParticle${i}`;
       const style = document.createElement("style");
@@ -372,16 +380,16 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
         }
       `;
       document.head.appendChild(style);
-      
+
       particle.style.width = `${size}px`;
       particle.style.height = `${size}px`;
       particle.style.left = `${centerX}px`;
       particle.style.top = `${centerY}px`;
       particle.style.background = `rgba(255, 215, 0, 0.8)`;
       particle.style.animation = `${animationName} ${duration}s ease-out forwards`;
-      
+
       document.body.appendChild(particle);
-      
+
       setTimeout(() => {
         particle.remove();
         style.remove();
@@ -392,11 +400,12 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
   const handleLoginClick = () => {
     const controller = document.querySelector(".controller");
     if (controller) {
-      controller.style.animation = "none";
-      controller.style.transform = "rotateY(180deg) scale(1.05)";
+      controller.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+      controller.style.opacity = "0";
+      controller.style.transform = "scale(0.95)";
       setTimeout(() => {
         onSwitchToLogin();
-      }, 600);
+      }, 400);
     }
   };
 
@@ -587,21 +596,9 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
           background: rgba(255, 255, 255, 0.12);
         }
 
-        .input-field:focus + .input-focus-line {
+        .input-field:focus{
           width: 100%;
           opacity: 1;
-        }
-
-        .input-focus-line {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: linear-gradient(90deg, #ff5722, #ff9800);
-          transition: all 0.4s ease;
-          opacity: 0;
-          box-shadow: 0 0 10px rgba(255, 87, 34, 0.7);
         }
 
         .password-input-wrapper {
@@ -1234,69 +1231,67 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
           <div className="controller">
             <div className="logo">
               <h1>BaitHub</h1>
-          </div>
+            </div>
 
             <form id="signupForm" onSubmit={handleSubmit}>
               <div className={`input-group ${error && !formData.name.trim() ? "has-error" : ""}`}>
                 <label htmlFor="name">FULL NAME</label>
-              <input
-                type="text"
+                <input
+                  type="text"
                   id="name"
-                name="name"
+                  name="name"
                   className="input-field"
                   placeholder="Enter your full name"
-                value={formData.name}
-                onChange={handleChange}
+                  value={formData.name}
+                  onChange={handleChange}
                   autoComplete="name"
-                required
-              />
-                <div className="input-focus-line"></div>
-            </div>
+                  required
+                />
+              </div>
 
               <div className={`input-group ${error && !formData.username.trim() ? "has-error" : ""}`}>
                 <label htmlFor="username">USERNAME</label>
-              <input
-                type="text"
+                <input
+                  type="text"
                   id="username"
-                name="username"
+                  name="username"
                   className="input-field"
                   placeholder="Choose a username"
-                value={formData.username}
-                onChange={handleChange}
+                  value={formData.username}
+                  onChange={handleChange}
                   autoComplete="username"
-                required
-              />
-            </div>
+                  required
+                />
+              </div>
 
               <div className={`input-group ${error && !formData.email.trim() ? "has-error" : ""}`}>
                 <label htmlFor="email">EMAIL</label>
-              <input
-                type="email"
+                <input
+                  type="email"
                   id="email"
-                name="email"
+                  name="email"
                   className="input-field"
                   placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
+                  value={formData.email}
+                  onChange={handleChange}
                   autoComplete="email"
-                required
-              />
-                <div className="input-focus-line"></div>
-            </div>
+                  required
+                />
+              </div>
 
               <div className={`input-group ${error && (!formData.password.trim() || formData.password.length < 6) ? "has-error" : ""}`}>
                 <label htmlFor="password">PASSWORD</label>
                 <div className="password-input-wrapper">
-              <input
+                  <input
                     type={showPassword ? "text" : "password"}
                     id="password"
-                name="password"
+                    name="password"
                     className="input-field"
                     placeholder="Create a password"
-                value={formData.password}
-                onChange={handleChange}
+                    value={formData.password}
+                    onChange={handleChange}
                     autoComplete="new-password"
-                required
+                    required
                     style={{ paddingRight: "60px" }}
                   />
                   {formData.password && (
@@ -1316,13 +1311,13 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
                     {error}
                   </span>
                 )}
-            </div>
+              </div>
 
               <div className={`terms-checkbox ${error && !agreedToTerms ? "has-error" : ""}`}>
-              <input
-                type="checkbox"
-                id="terms"
-                checked={agreedToTerms}
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={agreedToTerms}
                   onChange={(e) => {
                     setAgreedToTerms(e.target.checked);
                     if (error) setError("");
@@ -1337,26 +1332,26 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
                   <a href="#" onClick={(e) => e.preventDefault()}>
                     Privacy Policy
                   </a>
-              </label>
-            </div>
+                </label>
+              </div>
 
               <div className="button-group">
                 <button
-              type="submit"
+                  type="submit"
                   className={`btn signup-btn ${isLoading ? "loading" : ""}`}
                   disabled={isLoading || !formData.name.trim() || !formData.username.trim() || !formData.email.trim() || !formData.password.trim() || !agreedToTerms}
                   aria-busy={isLoading}
                 >
                   <span>{isLoading ? "CREATING..." : "SIGN UP"}</span>
                 </button>
-              <button
+                <button
                   type="button"
                   className="btn login-btn"
                   onClick={handleLoginClick}
                   disabled={isLoading}
                 >
                   LOGIN
-              </button>
+                </button>
               </div>
             </form>
 
@@ -1375,7 +1370,7 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
             </div>
           </div>
         </div>
-    </div>
+      </div>
     </>
   );
 }

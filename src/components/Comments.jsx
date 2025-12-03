@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [], onViewUserProfile }) {
   const [newComment, setNewComment] = useState("");

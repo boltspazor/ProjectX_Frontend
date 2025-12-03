@@ -14,6 +14,7 @@ export default function ExplorePage({ onViewUserProfile }) {
   const [isAIEnabled, setIsAIEnabled] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [activePostId, setActivePostId] = useState(null);
+  const [postsComments, setPostsComments] = useState({});
 
   const handleCommentClick = (postId) => {
     setActivePostId(postId);
@@ -131,6 +132,7 @@ export default function ExplorePage({ onViewUserProfile }) {
             isOpen={activePostId !== null} 
             onClose={handleCloseComments}
             variant="overlay"
+            initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
             onViewUserProfile={onViewUserProfile}
           />
         </>

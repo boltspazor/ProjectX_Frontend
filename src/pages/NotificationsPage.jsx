@@ -1,10 +1,12 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function NotificationsPage({ setActiveView, onViewUserProfile }) {
+export default function NotificationsPage({ setActiveView, onViewUserProfile, previousView = "home" }) {
+  const [showUndo, setShowUndo] = useState(false);
+  const [undoData, setUndoData] = useState(null);
   const [notifications, setNotifications] = useState({
     today: [
       {
@@ -104,22 +106,65 @@ export default function NotificationsPage({ setActiveView, onViewUserProfile }) 
     ],
   });
 
+  useEffect(() => {
+    let timer;
+    if (showUndo) {
+      timer = setTimeout(() => {
+        setShowUndo(false);
+        setUndoData(null);
+      }, 3000);
+    }
+    return () => clearTimeout(timer);
+  }, [showUndo]);
+
   const handleAction = (notificationId, section, actionType) => {
+    if (actionType === "dismiss") {
+      setNotifications((prev) => {
+        const updated = { ...prev };
+        updated[section] = updated[section].filter((n) => n.id !== notificationId);
+        return updated;
+      });
+      return;
+    }
+
+    // Don't show undo popup if clicking already-followed button
+    if (actionType === "following") {
+      return;
+    }
+
+    // Store previous state for undo
+    const previousState = JSON.parse(JSON.stringify(notifications));
+
     setNotifications((prev) => {
       const updated = { ...prev };
-      const notification = updated[section].find((n) => n.id === notificationId);
+      const notif = updated[section].find((n) => n.id === notificationId);
 
       if (actionType === "follow_back" || actionType === "confirm_request") {
-        notification.isFollowing = true;
-        notification.action = "Following";
-        notification.actionType = "following";
-        notification.showDismiss = false;
-      } else if (actionType === "dismiss") {
-        updated[section] = updated[section].filter((n) => n.id !== notificationId);
+        notif.isFollowing = true;
+        notif.action = "Following";
+        notif.actionType = "following";
+        notif.showDismiss = false;
       }
 
       return updated;
     });
+
+    // Show undo popup
+    setUndoData({
+      notificationId,
+      section,
+      actionType,
+      previousState,
+    });
+    setShowUndo(true);
+  };
+
+  const handleUndo = () => {
+    if (undoData) {
+      setNotifications(undoData.previousState);
+      setShowUndo(false);
+      setUndoData(null);
+    }
   };
 
   const renderNotification = (notification, section) => (
@@ -237,41 +282,15 @@ export default function NotificationsPage({ setActiveView, onViewUserProfile }) 
   return (
     <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-black border-b border-gray-800 md:hidden">
+      <div className="sticky top-0 z-10 bg-black border-b border-gray-800">
         <div className="flex items-center gap-4 px-4 py-3">
           <button
-            onClick={() => setActiveView("home")}
+            onClick={() => setActiveView(previousView)}
             className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-white hover:text-gray-300 transition-colors"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+            <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold text-white">Notifications</h1>
-        </div>
-      </div>
-
-      {/* Desktop Header */}
-      <div className="hidden md:block border-b border-gray-800 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-white">Notifications</h1>
-          <button
-            onClick={() => setActiveView(null)}
-            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
-            title="Close"
-          >
-            <X className="h-6 w-6 text-gray-400 hover:text-white" />
-          </button>
+          <h1 className="text-lg md:text-2xl font-semibold text-white">Notifications</h1>
         </div>
       </div>
 
@@ -281,6 +300,29 @@ export default function NotificationsPage({ setActiveView, onViewUserProfile }) 
         {renderSection("Yesterday", "yesterday")}
         {renderSection("This Week", "thisWeek")}
       </div>
+
+      {/* Undo Popup */}
+      <AnimatePresence>
+        {showUndo && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed bottom-20 md:bottom-6 left-4 right-4 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 z-50 md:w-auto md:min-w-[400px] md:max-w-md"
+          >
+            <div className="bg-[#1a1a1a] border border-gray-700 rounded-lg shadow-2xl px-3 py-2.5 md:px-4 md:py-3 flex items-center justify-between gap-3">
+              <span className="text-white text-xs md:text-sm font-medium">Action completed</span>
+              <button
+                onClick={handleUndo}
+                className="px-3 py-1.5 md:px-4 bg-orange-500 hover:bg-orange-600 text-white text-xs md:text-sm font-medium rounded-lg transition-colors flex-shrink-0"
+              >
+                Undo
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -7,6 +7,7 @@ const SAMPLE_PROFILE_VIDEO = "https://commondatastorage.googleapis.com/gtv-video
 
 // Generate video URL based on image URL or user ID
 // This is a placeholder - replace with actual logic
+// eslint-disable-next-line no-unused-vars
 export const getProfileVideoUrl = (imageSrc, userId = null) => {
   // In a real app, you would:
   // 1. Check if user has a profile video
@@ -29,4 +30,3 @@ export const getProfileVideoUrl = (imageSrc, userId = null) => {
 // export const getProfileVideoUrl = (imageSrc, userId = null) => {
 //   return null; // No videos for now
 // };
-

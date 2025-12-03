@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ArrowLeft, Globe, Pencil, Heart, Bookmark, X } from "lucide-react";
-import PostCard from "../components/PostCard";
 import ShareModal from "../components/ShareModal";
 import Comments from "../components/Comments";
 import commentIcon from "../assets/comment.svg";
 import messageIcon from "../assets/message.svg";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { getCommunityById, addPostToCommunity } from "../data/communitiesData";
-import { saveCommunityDraft, getCommunityDrafts, loadCommunityDraft, deleteCommunityDraft } from "../utils/drafts";
+import { saveCommunityDraft, getCommunityDrafts, deleteCommunityDraft } from "../utils/drafts";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
@@ -21,6 +20,21 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
 
   // Get community data by ID
   const community = getCommunityById(communityId);
+
+  // Initialize posts likes state from community posts
+  useEffect(() => {
+    const currentCommunity = getCommunityById(communityId);
+    if (currentCommunity && currentCommunity.posts) {
+      const likes = {};
+      currentCommunity.posts.forEach(post => {
+        likes[post.id] = {
+          liked: post.liked || false,
+          count: post.likes || 0
+        };
+      });
+      setPostsLikes(likes);
+    }
+  }, [communityId, refreshKey]);
 
   // If community not found, show error or redirect
   if (!community) {
@@ -38,21 +52,6 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
       </div>
     );
   }
-
-  // Initialize posts likes state from community posts
-  useEffect(() => {
-    const currentCommunity = getCommunityById(communityId);
-    if (currentCommunity && currentCommunity.posts) {
-      const likes = {};
-      currentCommunity.posts.forEach(post => {
-        likes[post.id] = {
-          liked: post.liked || false,
-          count: post.likes || 0
-        };
-      });
-      setPostsLikes(likes);
-    }
-  }, [communityId, refreshKey]);
 
   // Get fresh community data (in case it was updated)
   const currentCommunity = getCommunityById(communityId);
@@ -106,7 +105,7 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
       comments: 0,
       commentsList: [],
     });
-    
+
     // Update likes state for new post
     if (newPost) {
       setPostsLikes(prev => ({
@@ -117,7 +116,7 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
         }
       }));
     }
-    
+
     setIsCreatePostOpen(false);
     // Force re-render by updating refresh key
     setRefreshKey(prev => prev + 1);
@@ -170,11 +169,10 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
                   <div className="flex items-center gap-3">
                     <button
                       onClick={handleJoin}
-                      className={`px-6 py-2.5 rounded-lg text-sm font-medium transition ${
-                        isJoined
+                      className={`px-6 py-2.5 rounded-lg text-sm font-medium transition ${isJoined
                           ? "bg-gray-700 text-white border border-gray-600"
                           : "bg-orange-500 text-white hover:bg-orange-600"
-                      }`}
+                        }`}
                     >
                       {isJoined ? "Joined" : "Join"}
                     </button>
@@ -244,11 +242,10 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
                   <button
                     key={index}
                     onClick={() => handleTopicClick(topic)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
-                      index < 3
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${index < 3
                         ? "bg-orange-500 text-white"
                         : "bg-orange-500 text-white"
-                    }`}
+                      }`}
                   >
                     {topic}
                   </button>
@@ -302,8 +299,6 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
                           className="w-10 h-10 rounded-full"
                         />
                       </div>
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
                       <button
                         onClick={() => onViewUserProfile && onViewUserProfile(post.username)}
                         className="text-white font-medium hover:opacity-70 transition-opacity cursor-pointer"
@@ -347,18 +342,16 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
                       className="flex items-center gap-2 focus:outline-none group"
                     >
                       <Heart
-                        className={`w-5 h-5 transition-all ${
-                          postLikeData.liked
+                        className={`w-5 h-5 transition-all ${postLikeData.liked
                             ? "fill-red-500 text-red-500"
                             : "text-gray-400 group-hover:text-white"
-                        }`}
+                          }`}
                       />
                       <span
-                        className={`text-sm ${
-                          postLikeData.liked
+                        className={`text-sm ${postLikeData.liked
                             ? "text-red-500 font-semibold"
                             : "text-gray-400 group-hover:text-white"
-                        }`}
+                          }`}
                       >
                         {postLikeData.count}
                       </span>
@@ -377,21 +370,25 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
                       <img src={messageIcon} alt="share" className="w-5 h-5" />
                     </button>
                   </div>
-
-                  {/* Comments Component */}
-                  <Comments
-                    isOpen={openCommentsPostId === post.id}
-                    onClose={handleCloseComments}
-                    variant="overlay"
-                    initialComments={post.commentsList || []}
-                    onViewUserProfile={onViewUserProfile}
-                  />
                 </div>
               );
             })}
           </main>
         </div>
       </div>
+
+      {/* Comments Section - Overlay for both mobile and desktop */}
+      <Comments
+        isOpen={openCommentsPostId !== null}
+        onClose={handleCloseComments}
+        variant="overlay"
+        initialComments={
+          openCommentsPostId !== null
+            ? posts.find(p => p.id === openCommentsPostId)?.commentsList || []
+            : []
+        }
+        onViewUserProfile={onViewUserProfile}
+      />
 
       {/* Share Modal */}
       <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} onViewUserProfile={onViewUserProfile} />
@@ -448,7 +445,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
         category: selectedCategory,
         image: imagePreview,
       });
-      
+
       // Delete draft if it was a saved draft
       if (currentDraftId && community?.id) {
         deleteCommunityDraft(community.id, currentDraftId);
@@ -459,9 +456,9 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
 
   const handleSaveDraft = () => {
     if (!community?.id) return;
-    
+
     const existingDrafts = getCommunityDrafts(community.id);
-    
+
     // Check if we're at the limit and this is a new draft (not updating existing)
     if (!currentDraftId && existingDrafts.length >= 5) {
       // This will be handled by saveCommunityDraft (removes oldest), but show a message
@@ -470,7 +467,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
       );
       if (!confirmSave) return;
     }
-    
+
     const draftData = {
       id: currentDraftId || undefined,
       title: title.trim(),
@@ -480,7 +477,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
       step,
       createdAt: currentDraftId ? undefined : new Date().toISOString(),
     };
-    
+
     const savedDraft = saveCommunityDraft(community.id, draftData);
     if (savedDraft) {
       setCurrentDraftId(savedDraft.id);
@@ -517,7 +514,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
 
   // Get drafts for this community - make it reactive
   const [drafts, setDrafts] = useState(community?.id ? getCommunityDrafts(community.id) : []);
-  
+
   useEffect(() => {
     if (community?.id) {
       setDrafts(getCommunityDrafts(community.id));
@@ -551,7 +548,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                 <span className="absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full"></span>
               )}
             </button>
-            
+
             <button
               onClick={handleClose}
               className="text-gray-400 hover:text-white transition p-2 hover:bg-gray-800 rounded-full"
@@ -658,13 +655,13 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                   </div>
                 </button>
               </label>
-              
+
               {imagePreview && (
                 <div className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-black">
                   <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                 </div>
               )}
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep("caption")}
@@ -683,7 +680,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                   <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                 </div>
               )}
-              
+
               <div>
                 <label className="block text-white font-medium mb-2">Post Title *</label>
                 <input
@@ -714,11 +711,10 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                       onClick={() => setSelectedCategory(
                         selectedCategory === category ? null : category
                       )}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                        selectedCategory === category
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition ${selectedCategory === category
                           ? "bg-orange-500 text-white"
                           : "bg-[#1a1a1a] text-gray-300 border border-gray-700 hover:border-orange-500/50"
-                      }`}
+                        }`}
                     >
                       {category}
                     </button>
@@ -742,7 +738,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                     Post
                   </button>
                 </div>
-                
+
                 {/* Save Draft Button */}
                 {(title.trim() || imagePreview) && (
                   <button
