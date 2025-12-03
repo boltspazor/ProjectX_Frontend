@@ -22,24 +22,24 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
       if (!particlesRef.current) return;
       particlesRef.current.innerHTML = "";
       const particleCount = 25;
-      
+
       for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement("div");
         particle.className = "particle";
-        
+
         const size = Math.random() * 12 + 5;
         const left = Math.random() * 100;
         const animationDuration = Math.random() * 20 + 10;
         const animationDelay = Math.random() * 5;
         const hue = Math.random() * 30 + 15;
-        
+
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
         particle.style.left = `${left}%`;
         particle.style.animationDuration = `${animationDuration}s`;
         particle.style.animationDelay = `${animationDelay}s`;
         particle.style.background = `rgba(255, ${87 - hue}, ${34 - hue / 2}, 0.6)`;
-        
+
         particlesRef.current.appendChild(particle);
       }
     };
@@ -57,7 +57,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     const createGridBackground = () => {
       if (!gridBackgroundRef.current) return;
       gridBackgroundRef.current.innerHTML = "";
-      
+
       // Create horizontal lines
       for (let i = 0; i < 20; i++) {
         const line = document.createElement("div");
@@ -66,7 +66,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         line.style.animationDelay = `${Math.random() * 5}s`;
         gridBackgroundRef.current.appendChild(line);
       }
-      
+
       // Create vertical lines
       for (let i = 0; i < 20; i++) {
         const line = document.createElement("div");
@@ -90,7 +90,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           scanLineRef.current.style.animation = "scan 4s linear infinite";
         }, 10);
       }, 4000);
-      
+
       return () => clearInterval(interval);
     };
 
@@ -101,30 +101,30 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
   // D-pad button interactions
   useEffect(() => {
     const dpadButtons = document.querySelectorAll(".d-pad-btn");
-    
+
     const handleMouseDown = (e) => {
       e.target.style.transform = "scale(0.95)";
       e.target.style.background = "#ff5722";
     };
-    
+
     const handleMouseUp = (e) => {
       e.target.style.transform = "scale(1.08)";
       setTimeout(() => {
         e.target.style.background = "#555";
       }, 150);
     };
-    
+
     const handleMouseLeave = (e) => {
       e.target.style.transform = "scale(1)";
       e.target.style.background = "#555";
     };
-    
+
     dpadButtons.forEach((button) => {
       button.addEventListener("mousedown", handleMouseDown);
       button.addEventListener("mouseup", handleMouseUp);
       button.addEventListener("mouseleave", handleMouseLeave);
     });
-    
+
     return () => {
       dpadButtons.forEach((button) => {
         button.removeEventListener("mousedown", handleMouseDown);
@@ -137,25 +137,25 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
   // Action button interactions
   useEffect(() => {
     const actionButtons = document.querySelectorAll(".action-btn");
-    
+
     const handleMouseDown = (e) => {
       e.target.style.transform = "scale(0.9)";
     };
-    
+
     const handleMouseUp = (e) => {
       e.target.style.transform = "scale(1.15)";
     };
-    
+
     const handleMouseLeave = (e) => {
       e.target.style.transform = "scale(1)";
     };
-    
+
     actionButtons.forEach((button) => {
       button.addEventListener("mousedown", handleMouseDown);
       button.addEventListener("mouseup", handleMouseUp);
       button.addEventListener("mouseleave", handleMouseLeave);
     });
-    
+
     return () => {
       actionButtons.forEach((button) => {
         button.removeEventListener("mousedown", handleMouseDown);
@@ -168,30 +168,38 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
   // Input focus effects
   useEffect(() => {
     const inputFields = document.querySelectorAll(".input-field");
-    
+
     const handleFocus = (e) => {
-      const label = e.target.parentElement.querySelector("label");
+      let label = e.target.parentElement.querySelector("label");
+      // For password fields with nested structure, check parent's parent
+      if (!label && e.target.parentElement.parentElement) {
+        label = e.target.parentElement.parentElement.querySelector("label");
+      }
       if (label) {
         label.style.color = "#ff5722";
         label.style.transform = "translateY(-5px) scale(0.9)";
       }
     };
-    
+
     const handleBlur = (e) => {
       if (!e.target.value) {
-        const label = e.target.parentElement.querySelector("label");
+        let label = e.target.parentElement.querySelector("label");
+        // For password fields with nested structure, check parent's parent
+        if (!label && e.target.parentElement.parentElement) {
+          label = e.target.parentElement.parentElement.querySelector("label");
+        }
         if (label) {
           label.style.color = "#ccc";
           label.style.transform = "translateY(0) scale(1)";
         }
       }
     };
-    
+
     inputFields.forEach((input) => {
       input.addEventListener("focus", handleFocus);
       input.addEventListener("blur", handleBlur);
     });
-    
+
     return () => {
       inputFields.forEach((input) => {
         input.removeEventListener("focus", handleFocus);
@@ -209,19 +217,19 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
       triggerErrorAnimation();
       return;
     }
-    
+
     if (!password.trim()) {
       setError("Please enter your password");
       triggerErrorAnimation();
       return;
     }
-    
+
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
       triggerErrorAnimation();
       return;
     }
-    
+
     // Success - show loading state
     setIsLoading(true);
     const controller = document.querySelector(".controller");
@@ -230,7 +238,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
       controller.style.opacity = "0.8";
       controller.style.transform = "scale(0.98)";
       createSuccessParticles();
-      
+
       setTimeout(() => {
         setIsLoading(false);
         onLogin();
@@ -307,7 +315,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         closeForgotPasswordModal();
       }
     };
-    
+
     document.addEventListener("keypress", handleKeyPress);
     document.addEventListener("keydown", handleKeyPress);
     return () => {
@@ -319,24 +327,24 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
   const createSuccessParticles = () => {
     const controller = document.querySelector(".controller");
     if (!controller) return;
-    
+
     const rect = controller.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    
+
     for (let i = 0; i < 15; i++) {
       const particle = document.createElement("div");
       particle.className = "particle";
       particle.style.position = "fixed";
       particle.style.zIndex = "100";
-      
+
       const size = Math.random() * 8 + 4;
       const angle = Math.random() * Math.PI * 2;
       const distance = Math.random() * 100 + 50;
       const duration = Math.random() * 1 + 0.5;
       const endX = Math.cos(angle) * distance;
       const endY = Math.sin(angle) * distance;
-      
+
       // Create unique animation for each particle
       const animationName = `successParticle${i}`;
       const style = document.createElement("style");
@@ -353,16 +361,16 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         }
       `;
       document.head.appendChild(style);
-      
+
       particle.style.width = `${size}px`;
       particle.style.height = `${size}px`;
       particle.style.left = `${centerX}px`;
       particle.style.top = `${centerY}px`;
       particle.style.background = `rgba(255, 215, 0, 0.8)`;
       particle.style.animation = `${animationName} ${duration}s ease-out forwards`;
-      
+
       document.body.appendChild(particle);
-      
+
       setTimeout(() => {
         particle.remove();
         style.remove();
@@ -1517,42 +1525,42 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           <div className="controller">
             <div className="logo">
               <h1>BaitHub</h1>
-          </div>
+            </div>
 
             <form id="loginForm" onSubmit={handleSubmit}>
               <div className="input-group">
                 <label htmlFor="username">USERNAME</label>
-              <input
-                type="text"
+                <input
+                  type="text"
                   id="username"
                   className="input-field"
                   placeholder="Enter your username"
-                value={username}
+                  value={username}
                   onChange={(e) => {
                     setUsername(e.target.value);
                     setError("");
                   }}
                   autoComplete="username"
-                required
+                  required
                   aria-describedby={error ? "username-error" : undefined}
-              />
-            </div>
+                />
+              </div>
 
               <div className={`input-group ${error ? "has-error" : ""}`}>
                 <label htmlFor="password">PASSWORD</label>
                 <div className="password-input-wrapper">
-              <input
+                  <input
                     type={showPassword ? "text" : "password"}
                     id="password"
                     className="input-field"
                     placeholder="Enter your password"
-                value={password}
+                    value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
                       if (error) setError("");
                     }}
                     autoComplete="current-password"
-                required
+                    required
                     aria-describedby={error ? "password-error" : undefined}
                     style={{ paddingRight: "60px" }}
                   />
@@ -1631,7 +1639,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                   ×
                 </button>
               </div>
-              
+
               <form onSubmit={handleForgotPasswordSubmit}>
                 <div className="input-group">
                   <label htmlFor="reset-email">Email Address</label>
@@ -1682,7 +1690,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
             </div>
           </div>
         )}
-    </div>
+      </div>
     </>
   );
 }
