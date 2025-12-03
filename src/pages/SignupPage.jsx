@@ -392,11 +392,12 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
   const handleLoginClick = () => {
     const controller = document.querySelector(".controller");
     if (controller) {
-      controller.style.animation = "none";
-      controller.style.transform = "rotateY(180deg) scale(1.05)";
+      controller.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+      controller.style.opacity = "0";
+      controller.style.transform = "scale(0.95)";
       setTimeout(() => {
         onSwitchToLogin();
-      }, 600);
+      }, 400);
     }
   };
 

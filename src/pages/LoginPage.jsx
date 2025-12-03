@@ -49,33 +49,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
   // Create background elements
   useEffect(() => {
-    const createBackgroundElements = () => {
-      if (!backgroundElementsRef.current) return;
-      backgroundElementsRef.current.innerHTML = "";
-      const elementCount = 8;
-      
-      for (let i = 0; i < elementCount; i++) {
-        const element = document.createElement("div");
-        element.className = "floating-element";
-        
-        const size = Math.random() * 200 + 100;
-        const left = Math.random() * 100;
-        const top = Math.random() * 100;
-        const animationDuration = Math.random() * 30 + 20;
-        const animationDelay = Math.random() * 10;
-        
-        element.style.width = `${size}px`;
-        element.style.height = `${size}px`;
-        element.style.left = `${left}%`;
-        element.style.top = `${top}%`;
-        element.style.animationDuration = `${animationDuration}s`;
-        element.style.animationDelay = `${animationDelay}s`;
-        
-        backgroundElementsRef.current.appendChild(element);
-      }
-    };
-
-    createBackgroundElements();
+    // Removed floating elements that appear at top - keeping only bottom-to-top particles
   }, []);
 
   // Create grid background
@@ -100,27 +74,6 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         line.style.left = `${i * 50}px`;
         line.style.animationDelay = `${Math.random() * 5}s`;
         gridBackgroundRef.current.appendChild(line);
-      }
-      
-      // Create pulse circles
-      for (let i = 0; i < 5; i++) {
-        const circle = document.createElement("div");
-        circle.className = "pulse-circle";
-        
-        const size = Math.random() * 200 + 100;
-        const left = Math.random() * 100;
-        const top = Math.random() * 100;
-        const animationDuration = Math.random() * 10 + 5;
-        const animationDelay = Math.random() * 5;
-        
-        circle.style.width = `${size}px`;
-        circle.style.height = `${size}px`;
-        circle.style.left = `${left}%`;
-        circle.style.top = `${top}%`;
-        circle.style.animationDuration = `${animationDuration}s`;
-        circle.style.animationDelay = `${animationDelay}s`;
-        
-        gridBackgroundRef.current.appendChild(circle);
       }
     };
 
@@ -273,14 +226,15 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     setIsLoading(true);
     const controller = document.querySelector(".controller");
     if (controller) {
-      controller.style.animation = "none";
-      controller.style.transform = "scale(1.05) rotateY(10deg)";
+      controller.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+      controller.style.opacity = "0.8";
+      controller.style.transform = "scale(0.98)";
       createSuccessParticles();
       
       setTimeout(() => {
         setIsLoading(false);
-      onLogin();
-      }, 800);
+        onLogin();
+      }, 500);
     }
   };
 
@@ -419,11 +373,12 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
   const handleSignupClick = () => {
     const controller = document.querySelector(".controller");
     if (controller) {
-      controller.style.animation = "none";
-      controller.style.transform = "rotateY(180deg) scale(1.05)";
+      controller.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+      controller.style.opacity = "0";
+      controller.style.transform = "scale(0.95)";
       setTimeout(() => {
         onSwitchToSignup();
-      }, 600);
+      }, 400);
     }
   };
 
@@ -1089,36 +1044,6 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           20%, 40%, 60%, 80% { transform: translateX(5px) rotate(1deg); }
         }
 
-        .background-elements {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: 0;
-          overflow: hidden;
-          pointer-events: none;
-        }
-
-        .floating-element {
-          position: absolute;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.03);
-          animation: floating 20s infinite linear;
-        }
-
-        @keyframes floating {
-          0% {
-            transform: translateY(0) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-20px) rotate(180deg);
-          }
-          100% {
-            transform: translateY(0) rotate(360deg);
-          }
-        }
-
         .grid-background {
           position: fixed;
           top: 0;
@@ -1157,24 +1082,6 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         @keyframes gridMoveVertical {
           0% { transform: translateX(0); }
           100% { transform: translateX(100px); }
-        }
-
-        .pulse-circle {
-          position: absolute;
-          border-radius: 50%;
-          border: 1px solid rgba(255, 87, 34, 0.3);
-          animation: pulse 8s infinite ease-in-out;
-        }
-
-        @keyframes pulse {
-          0%, 100% {
-            transform: scale(0.5);
-            opacity: 0;
-          }
-          50% {
-            transform: scale(1.2);
-            opacity: 0.3;
-          }
         }
 
         .scan-line {
