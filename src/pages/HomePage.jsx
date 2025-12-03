@@ -5,6 +5,17 @@ import Comments from "../components/Comments";
 
 export default function HomePage({ setActiveView, onViewUserProfile }) {
   const [activePostId, setActivePostId] = useState(null);
+  const [postsComments, setPostsComments] = useState({
+    0: [
+      { id: 1, username: "john_doe", text: "Great post!", likes: 5, liked: false, image: "https://i.pravatar.cc/100?img=1" },
+      { id: 2, username: "jane_smith", text: "Love this!", likes: 3, liked: false, image: "https://i.pravatar.cc/100?img=2" },
+    ],
+    1: [
+      { id: 1, username: "mike_wilson", text: "Amazing content!", likes: 8, liked: false, image: "https://i.pravatar.cc/100?img=3" },
+    ],
+    2: [],
+    3: [],
+  });
 
   const handleCommentClick = (postId) => {
     setActivePostId(postId);
@@ -46,12 +57,22 @@ export default function HomePage({ setActiveView, onViewUserProfile }) {
 
           {/* Comments Section - Desktop only, side by side */}
             <div className="hidden md:block sticky top-0 h-fit">
-              <Comments isOpen={activePostId !== null} onClose={handleCloseComments} onViewUserProfile={onViewUserProfile} />
+              <Comments 
+                isOpen={activePostId !== null} 
+                onClose={handleCloseComments} 
+                initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
+                onViewUserProfile={onViewUserProfile} 
+              />
             </div>
 
           {/* Comments Section - Mobile only, overlay */}
           <div className="md:hidden">
-            <Comments isOpen={activePostId !== null} onClose={handleCloseComments} onViewUserProfile={onViewUserProfile} />
+            <Comments 
+              isOpen={activePostId !== null} 
+              onClose={handleCloseComments} 
+              initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
+              onViewUserProfile={onViewUserProfile} 
+            />
           </div>
         </div>
       </div>

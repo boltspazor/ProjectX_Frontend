@@ -370,21 +370,25 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
                       <img src={messageIcon} alt="share" className="w-5 h-5" />
                     </button>
                   </div>
-
-                  {/* Comments Component */}
-                  <Comments
-                    isOpen={openCommentsPostId === post.id}
-                    onClose={handleCloseComments}
-                    variant="overlay"
-                    initialComments={post.commentsList || []}
-                    onViewUserProfile={onViewUserProfile}
-                  />
                 </div>
               );
             })}
           </main>
         </div>
       </div>
+
+      {/* Comments Section - Overlay for both mobile and desktop */}
+      <Comments
+        isOpen={openCommentsPostId !== null}
+        onClose={handleCloseComments}
+        variant="overlay"
+        initialComments={
+          openCommentsPostId !== null
+            ? posts.find(p => p.id === openCommentsPostId)?.commentsList || []
+            : []
+        }
+        onViewUserProfile={onViewUserProfile}
+      />
 
       {/* Share Modal */}
       <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} onViewUserProfile={onViewUserProfile} />
