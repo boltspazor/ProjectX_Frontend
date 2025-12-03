@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, X } from "lucide-react";
 import ShareModal from "./ShareModal";
@@ -13,6 +13,8 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
   const [likes, setLikes] = useState(234);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const commentsEndRef = useRef(null);
+  const commentsContainerRef = useRef(null);
   const [comments, setComments] = useState([
     {
       id: 1,
@@ -60,6 +62,13 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
+
+  // Auto-scroll to bottom when comments change
+  useEffect(() => {
+    if (commentsEndRef.current && commentsContainerRef.current) {
+      commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [comments]);
 
   const handleLike = () => {
     setLiked(!liked);
@@ -110,158 +119,206 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
           />
 
           {/* Modal Content */}
-          <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 pointer-events-none">
+          <div className="fixed inset-0 z-[101] flex items-center justify-center p-0 md:p-6 pointer-events-none">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-6xl max-h-[90vh] bg-[#111] rounded-2xl overflow-hidden pointer-events-auto flex flex-col md:flex-row"
+              className="w-full h-full md:h-[90vh] md:max-w-7xl bg-[#0f0f0f] md:rounded-2xl overflow-hidden pointer-events-auto flex flex-col md:grid md:grid-cols-2 gap-0"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors"
+                className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/80 hover:bg-black flex items-center justify-center transition-colors"
               >
                 <X className="w-5 h-5 text-white" />
               </button>
 
-              {/* Post Image */}
-              <div className="w-full md:w-1/2 bg-black flex items-center justify-center aspect-[4/3] md:aspect-auto md:h-full min-h-[300px] max-h-[70vh] md:max-h-full">
-                <img
-                  src={postImage}
-                  alt="Post"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-
-              {/* Post Details */}
-              <div className="w-full md:w-1/2 flex flex-col bg-[#111] max-h-[70vh] md:max-h-full">
+              {/* Left Side - Post (looks exactly like PostCard) */}
+              <div className="w-full h-1/2 md:h-full flex flex-col bg-[#111] md:border-r border-b md:border-b-0 border-gray-800 overflow-hidden">
                 {/* User Info Header */}
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full overflow-hidden flex-shrink-0">
+                  <div className="h-9 w-9 rounded-full overflow-hidden flex-shrink-0">
                     <LiveProfilePhoto
                       imageSrc={profileImage}
                       videoSrc={getProfileVideoUrl(profileImage, username)}
                       alt="profile"
-                      className="h-10 w-10 rounded-full"
+                      className="h-9 w-9 rounded-full"
                     />
                   </div>
                   <button
                     onClick={() => onViewUserProfile && onViewUserProfile(username)}
-                    className="text-sm font-semibold hover:opacity-70 transition-opacity cursor-pointer"
+                    className="text-sm font-medium hover:opacity-70 transition-opacity cursor-pointer"
                   >
                     {username}
                   </button>
                 </div>
 
-                {/* Comments Section - Scrollable */}
-                <div className="flex-1 overflow-y-auto scrollbar-hide">
-                  {/* Caption */}
-                  <div className="px-4 py-3 border-b border-gray-800">
-                    <p className="text-sm">
-                      <button
-                        onClick={() => onViewUserProfile && onViewUserProfile(username)}
-                        className="font-semibold mr-2 hover:opacity-70 transition-opacity cursor-pointer"
-                      >
-                        {username}
-                      </button>
-                      <span className="text-gray-300">{caption}</span>
-                    </p>
-                  </div>
-
-                  {/* Comments */}
-                  <div className="px-4 py-4 space-y-4">
-                    {comments.map((comment) => (
-                      <div key={comment.id} className="flex items-start gap-3">
-                        <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
-                          <LiveProfilePhoto
-                            imageSrc={comment.image}
-                            videoSrc={getProfileVideoUrl(comment.image, comment.username)}
-                            alt={comment.username}
-                            className="h-8 w-8 rounded-full"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm">
-                            <button
-                              onClick={() => onViewUserProfile && onViewUserProfile(comment.username)}
-                              className="font-semibold mr-2 hover:opacity-70 transition-opacity cursor-pointer"
-                            >
-                              {comment.username}
-                            </button>
-                            <span className="text-gray-300">{comment.text}</span>
-                          </p>
-                          <div className="flex items-center gap-4 mt-1">
-                            <span className="text-xs text-gray-500">{comment.time}</span>
-                            <button
-                              onClick={() => handleLikeComment(comment.id)}
-                              className="text-xs text-gray-500 hover:text-white transition-colors"
-                            >
-                              {comment.liked ? "Liked" : "Like"}
-                            </button>
-                            <button className="text-xs text-gray-500 hover:text-white transition-colors">Reply</button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                {/* Post Image - Fills available space */}
+                <div className="flex-1 bg-black overflow-hidden flex items-center justify-center">
+                  <img
+                    src={postImage}
+                    alt="Post"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
 
                 {/* Actions */}
-                <div className="border-t border-gray-800 flex-shrink-0">
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-4 px-4 py-3">
-                    <button onClick={handleLike} className="focus:outline-none">
-                      <Heart
-                        className={`h-6 w-6 cursor-pointer hover:scale-110 transition-all duration-200 ${
-                          liked ? "fill-red-500 text-red-500" : "text-white"
-                        }`}
-                      />
-                    </button>
-                    <button className="focus:outline-none">
-                      <img
-                        src={commentIcon}
-                        alt="comment"
-                        className="h-6 w-6 cursor-pointer hover:scale-110 transition-transform duration-200"
-                      />
-                    </button>
-                    <button onClick={handleShareClick} className="focus:outline-none">
-                      <img
-                        src={messageIcon}
-                        alt="share"
-                        className="h-6 w-6 cursor-pointer hover:scale-110 transition-transform duration-200"
-                      />
-                    </button>
-                  </div>
+                <div className="flex items-center gap-4 px-4 py-3 flex-shrink-0 border-t border-gray-800">
+                  <button onClick={handleLike} className="focus:outline-none">
+                    <Heart
+                      className={`h-6 w-6 cursor-pointer hover:scale-110 transition-all duration-200 ${
+                        liked ? "fill-red-500 text-red-500" : "text-white"
+                      }`}
+                    />
+                  </button>
+                  <button className="focus:outline-none">
+                    <img
+                      src={commentIcon}
+                      alt="comment"
+                      className="h-6 w-6 cursor-pointer hover:scale-110 transition-transform duration-200"
+                    />
+                  </button>
+                  <button onClick={handleShareClick} className="focus:outline-none">
+                    <img
+                      src={messageIcon}
+                      alt="share"
+                      className="h-6 w-6 cursor-pointer hover:scale-110 transition-transform duration-200"
+                    />
+                  </button>
+                </div>
 
-                  {/* Likes Count */}
-                  <div className="px-4 pb-2">
-                    <p className="text-sm font-semibold">{likes.toLocaleString()} likes</p>
-                  </div>
+                {/* Likes Count */}
+                <div className="px-4 pb-2 flex-shrink-0">
+                  <p className="text-sm font-semibold">{likes.toLocaleString()} likes</p>
+                </div>
 
-                  {/* Comment Input */}
-                  <div className="px-4 pb-4 border-t border-gray-800 pt-3">
-                    <div className="flex items-center gap-2">
+                {/* Caption */}
+                <div className="px-4 pb-4 flex-shrink-0">
+                  <p className="text-sm">
+                    <button
+                      onClick={() => onViewUserProfile && onViewUserProfile(username)}
+                      className="font-semibold mr-2 hover:opacity-70 transition-opacity cursor-pointer"
+                    >
+                      {username}
+                    </button>
+                    <span className="text-gray-300">{caption}</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Side - Comments Section */}
+              <div className="w-full h-1/2 md:h-full flex flex-col bg-[#0f0f0f] overflow-hidden">
+                {/* Comments Header */}
+                <div className="flex items-center justify-between p-3 md:p-5 border-b border-gray-800 flex-shrink-0">
+                  <h3 className="text-base md:text-xl font-semibold text-white">Comments</h3>
+                </div>
+
+                {/* Comments List - Scrollable with fixed height */}
+                <div 
+                  ref={commentsContainerRef}
+                  className="flex-1 overflow-y-auto p-3 md:p-5 space-y-3 md:space-y-5 scrollbar-hide"
+                >
+                  {comments.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full py-12">
+                      <p className="text-gray-400 text-center">No comments yet. Be the first to comment!</p>
+                    </div>
+                  ) : (
+                    <>
+                      {comments.map((comment, index) => (
+                        <motion.div
+                          key={comment.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05, duration: 0.3 }}
+                          className="flex gap-3 md:gap-4"
+                        >
+                          <div className="w-9 h-9 md:w-10 md:h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-700">
+                            <LiveProfilePhoto
+                              imageSrc={comment.image}
+                              videoSrc={getProfileVideoUrl(comment.image, comment.username)}
+                              alt={comment.username}
+                              className="w-9 h-9 md:w-10 md:h-10 rounded-full"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="bg-[#1a1a1a] rounded-2xl px-4 py-2.5 md:px-5 md:py-3 hover:bg-[#1f1f1f] transition-colors">
+                              <button
+                                onClick={() => onViewUserProfile && onViewUserProfile(comment.username)}
+                                className="font-semibold text-sm md:text-base text-white mb-1 hover:opacity-70 transition-opacity cursor-pointer"
+                              >
+                                {comment.username}
+                              </button>
+                              <p className="text-sm md:text-base text-gray-300 leading-relaxed break-words">
+                                {comment.text}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-4 md:gap-5 mt-2 px-2">
+                              <button
+                                onClick={() => handleLikeComment(comment.id)}
+                                className="flex items-center gap-1.5 text-xs md:text-sm hover:scale-105 transition-transform group"
+                              >
+                                <Heart
+                                  className={`h-4 w-4 md:h-5 md:w-5 transition-all group-hover:scale-110 ${
+                                    comment.liked ? "fill-red-500 text-red-500" : "text-gray-400 group-hover:text-gray-300"
+                                  }`}
+                                />
+                                <span
+                                  className={comment.liked ? "text-red-500 font-semibold" : "text-gray-400 group-hover:text-gray-300"}
+                                >
+                                  {comment.likes > 0 ? comment.likes.toLocaleString() : "Like"}
+                                </span>
+                              </button>
+                              <span className="text-xs md:text-sm text-gray-500">{comment.time}</span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                      {/* Invisible element to scroll to */}
+                      <div ref={commentsEndRef} />
+                    </>
+                  )}
+                </div>
+
+                {/* Comment Input */}
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2, duration: 0.3 }}
+                  className="border-t border-gray-800 p-3 md:p-5 bg-[#0f0f0f] flex-shrink-0"
+                >
+                  <div className="flex gap-2 md:gap-4 items-center">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-700">
+                      <LiveProfilePhoto
+                        imageSrc={profilePhoto}
+                        videoSrc={getProfileVideoUrl(profilePhoto, "idkwhoisrahul_04")}
+                        alt="Your profile"
+                        className="w-8 h-8 md:w-10 md:h-10 rounded-full"
+                      />
+                    </div>
+                    <div className="flex-1 flex gap-2 items-center min-w-0">
                       <input
                         type="text"
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
+                        onKeyPress={(e) => e.key === "Enter" && handleSendComment()}
                         placeholder="Add a comment..."
-                        className="flex-1 bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none"
+                        className="flex-1 min-w-0 bg-[#1a1a1a] border border-gray-700 text-white rounded-full px-3 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder-gray-500 transition-all"
                       />
-                      <button
+                      <motion.button
                         onClick={handleSendComment}
                         disabled={!newComment.trim()}
-                        className="text-sm text-orange-500 font-semibold hover:text-orange-400 transition-colors disabled:text-gray-600 disabled:cursor-not-allowed"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-3 md:px-6 py-2 md:py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded-full text-xs md:text-base font-semibold transition-colors text-white flex-shrink-0"
                       >
-                        Post
-                      </button>
+                        Send
+                      </motion.button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           </div>
