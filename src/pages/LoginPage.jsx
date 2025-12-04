@@ -241,7 +241,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
       setTimeout(() => {
         setIsLoading(false);
-        onLogin();
+      onLogin();
       }, 500);
     }
   };
@@ -1530,62 +1530,62 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
             <form id="loginForm" onSubmit={handleSubmit}>
               <div className="input-group">
                 <label htmlFor="username">USERNAME</label>
-                <input
-                  type="text"
+              <input
+                type="text"
                   id="username"
                   className="input-field"
                   placeholder="Enter your username"
-                  value={username}
+                value={username}
                   onChange={(e) => {
                     setUsername(e.target.value);
                     setError("");
                   }}
                   autoComplete="username"
-                  required
+                required
                   aria-describedby={error ? "username-error" : undefined}
-                />
-              </div>
+              />
+            </div>
 
               <div className={`input-group ${error ? "has-error" : ""}`}>
                 <label htmlFor="password">PASSWORD</label>
                 <div className="password-input-wrapper">
-                  <input
+              <input
                     type={showPassword ? "text" : "password"}
                     id="password"
                     className="input-field"
                     placeholder="Enter your password"
-                    value={password}
+                value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
                       if (error) setError("");
                     }}
                     autoComplete="current-password"
-                    required
+                required
                     aria-describedby={error ? "password-error" : undefined}
                     style={{ paddingRight: "60px" }}
-                  />
+              />
                   {password && (
-                    <button
-                      type="button"
+                <button
+                  type="button"
                       className="password-toggle"
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
                       aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
+                >
                       {showPassword ? "HIDE" : "SHOW"}
-                    </button>
+                </button>
                   )}
-                </div>
+              </div>
                 {error && (
                   <span className="error-message" role="alert" id="password-error">
                     {error}
                   </span>
                 )}
-              </div>
+            </div>
 
               <div className="button-group">
                 <button
-                  type="submit"
+              type="submit"
                   className={`btn login-btn ${isLoading ? "loading" : ""}`}
                   disabled={isLoading || !username.trim() || !password.trim()}
                   aria-busy={isLoading}
@@ -1601,7 +1601,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                   SIGN UP
                 </button>
               </div>
-            </form>
+          </form>
 
             <div className="controller-buttons">
               <div className="d-pad">
@@ -1669,14 +1669,14 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                 </div>
 
                 <div className="button-group">
-                  <button
+              <button
                     type="submit"
                     className={`btn login-btn ${isSendingReset ? "loading" : ""}`}
                     disabled={isSendingReset || forgotPasswordSuccess || !forgotPasswordEmail.trim()}
                     aria-busy={isSendingReset}
                   >
                     <span>{isSendingReset ? "SENDING..." : forgotPasswordSuccess ? "SENT!" : "SEND RESET LINK"}</span>
-                  </button>
+              </button>
                   <button
                     type="button"
                     className="btn signup-btn"
@@ -1685,10 +1685,10 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                   >
                     CANCEL
                   </button>
-                </div>
-              </form>
-            </div>
           </div>
+              </form>
+        </div>
+    </div>
         )}
       </div>
     </>

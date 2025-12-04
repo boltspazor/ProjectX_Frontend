@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { LogOut, Settings } from "lucide-react";
 import profilePhotoDefault from "../assets/profile-photo.jpg";
@@ -108,6 +108,20 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
   const postsCount = posts.length;
   const followersCount = followersList.length;
   const followingCount = followingList.length;
+
+  // Listen for new posts created from CreatePost component
+  useEffect(() => {
+    const handleNewPost = (event) => {
+      const newPost = event.detail;
+      // Add new post to the beginning of the posts array
+      setPosts((prevPosts) => [newPost, ...prevPosts]);
+    };
+
+    window.addEventListener("newPostCreated", handleNewPost);
+    return () => {
+      window.removeEventListener("newPostCreated", handleNewPost);
+    };
+  }, []);
 
   const handlePostClick = (post) => {
     setSelectedPost(post);

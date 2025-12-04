@@ -313,7 +313,7 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
 
       setTimeout(() => {
         setIsLoading(false);
-        onSignup();
+      onSignup();
       }, 800);
     }
   };
@@ -1231,67 +1231,67 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
           <div className="controller">
             <div className="logo">
               <h1>BaitHub</h1>
-            </div>
+          </div>
 
             <form id="signupForm" onSubmit={handleSubmit}>
               <div className={`input-group ${error && !formData.name.trim() ? "has-error" : ""}`}>
                 <label htmlFor="name">FULL NAME</label>
-                <input
-                  type="text"
+              <input
+                type="text"
                   id="name"
-                  name="name"
+                name="name"
                   className="input-field"
                   placeholder="Enter your full name"
-                  value={formData.name}
-                  onChange={handleChange}
+                value={formData.name}
+                onChange={handleChange}
                   autoComplete="name"
-                  required
-                />
-              </div>
+                required
+              />
+            </div>
 
               <div className={`input-group ${error && !formData.username.trim() ? "has-error" : ""}`}>
                 <label htmlFor="username">USERNAME</label>
-                <input
-                  type="text"
+              <input
+                type="text"
                   id="username"
-                  name="username"
+                name="username"
                   className="input-field"
                   placeholder="Choose a username"
-                  value={formData.username}
-                  onChange={handleChange}
+                value={formData.username}
+                onChange={handleChange}
                   autoComplete="username"
-                  required
-                />
-              </div>
+                required
+              />
+            </div>
 
               <div className={`input-group ${error && !formData.email.trim() ? "has-error" : ""}`}>
                 <label htmlFor="email">EMAIL</label>
-                <input
-                  type="email"
+              <input
+                type="email"
                   id="email"
-                  name="email"
+                name="email"
                   className="input-field"
                   placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={handleChange}
+                value={formData.email}
+                onChange={handleChange}
                   autoComplete="email"
-                  required
-                />
-              </div>
+                required
+              />
+            </div>
 
               <div className={`input-group ${error && (!formData.password.trim() || formData.password.length < 6) ? "has-error" : ""}`}>
                 <label htmlFor="password">PASSWORD</label>
                 <div className="password-input-wrapper">
-                  <input
+              <input
                     type={showPassword ? "text" : "password"}
                     id="password"
-                    name="password"
+                name="password"
                     className="input-field"
                     placeholder="Create a password"
-                    value={formData.password}
-                    onChange={handleChange}
+                value={formData.password}
+                onChange={handleChange}
                     autoComplete="new-password"
-                    required
+                required
                     style={{ paddingRight: "60px" }}
                   />
                   {formData.password && (
@@ -1311,13 +1311,13 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
                     {error}
                   </span>
                 )}
-              </div>
+            </div>
 
               <div className={`terms-checkbox ${error && !agreedToTerms ? "has-error" : ""}`}>
-                <input
-                  type="checkbox"
-                  id="terms"
-                  checked={agreedToTerms}
+              <input
+                type="checkbox"
+                id="terms"
+                checked={agreedToTerms}
                   onChange={(e) => {
                     setAgreedToTerms(e.target.checked);
                     if (error) setError("");
@@ -1332,26 +1332,26 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
                   <a href="#" onClick={(e) => e.preventDefault()}>
                     Privacy Policy
                   </a>
-                </label>
-              </div>
+              </label>
+            </div>
 
               <div className="button-group">
                 <button
-                  type="submit"
+              type="submit"
                   className={`btn signup-btn ${isLoading ? "loading" : ""}`}
                   disabled={isLoading || !formData.name.trim() || !formData.username.trim() || !formData.email.trim() || !formData.password.trim() || !agreedToTerms}
                   aria-busy={isLoading}
                 >
                   <span>{isLoading ? "CREATING..." : "SIGN UP"}</span>
                 </button>
-                <button
+              <button
                   type="button"
                   className="btn login-btn"
                   onClick={handleLoginClick}
                   disabled={isLoading}
                 >
                   LOGIN
-                </button>
+              </button>
               </div>
             </form>
 
@@ -1370,7 +1370,7 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
             </div>
           </div>
         </div>
-      </div>
+    </div>
     </>
   );
 }
