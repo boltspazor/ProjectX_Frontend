@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Heart, Send } from "lucide-react";
 import ShareModal from "./ShareModal";
 
-export default function StoryViewer({ stories, initialIndex, onClose }) {
+export default function StoryViewer({ stories, initialIndex, onClose, onStoryViewed }) {
   const [currentStoryIndex, setCurrentStoryIndex] = useState(initialIndex);
   const [viewedStories, setViewedStories] = useState(new Set([initialIndex]));
   const [progress, setProgress] = useState(0);
@@ -66,11 +66,27 @@ export default function StoryViewer({ stories, initialIndex, onClose }) {
     };
   }, [currentStoryIndex, isPaused]);
 
+  const markViewed = (index) => {
+    setViewedStories((prev) => {
+      const nextSet = new Set([...prev, index]);
+      return nextSet;
+    });
+    if (onStoryViewed && stories[index]) {
+      onStoryViewed(stories[index].id);
+    }
+  };
+
+  // Mark initial story as viewed on mount
+  useEffect(() => {
+    markViewed(initialIndex);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleNext = () => {
     if (currentStoryIndex < stories.length - 1) {
       const nextIndex = currentStoryIndex + 1;
       setCurrentStoryIndex(nextIndex);
-      setViewedStories((prev) => new Set([...prev, nextIndex]));
+      markViewed(nextIndex);
       setProgress(0);
     } else {
       onClose();
@@ -81,6 +97,7 @@ export default function StoryViewer({ stories, initialIndex, onClose }) {
     if (currentStoryIndex > 0) {
       const prevIndex = currentStoryIndex - 1;
       setCurrentStoryIndex(prevIndex);
+      markViewed(prevIndex);
       setProgress(0);
     } else {
       onClose();
@@ -89,7 +106,7 @@ export default function StoryViewer({ stories, initialIndex, onClose }) {
 
   const handleStoryClick = (index) => {
     setCurrentStoryIndex(index);
-    setViewedStories((prev) => new Set([...prev, index]));
+    markViewed(index);
     setProgress(0);
   };
 

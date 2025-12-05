@@ -10,6 +10,7 @@ export default function Stories({ onAddStory }) {
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [selectedStoryIndex, setSelectedStoryIndex] = useState(null);
+  const [viewedStoryIds, setViewedStoryIds] = useState([]);
   const { profilePhoto, profileVideo } = useUserProfile();
 
   const stories = [
@@ -26,6 +27,14 @@ export default function Stories({ onAddStory }) {
     { id: 11, username: "user_123", image: "https://i.pravatar.cc/100?img=11" },
     { id: 12, username: "creative_mind", image: "https://i.pravatar.cc/100?img=12" },
   ];
+
+  // Sort stories: unseen first, then seen (stable by id)
+  const sortedStories = [...stories].sort((a, b) => {
+    const aSeen = viewedStoryIds.includes(a.id);
+    const bSeen = viewedStoryIds.includes(b.id);
+    if (aSeen === bSeen) return a.id - b.id;
+    return aSeen ? 1 : -1;
+  });
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -62,6 +71,13 @@ export default function Stories({ onAddStory }) {
         behavior: "smooth",
       });
     }
+  };
+
+  const handleStoryClick = (index, storyId) => {
+    setViewedStoryIds((prev) =>
+      prev.includes(storyId) ? prev : [...prev, storyId]
+    );
+    setSelectedStoryIndex(index);
   };
 
   return (
@@ -120,9 +136,10 @@ export default function Stories({ onAddStory }) {
           </motion.div>
 
         {/* Story Items */}
-          {stories.map((story, index) => {
-            const isLastStory = index === stories.length - 1;
+          {sortedStories.map((story, index) => {
+            const isLastStory = index === sortedStories.length - 1;
             const shouldShowArrow = isLastStory && showRightArrow;
+            const originalIndex = stories.findIndex((s) => s.id === story.id);
 
             return (
               <motion.div
@@ -134,8 +151,12 @@ export default function Stories({ onAddStory }) {
               >
                 <div className="relative group py-1">
                   <div 
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-orange-400 via-orange-500 to-orange-600 cursor-pointer hover:scale-105 transition-transform duration-200"
-                    onClick={() => setSelectedStoryIndex(index)}
+                    className={`w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] cursor-pointer hover:scale-105 transition-transform duration-200 ${
+                      viewedStoryIds.includes(story.id)
+                        ? "bg-gray-600"
+                        : "bg-gradient-to-tr from-orange-400 via-orange-500 to-orange-600"
+                    }`}
+                    onClick={() => handleStoryClick(originalIndex, story.id)}
                   >
                     <div className="w-full h-full rounded-full border-2 border-black overflow-hidden relative">
                 <img
@@ -190,6 +211,11 @@ export default function Stories({ onAddStory }) {
           stories={stories}
           initialIndex={selectedStoryIndex}
           onClose={() => setSelectedStoryIndex(null)}
+          onStoryViewed={(storyId) =>
+            setViewedStoryIds((prev) =>
+              prev.includes(storyId) ? prev : [...prev, storyId]
+            )
+          }
         />
       )}
     </div>
