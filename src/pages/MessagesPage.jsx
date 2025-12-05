@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import themeIcon from "../assets/theme.svg";
+import catTheme from "../assets/cat_theme.jpg";
+import xoxoTheme from "../assets/xoxo_theme.jpg";
 
 export default function MessagesPage({ onViewUserProfile, selectedChatUsername }) {
   const [activeChat, setActiveChat] = useState(null);
@@ -14,6 +17,35 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
     { id: 5, text: "That sounds exciting! Tell me more about it", sender: "sender", time: "10:36 AM" },
     { id: 6, text: "It's a social media app with some cool features", sender: "receiver", time: "10:38 AM" },
   ]);
+  const [chatThemes, setChatThemes] = useState({}); // key: chat id -> theme key
+  const [showThemePicker, setShowThemePicker] = useState(false);
+  const themePickerRef = useRef(null);
+
+  const themes = {
+    default: {
+      backgroundStyle: { backgroundColor: "#000" },
+      senderBubble: "bg-orange-600/40 text-white",
+      receiverBubble: "bg-orange-500/30 text-white",
+    },
+    cat: {
+      backgroundStyle: {
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(${catTheme})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      },
+      senderBubble: "bg-gray-200 text-black",
+      receiverBubble: "bg-gray-500/80 text-white",
+    },
+    xoxo: {
+      backgroundStyle: {
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url(${xoxoTheme})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      },
+      senderBubble: "bg-black/80 text-white",
+      receiverBubble: "bg-red-900/80 text-white",
+    },
+  };
 
   const chats = [
     { id: 1, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=10", time: "2h", unread: true },
@@ -55,6 +87,18 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChatUsername]);
 
+  // Close theme picker on outside click
+  useEffect(() => {
+    if (!showThemePicker) return;
+    const handler = (e) => {
+      if (themePickerRef.current && !themePickerRef.current.contains(e.target)) {
+        setShowThemePicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showThemePicker]);
+
   const handleSendMessage = () => {
     if (messageInput.trim()) {
       const newMessage = {
@@ -68,6 +112,13 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
     }
   };
 
+  const handleSelectTheme = (key) => {
+    if (!activeChat) return;
+    const chatKey = activeChat.id || activeChat.username;
+    setChatThemes((prev) => ({ ...prev, [chatKey]: key }));
+    setShowThemePicker(false);
+  };
+
   const handleChatClick = (chat) => {
     setActiveChat(chat);
   };
@@ -75,6 +126,9 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
   const handleBackClick = () => {
     setActiveChat(null);
   };
+
+  const activeChatKey = activeChat?.id || activeChat?.username;
+  const currentTheme = activeChatKey ? chatThemes[activeChatKey] || "default" : "default";
 
   return (
     <main className={`flex-1 overflow-hidden bg-black ${activeChat ? 'fixed inset-0 z-[70] md:relative md:z-auto md:h-[calc(100vh-4rem)]' : 'h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]'}`}>
@@ -136,31 +190,64 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
         {activeChat && (
           <div className="flex-1 flex flex-col bg-black">
             {/* Chat Header */}
-            <div className="flex items-center gap-3 p-4 border-b border-gray-800 bg-[#0f0f0f]">
-              <button
-                onClick={handleBackClick}
-                className="md:hidden p-2 hover:bg-gray-800 rounded-full transition"
-              >
-                <ArrowLeft className="w-5 h-5 text-white" />
-              </button>
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex-shrink-0">
-                <LiveProfilePhoto
-                  imageSrc={activeChat.image}
-                  videoSrc={getProfileVideoUrl(activeChat.image, activeChat.username)}
-                alt={activeChat.username}
-                  className="w-10 h-10 md:w-12 md:h-12 rounded-full"
-              />
+            <div className="flex items-center justify-between p-4 border-b border-gray-800 bg-[#0f0f0f] relative">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleBackClick}
+                  className="md:hidden p-2 hover:bg-gray-800 rounded-full transition"
+                >
+                  <ArrowLeft className="w-5 h-5 text-white" />
+                </button>
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex-shrink-0">
+                  <LiveProfilePhoto
+                    imageSrc={activeChat.image}
+                    videoSrc={getProfileVideoUrl(activeChat.image, activeChat.username)}
+                    alt={activeChat.username}
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full"
+                  />
+                </div>
+                <button
+                  onClick={() => onViewUserProfile && onViewUserProfile(activeChat.username)}
+                  className="font-semibold text-base md:text-lg text-white hover:opacity-70 transition-opacity cursor-pointer"
+                >
+                  {activeChat.username}
+                </button>
               </div>
-              <button
-                onClick={() => onViewUserProfile && onViewUserProfile(activeChat.username)}
-                className="font-semibold text-base md:text-lg text-white hover:opacity-70 transition-opacity cursor-pointer"
-              >
-                {activeChat.username}
-              </button>
+              <div className="relative" ref={themePickerRef}>
+                <button
+                  onClick={() => setShowThemePicker((s) => !s)}
+                  className="p-2 rounded-full hover:bg-gray-800 transition flex items-center justify-center"
+                  aria-label="Change chat theme"
+                >
+                  <img src={themeIcon} alt="theme" className="w-5 h-5 invert" />
+                </button>
+                {showThemePicker && (
+                  <div className="absolute right-0 mt-2 w-56 bg-[#0f0f0f] border border-gray-800 rounded-xl shadow-2xl p-3 z-20">
+                    <p className="text-sm text-gray-300 mb-3">Chat themes</p>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => handleSelectTheme("cat")}
+                        className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "cat" ? "border-orange-500" : "border-gray-700"}`}
+                        style={{ backgroundImage: `url(${catTheme})`, backgroundSize: "cover", backgroundPosition: "center" }}
+                        aria-label="Cat theme"
+                      />
+                      <button
+                        onClick={() => handleSelectTheme("xoxo")}
+                        className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "xoxo" ? "border-orange-500" : "border-gray-700"}`}
+                        style={{ backgroundImage: `url(${xoxoTheme})`, backgroundSize: "cover", backgroundPosition: "center" }}
+                        aria-label="XOXO theme"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+            <div
+              className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4"
+              style={themes[currentTheme]?.backgroundStyle || themes.default.backgroundStyle}
+            >
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -169,8 +256,8 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                   <div
                     className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${
                       message.sender === 'sender'
-                        ? 'bg-orange-600/40 text-white'
-                        : 'bg-orange-500/30 text-white'
+                        ? themes[currentTheme]?.senderBubble || themes.default.senderBubble
+                        : themes[currentTheme]?.receiverBubble || themes.default.receiverBubble
                     }`}
                   >
                     <p className="text-sm md:text-base">{message.text}</p>
