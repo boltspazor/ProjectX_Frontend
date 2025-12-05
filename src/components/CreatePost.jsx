@@ -1019,7 +1019,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                       alt="Upload"
                       className="w-20 h-20 invert"
                     />
-                  </div>
+        </div>
 
                   <p className="text-gray-300 text-lg">Drag photos and videos here</p>
                   <button
@@ -1542,8 +1542,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                     </button>
                   </div>
                   <div className="flex-1 overflow-y-auto p-4">
-                    <input
-                      type="text"
+        <input
+          type="text"
                       placeholder="Search for people..."
                       value={tagSearch}
                       onChange={(e) => setTagSearch(e.target.value)}
@@ -2155,8 +2155,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                           }`}
                         >
                           {filter.label}
-                        </span>
-                      </button>
+          </span>
+        </button>
                     ))}
                   </div>
                 </div>
@@ -2189,7 +2189,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                 >
                   Done
                 </button>
-              </div>
+        </div>
 
               {/* Crop Area */}
               <div className="flex-1 relative bg-black overflow-hidden flex items-center justify-center p-4">
@@ -2586,9 +2586,9 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                               className="sr-only peer"
                             />
                             <div className="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-                          </label>
-                        </div>
-                      </div>
+        </label>
+      </div>
+    </div>
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm text-white">Turn off commenting</span>
