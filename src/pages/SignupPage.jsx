@@ -122,6 +122,25 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
 
         gridBackgroundRef.current.appendChild(circle);
       }
+
+      // Soft translucent circles (ensure parity with login)
+      for (let i = 0; i < 10; i++) {
+        const soft = document.createElement("div");
+        soft.className = "soft-circle";
+
+        const size = Math.random() * 220 + 140; // 140-360px
+        const left = Math.random() * 90;
+        const top = Math.random() * 90;
+        const opacity = Math.random() * 0.10 + 0.08; // 0.08 - 0.18
+
+        soft.style.width = `${size}px`;
+        soft.style.height = `${size}px`;
+        soft.style.left = `${left}%`;
+        soft.style.top = `${top}%`;
+        soft.style.opacity = opacity.toFixed(2);
+
+        gridBackgroundRef.current.appendChild(soft);
+      }
     };
 
     createGridBackground();
@@ -313,7 +332,7 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
 
       setTimeout(() => {
         setIsLoading(false);
-        onSignup();
+      onSignup();
       }, 800);
     }
   };
@@ -1054,22 +1073,25 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
           border-radius: 50%;
           animation: float 15s infinite linear;
           box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+          transform: translateY(100vh);
+          opacity: 0;
+          animation-fill-mode: both;
         }
 
         @keyframes float {
           0% {
-            transform: translateY(100vh) rotate(0deg) scale(0);
+            transform: translateY(100vh) rotate(0deg) scale(0.8);
             opacity: 0;
           }
-          10% {
+          15% {
             opacity: 1;
-            transform: translateY(90vh) rotate(36deg) scale(1);
+            transform: translateY(80vh) rotate(36deg) scale(1);
           }
           90% {
             opacity: 1;
           }
           100% {
-            transform: translateY(-100px) rotate(360deg) scale(0);
+            transform: translateY(-120px) rotate(360deg) scale(0.8);
             opacity: 0;
           }
         }
@@ -1153,8 +1175,17 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
         .pulse-circle {
           position: absolute;
           border-radius: 50%;
-          border: 1px solid rgba(255, 87, 34, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
           animation: pulse 8s infinite ease-in-out;
+        }
+
+        .soft-circle {
+          position: absolute;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%);
+          filter: blur(2px);
+          pointer-events: none;
         }
 
         @keyframes pulse {
@@ -1231,67 +1262,67 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
           <div className="controller">
             <div className="logo">
               <h1>BaitHub</h1>
-            </div>
+          </div>
 
             <form id="signupForm" onSubmit={handleSubmit}>
               <div className={`input-group ${error && !formData.name.trim() ? "has-error" : ""}`}>
                 <label htmlFor="name">FULL NAME</label>
-                <input
-                  type="text"
+              <input
+                type="text"
                   id="name"
-                  name="name"
+                name="name"
                   className="input-field"
                   placeholder="Enter your full name"
-                  value={formData.name}
-                  onChange={handleChange}
+                value={formData.name}
+                onChange={handleChange}
                   autoComplete="name"
-                  required
-                />
-              </div>
+                required
+              />
+            </div>
 
               <div className={`input-group ${error && !formData.username.trim() ? "has-error" : ""}`}>
                 <label htmlFor="username">USERNAME</label>
-                <input
-                  type="text"
+              <input
+                type="text"
                   id="username"
-                  name="username"
+                name="username"
                   className="input-field"
                   placeholder="Choose a username"
-                  value={formData.username}
-                  onChange={handleChange}
+                value={formData.username}
+                onChange={handleChange}
                   autoComplete="username"
-                  required
-                />
-              </div>
+                required
+              />
+            </div>
 
               <div className={`input-group ${error && !formData.email.trim() ? "has-error" : ""}`}>
                 <label htmlFor="email">EMAIL</label>
-                <input
-                  type="email"
+              <input
+                type="email"
                   id="email"
-                  name="email"
+                name="email"
                   className="input-field"
                   placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={handleChange}
+                value={formData.email}
+                onChange={handleChange}
                   autoComplete="email"
-                  required
-                />
-              </div>
+                required
+              />
+            </div>
 
               <div className={`input-group ${error && (!formData.password.trim() || formData.password.length < 6) ? "has-error" : ""}`}>
                 <label htmlFor="password">PASSWORD</label>
                 <div className="password-input-wrapper">
-                  <input
+              <input
                     type={showPassword ? "text" : "password"}
                     id="password"
-                    name="password"
+                name="password"
                     className="input-field"
                     placeholder="Create a password"
-                    value={formData.password}
-                    onChange={handleChange}
+                value={formData.password}
+                onChange={handleChange}
                     autoComplete="new-password"
-                    required
+                required
                     style={{ paddingRight: "60px" }}
                   />
                   {formData.password && (
@@ -1311,13 +1342,13 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
                     {error}
                   </span>
                 )}
-              </div>
+            </div>
 
               <div className={`terms-checkbox ${error && !agreedToTerms ? "has-error" : ""}`}>
-                <input
-                  type="checkbox"
-                  id="terms"
-                  checked={agreedToTerms}
+              <input
+                type="checkbox"
+                id="terms"
+                checked={agreedToTerms}
                   onChange={(e) => {
                     setAgreedToTerms(e.target.checked);
                     if (error) setError("");
@@ -1332,26 +1363,26 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
                   <a href="#" onClick={(e) => e.preventDefault()}>
                     Privacy Policy
                   </a>
-                </label>
-              </div>
+              </label>
+            </div>
 
               <div className="button-group">
                 <button
-                  type="submit"
+              type="submit"
                   className={`btn signup-btn ${isLoading ? "loading" : ""}`}
                   disabled={isLoading || !formData.name.trim() || !formData.username.trim() || !formData.email.trim() || !formData.password.trim() || !agreedToTerms}
                   aria-busy={isLoading}
                 >
                   <span>{isLoading ? "CREATING..." : "SIGN UP"}</span>
                 </button>
-                <button
+              <button
                   type="button"
                   className="btn login-btn"
                   onClick={handleLoginClick}
                   disabled={isLoading}
                 >
                   LOGIN
-                </button>
+              </button>
               </div>
             </form>
 
@@ -1370,7 +1401,7 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
             </div>
           </div>
         </div>
-      </div>
+    </div>
     </>
   );
 }

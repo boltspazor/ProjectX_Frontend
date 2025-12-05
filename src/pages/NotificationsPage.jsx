@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
 export default function NotificationsPage({ setActiveView, onViewUserProfile, previousView = "home" }) {
-  const [showUndo, setShowUndo] = useState(false);
-  const [undoData, setUndoData] = useState(null);
   const [notifications, setNotifications] = useState({
     today: [
       {
@@ -106,17 +104,6 @@ export default function NotificationsPage({ setActiveView, onViewUserProfile, pr
     ],
   });
 
-  useEffect(() => {
-    let timer;
-    if (showUndo) {
-      timer = setTimeout(() => {
-        setShowUndo(false);
-        setUndoData(null);
-      }, 3000);
-    }
-    return () => clearTimeout(timer);
-  }, [showUndo]);
-
   const handleAction = (notificationId, section, actionType) => {
     if (actionType === "dismiss") {
       setNotifications((prev) => {
@@ -127,44 +114,25 @@ export default function NotificationsPage({ setActiveView, onViewUserProfile, pr
       return;
     }
 
-    // Don't show undo popup if clicking already-followed button
-    if (actionType === "following") {
-      return;
-    }
-
-    // Store previous state for undo
-    const previousState = JSON.parse(JSON.stringify(notifications));
-
     setNotifications((prev) => {
       const updated = { ...prev };
-      const notif = updated[section].find((n) => n.id === notificationId);
+      const notif = updated[section]?.find((n) => n.id === notificationId);
+      if (!notif) return prev;
 
       if (actionType === "follow_back" || actionType === "confirm_request") {
         notif.isFollowing = true;
         notif.action = "Following";
         notif.actionType = "following";
         notif.showDismiss = false;
+      } else if (actionType === "following") {
+        // Toggle back to follow (acts like undo without popup)
+        notif.isFollowing = false;
+        notif.action = notif.type === "follow_request" ? "Follow" : "Follow Back";
+        notif.actionType = "follow_back";
       }
 
       return updated;
     });
-
-    // Show undo popup
-    setUndoData({
-      notificationId,
-      section,
-      actionType,
-      previousState,
-    });
-    setShowUndo(true);
-  };
-
-  const handleUndo = () => {
-    if (undoData) {
-      setNotifications(undoData.previousState);
-      setShowUndo(false);
-      setUndoData(null);
-    }
   };
 
   const renderNotification = (notification, section) => (
@@ -301,28 +269,6 @@ export default function NotificationsPage({ setActiveView, onViewUserProfile, pr
         {renderSection("This Week", "thisWeek")}
       </div>
 
-      {/* Undo Popup */}
-      <AnimatePresence>
-        {showUndo && (
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-20 md:bottom-6 left-4 right-4 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 z-50 md:w-auto md:min-w-[400px] md:max-w-md"
-          >
-            <div className="bg-[#1a1a1a] border border-gray-700 rounded-lg shadow-2xl px-3 py-2.5 md:px-4 md:py-3 flex items-center justify-between gap-3">
-              <span className="text-white text-xs md:text-sm font-medium">Action completed</span>
-              <button
-                onClick={handleUndo}
-                className="px-3 py-1.5 md:px-4 bg-orange-500 hover:bg-orange-600 text-white text-xs md:text-sm font-medium rounded-lg transition-colors flex-shrink-0"
-              >
-                Undo
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

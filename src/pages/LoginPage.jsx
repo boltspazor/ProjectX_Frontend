@@ -75,6 +75,46 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         line.style.animationDelay = `${Math.random() * 5}s`;
         gridBackgroundRef.current.appendChild(line);
       }
+
+      // Create pulse circles (match signup background style)
+      for (let i = 0; i < 5; i++) {
+        const circle = document.createElement("div");
+        circle.className = "pulse-circle";
+
+        const size = Math.random() * 200 + 100;
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        const animationDuration = Math.random() * 10 + 5;
+        const animationDelay = Math.random() * 5;
+
+        circle.style.width = `${size}px`;
+        circle.style.height = `${size}px`;
+        circle.style.left = `${left}%`;
+        circle.style.top = `${top}%`;
+        circle.style.animationDuration = `${animationDuration}s`;
+        circle.style.animationDelay = `${animationDelay}s`;
+
+        gridBackgroundRef.current.appendChild(circle);
+      }
+
+      // Soft translucent circles (match signup look)
+      for (let i = 0; i < 10; i++) {
+        const soft = document.createElement("div");
+        soft.className = "soft-circle";
+
+        const size = Math.random() * 220 + 140; // 140-360px
+        const left = Math.random() * 90;
+        const top = Math.random() * 90;
+        const opacity = Math.random() * 0.10 + 0.08; // 0.08 - 0.18
+
+        soft.style.width = `${size}px`;
+        soft.style.height = `${size}px`;
+        soft.style.left = `${left}%`;
+        soft.style.top = `${top}%`;
+        soft.style.opacity = opacity.toFixed(2);
+
+        gridBackgroundRef.current.appendChild(soft);
+      }
     };
 
     createGridBackground();
@@ -241,7 +281,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
       setTimeout(() => {
         setIsLoading(false);
-        onLogin();
+      onLogin();
       }, 500);
     }
   };
@@ -1015,22 +1055,25 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           border-radius: 50%;
           animation: float 15s infinite linear;
           box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+          transform: translateY(100vh);
+          opacity: 0;
+          animation-fill-mode: both;
         }
 
         @keyframes float {
           0% {
-            transform: translateY(100vh) rotate(0deg) scale(0);
+            transform: translateY(100vh) rotate(0deg) scale(0.8);
             opacity: 0;
           }
-          10% {
+          15% {
             opacity: 1;
-            transform: translateY(90vh) rotate(36deg) scale(1);
+            transform: translateY(80vh) rotate(36deg) scale(1);
           }
           90% {
             opacity: 1;
           }
           100% {
-            transform: translateY(-100px) rotate(360deg) scale(0);
+            transform: translateY(-120px) rotate(360deg) scale(0.8);
             opacity: 0;
           }
         }
@@ -1059,7 +1102,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           width: 100%;
           height: 100%;
           z-index: -1;
-          opacity: 0.2;
+          opacity: 0.28;
           pointer-events: none;
         }
 
@@ -1090,6 +1133,33 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         @keyframes gridMoveVertical {
           0% { transform: translateX(0); }
           100% { transform: translateX(100px); }
+        }
+
+        .pulse-circle {
+          position: absolute;
+          border-radius: 50%;
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+          animation: pulse 8s infinite ease-in-out;
+        }
+
+        .soft-circle {
+          position: absolute;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%);
+          filter: blur(2px);
+          pointer-events: none;
+        }
+
+        @keyframes pulse {
+          0%, 100% {
+            transform: scale(0.5);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1.2);
+            opacity: 0.3;
+          }
         }
 
         .scan-line {
@@ -1530,62 +1600,62 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
             <form id="loginForm" onSubmit={handleSubmit}>
               <div className="input-group">
                 <label htmlFor="username">USERNAME</label>
-                <input
-                  type="text"
+              <input
+                type="text"
                   id="username"
                   className="input-field"
                   placeholder="Enter your username"
-                  value={username}
+                value={username}
                   onChange={(e) => {
                     setUsername(e.target.value);
                     setError("");
                   }}
                   autoComplete="username"
-                  required
+                required
                   aria-describedby={error ? "username-error" : undefined}
-                />
-              </div>
+              />
+            </div>
 
               <div className={`input-group ${error ? "has-error" : ""}`}>
                 <label htmlFor="password">PASSWORD</label>
                 <div className="password-input-wrapper">
-                  <input
+              <input
                     type={showPassword ? "text" : "password"}
                     id="password"
                     className="input-field"
                     placeholder="Enter your password"
-                    value={password}
+                value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
                       if (error) setError("");
                     }}
                     autoComplete="current-password"
-                    required
+                required
                     aria-describedby={error ? "password-error" : undefined}
                     style={{ paddingRight: "60px" }}
-                  />
+              />
                   {password && (
-                    <button
-                      type="button"
+                <button
+                  type="button"
                       className="password-toggle"
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
                       aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
+                >
                       {showPassword ? "HIDE" : "SHOW"}
-                    </button>
+                </button>
                   )}
-                </div>
+              </div>
                 {error && (
                   <span className="error-message" role="alert" id="password-error">
                     {error}
                   </span>
                 )}
-              </div>
+            </div>
 
               <div className="button-group">
                 <button
-                  type="submit"
+              type="submit"
                   className={`btn login-btn ${isLoading ? "loading" : ""}`}
                   disabled={isLoading || !username.trim() || !password.trim()}
                   aria-busy={isLoading}
@@ -1601,7 +1671,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                   SIGN UP
                 </button>
               </div>
-            </form>
+          </form>
 
             <div className="controller-buttons">
               <div className="d-pad">
@@ -1669,14 +1739,14 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                 </div>
 
                 <div className="button-group">
-                  <button
+              <button
                     type="submit"
                     className={`btn login-btn ${isSendingReset ? "loading" : ""}`}
                     disabled={isSendingReset || forgotPasswordSuccess || !forgotPasswordEmail.trim()}
                     aria-busy={isSendingReset}
                   >
                     <span>{isSendingReset ? "SENDING..." : forgotPasswordSuccess ? "SENT!" : "SEND RESET LINK"}</span>
-                  </button>
+              </button>
                   <button
                     type="button"
                     className="btn signup-btn"
@@ -1685,10 +1755,10 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                   >
                     CANCEL
                   </button>
-                </div>
-              </form>
-            </div>
           </div>
+              </form>
+        </div>
+    </div>
         )}
       </div>
     </>
