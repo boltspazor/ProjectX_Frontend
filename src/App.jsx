@@ -11,11 +11,11 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import CreatePost from "./components/CreatePost";
 import CommunitiesPage from "./pages/CommunitiesPage";
-import CreateCommunity from "./pages/CreateCommunity";
-import CommunityDetailPage from "./pages/CommunityDetailPage";
-import NotificationsPage from "./pages/NotificationsPage";
-import AddStoryPage from "./pages/AddStoryPage";
-import OtherUserProfilePage from "./pages/OtherUserProfilePage";
+import CreateCommunity from "./components/CreateCommunity";
+import CommunityDetail from "./components/CommunityDetail";
+import Notifications from "./components/Notifications";
+import AddStory from "./components/AddStory";
+import OtherUserProfile from "./components/OtherUserProfile";
 
 export default function App() {
   const [activeView, setActiveView] = useState("home");
@@ -146,17 +146,17 @@ export default function App() {
       case "createCommunity":
         return <CreateCommunity setActiveView={handleViewChange} />;
       case "communityDetail":
-        return <CommunityDetailPage setActiveView={handleViewChange} communityId={selectedCommunityId} onViewUserProfile={handleViewUserProfile} />;
+        return <CommunityDetail setActiveView={handleViewChange} communityId={selectedCommunityId} onViewUserProfile={handleViewUserProfile} />;
       case "profile":
         return <ProfilePage onLogout={handleLogout} onViewUserProfile={handleViewUserProfile} />;
       case "shop":
         return <ShopPage />;
       case "notifications":
-        return <NotificationsPage setActiveView={setActiveView} onViewUserProfile={handleViewUserProfile} />;
+        return <Notifications setActiveView={setActiveView} onViewUserProfile={handleViewUserProfile} />;
       case "addStory":
-        return <AddStoryPage setActiveView={handleViewChange} />;
+        return <AddStory setActiveView={handleViewChange} />;
       case "userProfile":
-        return <OtherUserProfilePage username={viewedUsername} setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
+        return <OtherUserProfile username={viewedUsername} setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
       case "createPost":
         // Legacy full page view - will be handled by modal now
         return <HomePage setActiveView={handleViewChange} />;

@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function NotificationsPage({ setActiveView, onViewUserProfile, previousView = "home" }) {
+export default function Notifications({ setActiveView, onViewUserProfile, previousView = "home" }) {
   const [notifications, setNotifications] = useState({
     today: [
       {

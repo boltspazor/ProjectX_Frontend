@@ -4,7 +4,7 @@ import profilePhotoDefault from "../assets/profile-photo.jpg";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getUserProfile, saveUserProfile } from "../utils/userProfile";
 
-export default function ProfileSettingsPage({ onBack }) {
+export default function ProfileSettings({ onBack }) {
   // Load saved profile or use defaults
   const savedProfile = getUserProfile();
   

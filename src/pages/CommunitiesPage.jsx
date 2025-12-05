@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import JoinedCommunities from "../components/JoinedCommunities";
-import DiscoverCommunitiesPage from "./DiscoverCommunitiesPage";
+import DiscoverCommunities from "../components/DiscoverCommunities";
 
 export default function CommunitiesPage({ setActiveView }) {
   const [showDiscover, setShowDiscover] = useState(false);
 
   // Show discover page if active
   if (showDiscover) {
-    return <DiscoverCommunitiesPage onBack={() => setShowDiscover(false)} />;
+    return <DiscoverCommunities onBack={() => setShowDiscover(false)} />;
   }
 
   return (

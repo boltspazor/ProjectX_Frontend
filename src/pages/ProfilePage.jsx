@@ -4,7 +4,7 @@ import { LogOut, Settings } from "lucide-react";
 import profilePhotoDefault from "../assets/profile-photo.jpg";
 import PostDetailModal from "../components/PostDetailModal";
 import LogoutConfirmationModal from "../components/LogoutConfirmationModal";
-import ProfileSettingsPage from "./ProfileSettingsPage";
+import ProfileSettings from "../components/ProfileSettings";
 import FollowersFollowingModal from "../components/FollowersFollowingModal";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { useUserProfile } from "../hooks/useUserProfile";
@@ -189,7 +189,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
 
   // Show settings page if active
   if (showSettings) {
-    return <ProfileSettingsPage onBack={() => setShowSettings(false)} />;
+    return <ProfileSettings onBack={() => setShowSettings(false)} />;
   }
 
   return (

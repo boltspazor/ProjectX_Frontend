@@ -10,7 +10,7 @@ import { saveCommunityDraft, getCommunityDrafts, deleteCommunityDraft } from "..
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function CommunityDetailPage({ setActiveView, communityId, onViewUserProfile }) {
+export default function CommunityDetail({ setActiveView, communityId, onViewUserProfile }) {
   const [isJoined, setIsJoined] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
@@ -64,7 +64,6 @@ export default function CommunityDetailPage({ setActiveView, communityId, onView
 
   const handleTopicClick = (topic) => {
     // Handle topic filtering
-    console.log("Filter by topic:", topic);
   };
 
   const handleLike = (postId) => {

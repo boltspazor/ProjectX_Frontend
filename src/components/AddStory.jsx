@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { ArrowLeft, X, Type, Sparkles, Image as ImageIcon, Camera } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/logo.png";
 
-export default function AddStoryPage({ setActiveView }) {
+export default function AddStory({ setActiveView }) {
   const [step, setStep] = useState("select"); // "select", "edit"
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -13,7 +13,6 @@ export default function AddStoryPage({ setActiveView }) {
   const [textValue, setTextValue] = useState("");
   const [textColor, setTextColor] = useState("#FFFFFF");
   const [filter, setFilter] = useState("none");
-  const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
 
   // Mock recent images - in production, these would come from device storage
@@ -92,7 +91,6 @@ export default function AddStoryPage({ setActiveView }) {
 
   const handleShare = () => {
     // Handle story sharing
-    console.log("Sharing story with:", { selectedImage, textValue, filter });
     // Close and go back
     setActiveView("home");
   };
@@ -156,7 +154,6 @@ export default function AddStoryPage({ setActiveView }) {
             <button
               onClick={() => {
                 // Generate AI image - placeholder
-                console.log("Generate AI image");
               }}
               className="aspect-square rounded-lg flex flex-col items-center justify-center gap-2 border-2 border-orange-500/50 hover:border-orange-500 transition relative overflow-hidden bg-black"
             >
@@ -357,7 +354,6 @@ export default function AddStoryPage({ setActiveView }) {
                     key={index}
                     onClick={() => {
                       // Add sticker to image - placeholder
-                      console.log("Add sticker:", sticker);
                     }}
                     className="flex-shrink-0 w-12 h-12 text-2xl hover:scale-110 transition"
                   >

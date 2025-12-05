@@ -7,7 +7,7 @@ import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 import { useUserProfile } from "../hooks/useUserProfile";
 
-export default function OtherUserProfilePage({ username: viewedUsername, setActiveView, onViewUserProfile }) {
+export default function OtherUserProfile({ username: viewedUsername, setActiveView, onViewUserProfile }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);

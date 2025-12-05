@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 
-export default function DiscoverCommunitiesPage({ onBack }) {
+export default function DiscoverCommunities({ onBack }) {
   const [activeCategory, setActiveCategory] = useState("All");
 
   const categories = [

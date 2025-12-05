@@ -32,7 +32,6 @@ export default function ShareModal({ isOpen, onClose, onViewUserProfile }) {
 
   const handleShare = () => {
     // Handle share logic here
-    console.log("Sharing to:", Array.from(selectedFriends));
     onClose();
     setSelectedFriends(new Set());
   };
