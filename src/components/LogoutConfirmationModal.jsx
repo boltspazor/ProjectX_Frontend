@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) {
@@ -7,7 +8,7 @@ export default function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) 
     onClose();
   };
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -17,12 +18,12 @@ export default function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[200]"
+            className="fixed inset-0 bg-black/90 backdrop-blur-md z-[9998]"
             onClick={onClose}
           />
 
           {/* Modal Container - Centers the modal */}
-          <div className="fixed inset-0 z-[201] flex items-center justify-center p-4 pointer-events-none">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -75,4 +76,7 @@ export default function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) 
       )}
     </AnimatePresence>
   );
+
+  // Render modal using portal to ensure it's at the root level
+  return isOpen ? createPortal(modalContent, document.body) : null;
 }
