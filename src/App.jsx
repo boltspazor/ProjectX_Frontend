@@ -174,7 +174,7 @@ export default function App() {
   const isStoryPage = activeView === "addStory";
 
   return (
-    <div className="bg-black text-white min-h-screen flex flex-col">
+    <div className="bg-[#fffcfa] dark:bg-black text-black dark:text-white min-h-screen flex flex-col">
       {/* Hide Navbar/Sidebar for Story Page */}
       {!isStoryPage && (
         <>

@@ -56,22 +56,22 @@ export default function HomePage({ setActiveView, onViewUserProfile }) {
           </div>
 
           {/* Comments Section - Desktop only, side by side */}
-            <div className="hidden md:block sticky top-0 h-fit">
-              <Comments 
-                isOpen={activePostId !== null} 
-                onClose={handleCloseComments} 
-                initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
-                onViewUserProfile={onViewUserProfile} 
-              />
-            </div>
+          <div className="hidden md:block sticky top-0 h-fit">
+            <Comments
+              isOpen={activePostId !== null}
+              onClose={handleCloseComments}
+              initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
+              onViewUserProfile={onViewUserProfile}
+            />
+          </div>
 
           {/* Comments Section - Mobile only, overlay */}
           <div className="md:hidden">
-            <Comments 
-              isOpen={activePostId !== null} 
-              onClose={handleCloseComments} 
+            <Comments
+              isOpen={activePostId !== null}
+              onClose={handleCloseComments}
               initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
-              onViewUserProfile={onViewUserProfile} 
+              onViewUserProfile={onViewUserProfile}
             />
           </div>
         </div>

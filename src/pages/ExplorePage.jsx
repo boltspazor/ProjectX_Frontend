@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import PostCard from "../components/PostCard";
 import Filters from "../components/Filters";
 import Accounts from "../components/Accounts";
-import Communities from "../components/Communities";
 import Comments from "../components/Comments";
 
 export default function ExplorePage({ onViewUserProfile }) {
@@ -84,10 +83,9 @@ export default function ExplorePage({ onViewUserProfile }) {
                     px-4 md:px-6 py-2 md:py-3 rounded-xl
                     text-sm md:text-base font-medium
                     transition-all duration-200
-                    ${
-                      isSelected
-                        ? "bg-orange-500 text-white shadow-lg shadow-orange-500/50"
-                        : "bg-[#1a1a1a] text-white border border-gray-700 hover:border-orange-500/50 hover:bg-[#222]"
+                    ${isSelected
+                      ? "bg-orange-500 text-white shadow-lg shadow-orange-500/50"
+                      : "bg-gray-100 dark:bg-[#1a1a1a] text-black dark:text-white border border-black dark:border-gray-700 hover:border-orange-500/50 hover:bg-gray-200 dark:hover:bg-[#222]"
                     }
                   `}
                 >
@@ -103,8 +101,8 @@ export default function ExplorePage({ onViewUserProfile }) {
       {activeTab === "Posts" && (
         <>
           {searchQuery && (
-            <h2 className="text-lg md:text-xl font-semibold mb-5 text-white max-w-7xl mx-auto">
-              Results for <span className="text-gray-300">"{searchQuery}"</span>
+            <h2 className="text-lg md:text-xl font-semibold mb-5 text-black dark:text-white max-w-7xl mx-auto">
+              Results for <span className="text-gray-600 dark:text-gray-300">"{searchQuery}"</span>
             </h2>
           )}
           <div
@@ -117,8 +115,8 @@ export default function ExplorePage({ onViewUserProfile }) {
             "
           >
             {Array.from({ length: isAIEnabled ? 20 : 20 }).map((_, i) => (
-              <PostCard 
-                key={i} 
+              <PostCard
+                key={i}
                 postId={i}
                 onCommentClick={handleCommentClick}
                 isActive={activePostId === i}
@@ -128,8 +126,8 @@ export default function ExplorePage({ onViewUserProfile }) {
           </div>
 
           {/* Comments Section - Overlay for both mobile and desktop */}
-          <Comments 
-            isOpen={activePostId !== null} 
+          <Comments
+            isOpen={activePostId !== null}
             onClose={handleCloseComments}
             variant="overlay"
             initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
@@ -140,10 +138,6 @@ export default function ExplorePage({ onViewUserProfile }) {
 
       {activeTab === "Accounts" && (
         <Accounts searchQuery={searchQuery} hasSearched={searchQuery !== ""} />
-      )}
-
-      {activeTab === "Communities" && (
-        <Communities searchQuery={searchQuery} hasSearched={searchQuery !== ""} />
       )}
     </main>
   );

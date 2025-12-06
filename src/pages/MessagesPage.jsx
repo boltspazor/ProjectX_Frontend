@@ -23,9 +23,9 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
 
   const themes = {
     default: {
-      backgroundStyle: { backgroundColor: "#000" },
-      senderBubble: "bg-orange-600/40 text-white",
-      receiverBubble: "bg-orange-500/30 text-white",
+      backgroundStyle: { backgroundColor: "" }, // Will use the container's background
+      senderBubble: "bg-orange-500/90 text-white dark:bg-orange-600/40 dark:text-white",
+      receiverBubble: "bg-orange-400/80 text-white dark:bg-orange-500/30 dark:text-white",
     },
     cat: {
       backgroundStyle: {
@@ -61,11 +61,11 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
   useEffect(() => {
     if (selectedChatUsername) {
       // Check if chat already exists (case-insensitive comparison)
-      const existingChat = chats.find(chat => 
+      const existingChat = chats.find(chat =>
         chat.username.toLowerCase() === selectedChatUsername.toLowerCase() ||
         chat.username === selectedChatUsername
       );
-      
+
       if (existingChat) {
         // Open existing chat
         setActiveChat(existingChat);
@@ -131,10 +131,10 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
   const currentTheme = activeChatKey ? chatThemes[activeChatKey] || "default" : "default";
 
   return (
-    <main className={`flex-1 overflow-hidden bg-black ${activeChat ? 'fixed inset-0 z-[70] md:relative md:z-auto md:h-[calc(100vh-4rem)]' : 'h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]'}`}>
+    <main className={`flex-1 overflow-hidden bg-[#fffcfa] dark:bg-black ${activeChat ? 'fixed inset-0 z-[70] md:relative md:z-auto md:h-[calc(100vh-4rem)]' : 'h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]'}`}>
       <div className="h-full flex">
         {/* Left Side - Chat List */}
-        <div className={`${activeChat ? 'hidden md:block' : 'block'} w-full md:w-96 border-r border-gray-800 overflow-y-auto`}>
+        <div className={`${activeChat ? 'hidden md:block' : 'block'} w-full md:w-96 border-r border-black dark:border-gray-800 overflow-y-auto bg-[#fffcfa] dark:bg-black`}>
           <div className="p-4 md:p-6">
             <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Messages</h1>
 
@@ -143,7 +143,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                 <div
                   key={chat.id}
                   onClick={() => handleChatClick(chat)}
-                  className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-[#0f0f0f] border border-gray-800 hover:border-orange-500 cursor-pointer transition"
+                  className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 hover:border-orange-500 cursor-pointer transition"
                 >
                   {/* Profile Picture */}
                   <div className="relative flex-shrink-0">
@@ -151,9 +151,9 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                       <LiveProfilePhoto
                         imageSrc={chat.image}
                         videoSrc={getProfileVideoUrl(chat.image, chat.username)}
-                      alt={chat.username}
+                        alt={chat.username}
                         className="w-12 h-12 md:w-14 md:h-14 rounded-full"
-                    />
+                      />
                     </div>
                     {chat.unread && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-red-500 rounded-full border-2 border-black"></div>
@@ -168,7 +168,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                           e.stopPropagation();
                           onViewUserProfile && onViewUserProfile(chat.username);
                         }}
-                        className="font-semibold text-sm md:text-base text-white truncate hover:opacity-70 transition-opacity cursor-pointer"
+                        className="font-semibold text-sm md:text-base text-black dark:text-white truncate hover:opacity-70 transition-opacity cursor-pointer"
                       >
                         {chat.username}
                       </button>
@@ -176,7 +176,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                         {chat.time}
                       </span>
                     </div>
-                    <p className={`text-xs md:text-sm truncate ${chat.unread ? 'text-white font-medium' : 'text-gray-400'}`}>
+                    <p className={`text-xs md:text-sm truncate ${chat.unread ? 'text-black dark:text-white font-medium' : 'text-gray-400'}`}>
                       {chat.lastMessage}
                     </p>
                   </div>
@@ -188,15 +188,15 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
 
         {/* Right Side - Chat Window */}
         {activeChat && (
-          <div className="flex-1 flex flex-col bg-black">
+          <div className="flex-1 flex flex-col bg-[#fffcfa] dark:bg-black">
             {/* Chat Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-800 bg-[#0f0f0f] relative">
+            <div className="flex items-center justify-between p-4 border-b border-black dark:border-gray-800 bg-[#fffcfa] dark:bg-[#0f0f0f] relative">
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleBackClick}
-                  className="md:hidden p-2 hover:bg-gray-800 rounded-full transition"
+                  className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition"
                 >
-                  <ArrowLeft className="w-5 h-5 text-white" />
+                  <ArrowLeft className="w-5 h-5 text-black dark:text-white" />
                 </button>
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex-shrink-0">
                   <LiveProfilePhoto
@@ -208,7 +208,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                 </div>
                 <button
                   onClick={() => onViewUserProfile && onViewUserProfile(activeChat.username)}
-                  className="font-semibold text-base md:text-lg text-white hover:opacity-70 transition-opacity cursor-pointer"
+                  className="font-semibold text-base md:text-lg text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
                 >
                   {activeChat.username}
                 </button>
@@ -216,24 +216,24 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
               <div className="relative" ref={themePickerRef}>
                 <button
                   onClick={() => setShowThemePicker((s) => !s)}
-                  className="p-2 rounded-full hover:bg-gray-800 transition flex items-center justify-center"
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center justify-center"
                   aria-label="Change chat theme"
                 >
-                  <img src={themeIcon} alt="theme" className="w-5 h-5 invert" />
+                  <img src={themeIcon} alt="theme" className="w-5 h-5 dark:invert" />
                 </button>
                 {showThemePicker && (
-                  <div className="absolute right-0 mt-2 w-56 bg-[#0f0f0f] border border-gray-800 rounded-xl shadow-2xl p-3 z-20">
-                    <p className="text-sm text-gray-300 mb-3">Chat themes</p>
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 rounded-xl shadow-2xl p-3 z-20">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">Chat themes</p>
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => handleSelectTheme("cat")}
-                        className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "cat" ? "border-orange-500" : "border-gray-700"}`}
+                        className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "cat" ? "border-orange-500" : "border-gray-300 dark:border-gray-700"}`}
                         style={{ backgroundImage: `url(${catTheme})`, backgroundSize: "cover", backgroundPosition: "center" }}
                         aria-label="Cat theme"
                       />
                       <button
                         onClick={() => handleSelectTheme("xoxo")}
-                        className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "xoxo" ? "border-orange-500" : "border-gray-700"}`}
+                        className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "xoxo" ? "border-orange-500" : "border-gray-300 dark:border-gray-700"}`}
                         style={{ backgroundImage: `url(${xoxoTheme})`, backgroundSize: "cover", backgroundPosition: "center" }}
                         aria-label="XOXO theme"
                       />
@@ -245,8 +245,8 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
 
             {/* Messages Area */}
             <div
-              className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4"
-              style={themes[currentTheme]?.backgroundStyle || themes.default.backgroundStyle}
+              className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-[#fffcfa] dark:bg-[#0f0f0f]"
+              style={currentTheme !== "default" ? (themes[currentTheme]?.backgroundStyle || {}) : {}}
             >
               {messages.map((message) => (
                 <div
@@ -254,11 +254,10 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                   className={`flex ${message.sender === 'sender' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${
-                      message.sender === 'sender'
-                        ? themes[currentTheme]?.senderBubble || themes.default.senderBubble
-                        : themes[currentTheme]?.receiverBubble || themes.default.receiverBubble
-                    }`}
+                    className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${message.sender === 'sender'
+                      ? themes[currentTheme]?.senderBubble || themes.default.senderBubble
+                      : themes[currentTheme]?.receiverBubble || themes.default.receiverBubble
+                      }`}
                   >
                     <p className="text-sm md:text-base">{message.text}</p>
                   </div>
@@ -267,7 +266,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
             </div>
 
             {/* Message Input */}
-            <div className="border-t border-gray-800 p-4 bg-[#0f0f0f]">
+            <div className="border-t border-black dark:border-gray-800 p-4 bg-white dark:bg-[#0f0f0f]">
               <div className="flex items-center gap-3">
                 <input
                   type="text"
@@ -275,14 +274,14 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                   onChange={(e) => setMessageInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Type a message..."
-                  className="flex-1 bg-[#2f2f2f] border border-gray-800 rounded-full px-4 py-2 md:py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  className="flex-1 bg-gray-100 dark:bg-[#2f2f2f] border border-black dark:border-gray-500 rounded-full px-4 py-2 md:py-3 text-sm text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!messageInput.trim()}
-                  className="p-2 md:p-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full transition"
+                  className="p-2 md:p-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full transition"
                 >
-                  <Send className="w-5 h-5 text-white" />
+                  <Send className="w-5 h-5 text-white dark:text-white" />
                 </button>
               </div>
             </div>
@@ -291,7 +290,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
 
         {/* Empty State (when no chat is selected on desktop) */}
         {!activeChat && (
-          <div className="hidden md:flex flex-1 items-center justify-center bg-black">
+          <div className="hidden md:flex flex-1 items-center justify-center bg-[#fffcfa] dark:bg-black">
             <div className="text-center text-gray-500">
               <p className="text-lg">Select a chat to start messaging</p>
             </div>

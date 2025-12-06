@@ -115,7 +115,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-black/90 dark:bg-black/90 backdrop-blur-sm z-[100]"
           />
 
           {/* Modal Content */}
@@ -125,19 +125,19 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full h-full md:h-[90vh] md:max-w-7xl bg-[#0f0f0f] md:rounded-2xl overflow-hidden pointer-events-auto flex flex-col md:grid md:grid-cols-2 gap-0"
+              className="w-full h-full md:h-[90vh] md:max-w-7xl bg-white dark:bg-[#0f0f0f] md:rounded-2xl overflow-hidden pointer-events-auto flex flex-col md:grid md:grid-cols-2 gap-0"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/80 hover:bg-black flex items-center justify-center transition-colors"
+                className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/80 hover:bg-black dark:bg-black/80 dark:hover:bg-black flex items-center justify-center transition-colors"
               >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-5 h-5 text-white dark:text-white" />
               </button>
 
               {/* Left Side - Post (looks exactly like PostCard) */}
-              <div className="w-full h-1/2 md:h-full flex flex-col bg-[#111] md:border-r border-b md:border-b-0 border-gray-800 overflow-hidden">
+              <div className="w-full h-1/2 md:h-full flex flex-col bg-gray-100 dark:bg-[#111] md:border-r border-b md:border-b-0 border-gray-300 dark:border-gray-800 overflow-hidden">
                 {/* User Info Header */}
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 flex-shrink-0">
                   <div className="h-9 w-9 rounded-full overflow-hidden flex-shrink-0">
@@ -157,7 +157,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                 </div>
 
                 {/* Post Image - Fills available space */}
-                <div className="flex-1 bg-black overflow-hidden flex items-center justify-center">
+                <div className="flex-1 bg-white dark:bg-black overflow-hidden flex items-center justify-center">
                   <img
                     src={postImage}
                     alt="Post"
@@ -169,23 +169,22 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                 <div className="flex items-center gap-4 px-4 py-3 flex-shrink-0 border-t border-gray-800">
                   <button onClick={handleLike} className="focus:outline-none">
                     <Heart
-                      className={`h-6 w-6 cursor-pointer hover:scale-110 transition-all duration-200 ${
-                        liked ? "fill-red-500 text-red-500" : "text-white"
-                      }`}
+                      className={`h-6 w-6 cursor-pointer hover:scale-110 transition-all duration-200 ${liked ? "fill-red-500 text-red-500" : "text-black dark:text-white"
+                        }`}
                     />
                   </button>
                   <button className="focus:outline-none">
                     <img
                       src={commentIcon}
                       alt="comment"
-                      className="h-6 w-6 cursor-pointer hover:scale-110 transition-transform duration-200"
+                      className="h-6 w-6 cursor-pointer hover:scale-110 transition-transform duration-200 invert dark:invert-0"
                     />
                   </button>
                   <button onClick={handleShareClick} className="focus:outline-none">
                     <img
                       src={messageIcon}
                       alt="share"
-                      className="h-6 w-6 cursor-pointer hover:scale-110 transition-transform duration-200"
+                      className="h-6 w-6 cursor-pointer hover:scale-110 transition-transform duration-200 invert dark:invert-0"
                     />
                   </button>
                 </div>
@@ -204,20 +203,20 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                     >
                       {username}
                     </button>
-                    <span className="text-gray-300">{caption}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{caption}</span>
                   </p>
                 </div>
               </div>
 
               {/* Right Side - Comments Section */}
-              <div className="w-full h-1/2 md:h-full flex flex-col bg-[#0f0f0f] overflow-hidden">
+              <div className="w-full h-1/2 md:h-full flex flex-col bg-white dark:bg-[#0f0f0f] overflow-hidden">
                 {/* Comments Header */}
-                <div className="flex items-center justify-between p-3 md:p-5 border-b border-gray-800 flex-shrink-0">
-                  <h3 className="text-base md:text-xl font-semibold text-white">Comments</h3>
+                <div className="flex items-center justify-between p-3 md:p-5 border-b border-gray-300 dark:border-gray-800 flex-shrink-0">
+                  <h3 className="text-base md:text-xl font-semibold text-black dark:text-white">Comments</h3>
                 </div>
 
                 {/* Comments List - Scrollable with fixed height */}
-                <div 
+                <div
                   ref={commentsContainerRef}
                   className="flex-1 overflow-y-auto p-3 md:p-5 space-y-3 md:space-y-5 scrollbar-hide"
                 >
@@ -244,14 +243,14 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="bg-[#1a1a1a] rounded-2xl px-4 py-2.5 md:px-5 md:py-3 hover:bg-[#1f1f1f] transition-colors">
+                            <div className="bg-gray-200 dark:bg-[#1a1a1a] rounded-2xl px-4 py-2.5 md:px-5 md:py-3 hover:bg-gray-300 dark:hover:bg-[#1f1f1f] transition-colors">
                               <button
                                 onClick={() => onViewUserProfile && onViewUserProfile(comment.username)}
-                                className="font-semibold text-sm md:text-base text-white mb-1 hover:opacity-70 transition-opacity cursor-pointer"
+                                className="font-semibold text-sm md:text-base text-black dark:text-white mb-1 hover:opacity-70 transition-opacity cursor-pointer"
                               >
                                 {comment.username}
                               </button>
-                              <p className="text-sm md:text-base text-gray-300 leading-relaxed break-words">
+                              <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed break-words">
                                 {comment.text}
                               </p>
                             </div>
@@ -261,12 +260,11 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                                 className="flex items-center gap-1.5 text-xs md:text-sm hover:scale-105 transition-transform group"
                               >
                                 <Heart
-                                  className={`h-4 w-4 md:h-5 md:w-5 transition-all group-hover:scale-110 ${
-                                    comment.liked ? "fill-red-500 text-red-500" : "text-gray-400 group-hover:text-gray-300"
-                                  }`}
+                                  className={`h-4 w-4 md:h-5 md:w-5 transition-all group-hover:scale-110 ${comment.liked ? "fill-red-500 text-red-500" : "text-gray-400 dark:text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300"
+                                    }`}
                                 />
                                 <span
-                                  className={comment.liked ? "text-red-500 font-semibold" : "text-gray-400 group-hover:text-gray-300"}
+                                  className={comment.liked ? "text-red-500 font-semibold" : "text-gray-400 dark:text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300"}
                                 >
                                   {comment.likes > 0 ? comment.likes.toLocaleString() : "Like"}
                                 </span>
@@ -287,7 +285,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.2, duration: 0.3 }}
-                  className="border-t border-gray-800 p-3 md:p-5 bg-[#0f0f0f] flex-shrink-0"
+                  className="border-t border-gray-300 dark:border-gray-800 p-3 md:p-5 bg-white dark:bg-[#0f0f0f] flex-shrink-0"
                 >
                   <div className="flex gap-2 md:gap-4 items-center">
                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-700">
@@ -305,7 +303,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                         onChange={(e) => setNewComment(e.target.value)}
                         onKeyPress={(e) => e.key === "Enter" && handleSendComment()}
                         placeholder="Add a comment..."
-                        className="flex-1 min-w-0 bg-[#1a1a1a] border border-gray-700 text-white rounded-full px-3 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder-gray-500 transition-all"
+                        className="flex-1 min-w-0 bg-gray-100 dark:bg-[#1a1a1a] border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-full px-3 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder-gray-500 transition-all"
                       />
                       <motion.button
                         onClick={handleSendComment}

@@ -9,7 +9,7 @@ export default function Filters({
   isAIEnabled,
   setIsAIEnabled,
 }) {
-  const tabs = useMemo(() => ["Posts", "Accounts", "Communities"], []);
+  const tabs = useMemo(() => ["Posts", "Accounts"], []);
   const [indicatorStyle, setIndicatorStyle] = useState({});
   const tabRefs = useRef([]);
 
@@ -41,11 +41,10 @@ export default function Filters({
               key={tab}
               ref={(el) => (tabRefs.current[i] = el)}
               onClick={() => setActiveTab(tab)}
-              className={`relative pb-1 transition-colors duration-300 ${
-                activeTab === tab
-                  ? "text-white"
-                  : "text-gray-400 hover:text-white"
-              }`}
+              className={`relative pb-1 transition-colors duration-300 ${activeTab === tab
+                  ? "text-black dark:text-white"
+                  : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white"
+                }`}
             >
               {tab}
             </button>
@@ -62,31 +61,29 @@ export default function Filters({
         <div className="flex items-center gap-4 w-full md:w-auto">
           {/* 🔍 Search bar */}
           <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-2.5 text-black dark:text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#2f2f2f] border border-gray-800 rounded-full pl-9 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+              className="w-full bg-gradient-to-r from-orange-100 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-black dark:border-gray-600 rounded-full pl-9 pr-4 py-2 text-sm text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition"
             />
           </div>
 
           {/* AI Filter Switch */}
           <button
             onClick={() => setIsAIEnabled(!isAIEnabled)}
-            className={`relative w-12 h-6 flex items-center rounded-full transition-all duration-500 flex-shrink-0 ${
-              isAIEnabled
+            className={`relative w-12 h-6 flex items-center rounded-full transition-all duration-500 flex-shrink-0 border border-black ${isAIEnabled
                 ? "bg-gradient-to-r from-orange-400 to-orange-600"
-                : "bg-gray-700"
-            }`}
+                : "bg-gradient-to-r from-orange-200 to-orange-100 dark:from-gray-700 dark:to-gray-800"
+              }`}
           >
             <span
-              className={`absolute top-1 w-4 h-4 rounded-full flex items-center justify-center transition-all duration-500 text-[9px] font-bold ${
-                isAIEnabled
+              className={`absolute top-1 w-4 h-4 rounded-full flex items-center justify-center transition-all duration-500 text-[9px] font-bold ${isAIEnabled
                   ? "left-7 bg-white text-black"
-                  : "left-1 bg-white text-black"
-              }`}
+                  : "left-1 bg-white text-black dark:bg-gray-300 dark:text-gray-900"
+                }`}
             >
               AI
             </span>

@@ -49,13 +49,13 @@ export default function Stories({ onAddStory }) {
     if (container) {
       checkScrollPosition();
       container.addEventListener("scroll", checkScrollPosition);
-      
+
       // Also check on resize to handle responsive changes
       const handleResize = () => {
         setTimeout(checkScrollPosition, 100);
       };
       window.addEventListener("resize", handleResize);
-      
+
       return () => {
         container.removeEventListener("scroll", checkScrollPosition);
         window.removeEventListener("resize", handleResize);
@@ -82,7 +82,7 @@ export default function Stories({ onAddStory }) {
 
   return (
     <div className="w-full max-w-7xl mx-auto">
-      <div className="relative bg-black border border-gray-800 rounded-xl py-3 md:py-4 px-3 sm:px-4 md:px-6">
+      <div className="relative bg-white dark:bg-black border border-black dark:border-gray-800 hover:border-orange-500 transition-colors duration-300 rounded-xl py-3 md:py-4 px-3 sm:px-4 md:px-6">
         {/* Left Arrow - Show when scrolled */}
         {showLeftArrow && (
           <motion.button
@@ -90,10 +90,10 @@ export default function Stories({ onAddStory }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => scroll("left")}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/80 backdrop-blur-sm border border-gray-700 flex items-center justify-center hover:bg-black/90 transition-all cursor-pointer"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-sm border border-black dark:border-gray-700 hover:border-orange-500 flex items-center justify-center hover:bg-white/90 dark:hover:bg-black/90 transition-all cursor-pointer"
             aria-label="Scroll left"
           >
-            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-white rotate-180" />
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 dark:text-white text-black rotate-180" />
           </motion.button>
         )}
 
@@ -116,26 +116,26 @@ export default function Stories({ onAddStory }) {
           >
             <div className="relative w-14 h-14 md:w-16 md:h-16 cursor-pointer group">
               {/* Profile Picture */}
-              <div className="w-full h-full rounded-full border-2 border-gray-700 overflow-hidden">
+              <div className="w-full h-full rounded-full border-2 border-black dark:border-gray-700 overflow-hidden">
                 <LiveProfilePhoto
                   imageSrc={profilePhoto}
                   videoSrc={profileVideo}
                   alt="Your story"
                   className="w-full h-full rounded-full"
                 />
-        </div>
-              
+              </div>
+
               {/* Plus Icon Overlay */}
-              <div className="absolute bottom-0 right-0 w-5 h-5 md:w-6 md:h-6 bg-orange-500 rounded-full border-2 border-black flex items-center justify-center group-hover:bg-orange-600 transition-all duration-200 group-hover:scale-110">
+              <div className="absolute bottom-0 right-0 w-5 h-5 md:w-6 md:h-6 bg-orange-500 rounded-full border-2 dark:border-black border-white flex items-center justify-center group-hover:bg-orange-600 transition-all duration-200 group-hover:scale-110">
                 <svg className="w-3 h-3 md:w-3.5 md:h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
                 </svg>
               </div>
             </div>
-            <span className="text-xs text-gray-400 whitespace-nowrap">Your Story</span>
+            <span className="text-xs dark:text-gray-400 text-gray-600 whitespace-nowrap">Your Story</span>
           </motion.div>
 
-        {/* Story Items */}
+          {/* Story Items */}
           {sortedStories.map((story, index) => {
             const isLastStory = index === sortedStories.length - 1;
             const shouldShowArrow = isLastStory && showRightArrow;
@@ -150,25 +150,24 @@ export default function Stories({ onAddStory }) {
                 className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0"
               >
                 <div className="relative group py-1">
-                  <div 
-                    className={`w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] cursor-pointer hover:scale-105 transition-transform duration-200 ${
-                      viewedStoryIds.includes(story.id)
+                  <div
+                    className={`w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] cursor-pointer hover:scale-105 transition-transform duration-200 ${viewedStoryIds.includes(story.id)
                         ? "bg-gray-600"
                         : "bg-gradient-to-tr from-orange-400 via-orange-500 to-orange-600"
-                    }`}
+                      }`}
                     onClick={() => handleStoryClick(originalIndex, story.id)}
                   >
-                    <div className="w-full h-full rounded-full border-2 border-black overflow-hidden relative">
-                <img
-                  src={story.image}
-                  alt={story.username}
-                  className="w-full h-full object-cover"
+                    <div className="w-full h-full rounded-full border-2 border-white dark:border-black overflow-hidden relative">
+                      <img
+                        src={story.image}
+                        alt={story.username}
+                        className="w-full h-full object-cover"
                         loading="lazy"
                         decoding="async"
                       />
                       {/* Arrow Overlay on last story when more content available */}
                       {shouldShowArrow && (
-                        <motion.div 
+                        <motion.div
                           className="absolute inset-0 flex items-center justify-end pr-0.5 md:pr-1"
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
@@ -180,15 +179,15 @@ export default function Stories({ onAddStory }) {
                         </motion.div>
                       )}
                     </div>
-              </div>
-            </div>
-                <span className="text-xs text-white max-w-[70px] md:max-w-[80px] truncate text-center">
-              {story.username}
-            </span>
+                  </div>
+                </div>
+                <span className="text-xs dark:text-white text-black max-w-[70px] md:max-w-[80px] truncate text-center">
+                  {story.username}
+                </span>
               </motion.div>
             );
           })}
-          </div>
+        </div>
 
         {/* Right Arrow Button - Always visible when more content */}
         {showRightArrow && (
@@ -197,10 +196,10 @@ export default function Stories({ onAddStory }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => scroll("right")}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/80 backdrop-blur-sm border border-gray-700 flex items-center justify-center hover:bg-black/90 transition-all cursor-pointer"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-sm border border-black dark:border-gray-700 hover:border-orange-500 flex items-center justify-center hover:bg-white/90 dark:hover:bg-black/90 transition-all cursor-pointer"
             aria-label="Scroll right"
           >
-            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-white" />
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 dark:text-white text-black" />
           </motion.button>
         )}
       </div>

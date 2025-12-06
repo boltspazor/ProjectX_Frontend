@@ -18,7 +18,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
   const [followersModalOpen, setFollowersModalOpen] = useState(false);
   const [followersModalType, setFollowersModalType] = useState("followers");
   const { profilePhoto, profileVideo, username, profile } = useUserProfile();
-  
+
   // Posts state - counts will be dynamic based on this array length
   const [posts, setPosts] = useState([
     {
@@ -95,7 +95,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
     { username: "sarah_jones", fullName: "Sarah Jones", image: "https://i.pravatar.cc/100?img=4", isFollowing: false },
     { username: "david_wilson", fullName: "David Wilson", image: "https://i.pravatar.cc/100?img=5", isFollowing: true },
   ]);
-  
+
   const [followingList, setFollowingList] = useState([
     { username: "sheryanne_xoxo", fullName: "Sheryanne Smith", image: "https://i.pravatar.cc/100?img=10", isFollowing: true },
     { username: "pxhf_12", fullName: "Pxhf User", image: "https://i.pravatar.cc/100?img=11", isFollowing: true },
@@ -156,10 +156,10 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
 
   const handleFollow = (targetUsername) => {
     // Update followers list (if following back)
-    setFollowersList(followersList.map(user => 
+    setFollowersList(followersList.map(user =>
       user.username === targetUsername ? { ...user, isFollowing: true } : user
     ));
-    
+
     // Add to following list if not already there
     const isInFollowing = followingList.find(u => u.username === targetUsername);
     if (!isInFollowing) {
@@ -171,7 +171,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
       };
       setFollowingList([...followingList, userToAdd]);
     } else {
-      setFollowingList(followingList.map(user => 
+      setFollowingList(followingList.map(user =>
         user.username === targetUsername ? { ...user, isFollowing: true } : user
       ));
     }
@@ -179,10 +179,10 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
 
   const handleUnfollow = (targetUsername) => {
     // Update followers list
-    setFollowersList(followersList.map(user => 
+    setFollowersList(followersList.map(user =>
       user.username === targetUsername ? { ...user, isFollowing: false } : user
     ));
-    
+
     // Remove from following list
     setFollowingList(followingList.filter(u => u.username !== targetUsername));
   };
@@ -193,7 +193,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#fffcfa] dark:bg-black text-black dark:text-white pb-20 md:pb-0">
       {/* Profile Content */}
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
         {/* Action Buttons - Top Right */}
@@ -201,12 +201,12 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
           {/* Settings Button - Always visible */}
           <button
             onClick={() => setShowSettings(true)}
-            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors"
             title="Settings"
           >
-            <Settings className="h-5 w-5 text-gray-400 hover:text-white" />
+            <Settings className="h-5 w-5 text-black dark:text-gray-400 dark:hover:text-white" />
           </button>
-          
+
           {/* Logout Button - Mobile Only */}
           <button
             onClick={handleLogoutClick}
@@ -224,7 +224,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-gray-800"
+            className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-black dark:border-gray-800"
           >
             <LiveProfilePhoto
               imageSrc={profilePhoto}
@@ -241,7 +241,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1, duration: 0.5 }}
-              className="text-xl md:text-2xl font-semibold text-white mb-2"
+              className="text-xl md:text-2xl font-semibold text-black dark:text-white mb-2"
             >
               {username}
             </motion.h2>
@@ -251,7 +251,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.5 }}
-              className="text-gray-300 mb-3"
+              className="text-gray-600 dark:text-gray-300 mb-3"
             >
               Rahul Chauhan
             </motion.p>
@@ -261,7 +261,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-white mb-6 text-sm md:text-base"
+              className="text-black dark:text-white mb-6 text-sm md:text-base"
             >
               {profile?.bio || "Wish I was half as interesting as my bio"}
             </motion.p>
@@ -274,8 +274,8 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               className="flex items-center justify-center gap-4 md:gap-6 text-base md:text-lg"
             >
               <div className="text-center">
-                <p className="font-bold text-white">{postsCount}</p>
-                <p className="text-gray-400 text-xs md:text-sm">Posts</p>
+                <p className="font-bold text-black dark:text-white">{postsCount}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">Posts</p>
               </div>
 
               <div className="h-6 w-px bg-gray-700"></div>
@@ -284,8 +284,8 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
                 onClick={handleFollowersClick}
                 className="text-center hover:opacity-70 transition-opacity cursor-pointer"
               >
-                <p className="font-bold text-white">{followersCount}</p>
-                <p className="text-gray-400 text-xs md:text-sm">Followers</p>
+                <p className="font-bold text-black dark:text-white">{followersCount}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">Followers</p>
               </button>
 
               <div className="h-6 w-px bg-gray-700"></div>
@@ -294,8 +294,8 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
                 onClick={handleFollowingClick}
                 className="text-center hover:opacity-70 transition-opacity cursor-pointer"
               >
-                <p className="font-bold text-white">{followingCount}</p>
-                <p className="text-gray-400 text-xs md:text-sm">Following</p>
+                <p className="font-bold text-black dark:text-white">{followingCount}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">Following</p>
               </button>
             </motion.div>
           </div>

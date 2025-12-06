@@ -5,9 +5,9 @@ import { X } from "lucide-react";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function FollowersFollowingModal({ 
-  isOpen, 
-  onClose, 
+export default function FollowersFollowingModal({
+  isOpen,
+  onClose,
   type, // "followers" or "following"
   followersList = [],
   followingList = [],
@@ -62,7 +62,7 @@ export default function FollowersFollowingModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed top-0 left-0 right-0 bottom-0 bg-black/70 backdrop-blur-sm z-[200]"
+            className="fixed top-0 left-0 right-0 bottom-0 bg-black/70 dark:bg-black/70 backdrop-blur-sm z-[200]"
             onClick={onClose}
           />
 
@@ -73,39 +73,37 @@ export default function FollowersFollowingModal({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300, duration: 0.3 }}
-              className="w-full max-w-[400px] sm:max-w-[420px] h-auto max-h-[85vh] bg-[#0f0f0f] border border-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
+              className="w-full max-w-[400px] sm:max-w-[420px] h-auto max-h-[85vh] bg-[#fffcfa] dark:bg-[#0f0f0f] border-2 border-black dark:border-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-4 md:p-5 border-b border-gray-800 flex-shrink-0">
-                <h2 className="text-lg md:text-xl font-semibold text-white">{listTitle}</h2>
+              <div className="flex items-center justify-between p-4 md:p-5 border-b border-black dark:border-gray-800 flex-shrink-0">
+                <h2 className="text-lg md:text-xl font-semibold text-black dark:text-white">{listTitle}</h2>
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-gray-800 rounded-full"
+                  className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full"
                 >
                   <X className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
 
               {/* Tabs */}
-              <div className="flex border-b border-gray-800">
+              <div className="flex border-b border-black dark:border-gray-800">
                 <button
                   onClick={() => setActiveTab("followers")}
-                  className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
-                    activeTab === "followers"
-                      ? "text-white border-b-2 border-white"
-                      : "text-gray-400 hover:text-gray-300"
-                  }`}
+                  className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${activeTab === "followers"
+                    ? "text-black dark:text-white border-b-2 border-orange-500"
+                    : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-gray-300"
+                    }`}
                 >
                   Followers
                 </button>
                 <button
                   onClick={() => setActiveTab("following")}
-                  className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
-                    activeTab === "following"
-                      ? "text-white border-b-2 border-white"
-                      : "text-gray-400 hover:text-gray-300"
-                  }`}
+                  className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${activeTab === "following"
+                    ? "text-black dark:text-white border-b-2 border-orange-500"
+                    : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-gray-300"
+                    }`}
                 >
                   Following
                 </button>
@@ -124,9 +122,9 @@ export default function FollowersFollowingModal({
                   >
                     {currentList.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-12 px-4">
-                        <p className="text-gray-400 text-center">
-                          {activeTab === "followers" 
-                            ? "No followers yet" 
+                        <p className="text-gray-500 dark:text-gray-400 text-center">
+                          {activeTab === "followers"
+                            ? "No followers yet"
                             : "Not following anyone yet"}
                         </p>
                       </div>
@@ -137,7 +135,7 @@ export default function FollowersFollowingModal({
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.03, duration: 0.3 }}
-                          className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl hover:bg-[#1a1a1a] transition-colors"
+                          className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl hover:bg-orange-50 dark:hover:bg-[#1a1a1a] transition-colors"
                         >
                           {/* Profile Picture */}
                           <button
@@ -170,11 +168,11 @@ export default function FollowersFollowingModal({
                               }}
                               className="text-left w-full"
                             >
-                              <p className="font-semibold text-sm md:text-base text-white truncate hover:opacity-70 transition-opacity">
+                              <p className="font-semibold text-sm md:text-base text-black dark:text-white truncate hover:opacity-70 transition-opacity">
                                 {user.username}
                               </p>
                               {user.fullName && (
-                                <p className="text-xs md:text-sm text-gray-400 truncate">
+                                <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate">
                                   {user.fullName}
                                 </p>
                               )}
@@ -191,11 +189,10 @@ export default function FollowersFollowingModal({
                                   handleFollow(user.username);
                                 }
                               }}
-                              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                                user.isFollowing
-                                  ? "bg-gray-800 text-white hover:bg-gray-700 border border-gray-700"
-                                  : "bg-orange-500 text-white hover:bg-orange-600"
-                              }`}
+                              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${user.isFollowing
+                                ? "bg-gray-200 dark:bg-gray-800 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 border border-gray-400 dark:border-gray-700"
+                                : "bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
+                                }`}
                             >
                               {user.isFollowing ? "Following" : "Follow"}
                             </button>
@@ -214,8 +211,7 @@ export default function FollowersFollowingModal({
   );
 
   // Use portal to render at body level
-  return typeof document !== 'undefined' 
+  return typeof document !== 'undefined'
     ? createPortal(modalContent, document.body)
     : null;
 }
-

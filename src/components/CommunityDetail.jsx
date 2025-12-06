@@ -122,7 +122,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#0b0b0b]">
+    <div className="min-h-screen w-full bg-[#fffcfa] dark:bg-[#0b0b0b]">
       {/* Header with Banner */}
       <div className="relative w-full">
         {/* Banner Image */}
@@ -169,8 +169,8 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     <button
                       onClick={handleJoin}
                       className={`px-6 py-2.5 rounded-lg text-sm font-medium transition ${isJoined
-                          ? "bg-gray-700 text-white border border-gray-600"
-                          : "bg-orange-500 text-white hover:bg-orange-600"
+                        ? "bg-gray-700 text-white border border-gray-600"
+                        : "bg-orange-500 text-white hover:bg-orange-600"
                         }`}
                     >
                       {isJoined ? "Joined" : "Join"}
@@ -191,7 +191,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
         {/* Back Button */}
         <button
           onClick={() => setActiveView("communities", null)}
-          className="absolute top-4 left-4 p-2 bg-black/50 hover:bg-black/70 rounded-full transition backdrop-blur-sm"
+          className="absolute top-4 left-4 p-2 bg-black/50 hover:bg-black/70 dark:bg-black/50 dark:hover:bg-black/70 rounded-full transition backdrop-blur-sm"
         >
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
@@ -202,30 +202,30 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
           {/* Left Sidebar */}
           <aside className="lg:col-span-1 space-y-6">
             {/* Community Information */}
-            <div className="bg-[#121212] border border-gray-800 rounded-xl p-4 space-y-4">
-              <div className="flex items-center gap-2 text-sm text-gray-300">
+            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-4 space-y-4">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                 <Pencil className="w-4 h-4 text-orange-500" />
                 <span>Created {community.createdDate}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                 <Globe className="w-4 h-4 text-orange-500" />
                 <span>{community.type}</span>
               </div>
 
               {/* Community Description */}
               <div>
-                <h3 className="text-white font-semibold mb-2">{community.name}</h3>
-                <p className="text-sm text-gray-400 leading-relaxed">
+                <h3 className="text-black dark:text-white font-semibold mb-2">{community.name}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                   {community.description}
                 </p>
               </div>
 
               {/* Rules */}
               <div>
-                <h3 className="text-white font-semibold mb-2">Rules</h3>
+                <h3 className="text-black dark:text-white font-semibold mb-2">Rules</h3>
                 <ul className="space-y-1">
                   {community.rules.map((rule, index) => (
-                    <li key={index} className="text-sm text-gray-400">
+                    <li key={index} className="text-sm text-gray-600 dark:text-gray-400">
                       {index + 1}. {rule}
                     </li>
                   ))}
@@ -234,16 +234,16 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
             </div>
 
             {/* Search By Topic */}
-            <div className="bg-[#121212] border border-gray-800 rounded-xl p-4">
-              <h3 className="text-white font-semibold mb-3">Search By Topic</h3>
+            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-4">
+              <h3 className="text-black dark:text-white font-semibold mb-3">Search By Topic</h3>
               <div className="flex flex-wrap gap-2">
                 {community.topics.map((topic, index) => (
                   <button
                     key={index}
                     onClick={() => handleTopicClick(topic)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${index < 3
-                        ? "bg-orange-500 text-white"
-                        : "bg-orange-500 text-white"
+                      ? "bg-orange-500 text-white"
+                      : "bg-orange-500 text-white"
                       }`}
                   >
                     {topic}
@@ -253,8 +253,8 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
             </div>
 
             {/* Moderators */}
-            <div className="bg-[#121212] border border-gray-800 rounded-xl p-4">
-              <h3 className="text-white font-semibold mb-3">Moderators</h3>
+            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-4">
+              <h3 className="text-black dark:text-white font-semibold mb-3">Moderators</h3>
               <div className="space-y-3">
                 {community.moderators.map((mod) => (
                   <div key={mod.id} className="flex items-center gap-3">
@@ -268,7 +268,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     </div>
                     <button
                       onClick={() => onViewUserProfile && onViewUserProfile(mod.username)}
-                      className="text-sm text-gray-300 hover:opacity-70 transition-opacity cursor-pointer"
+                      className="text-sm text-gray-700 dark:text-gray-300 hover:opacity-70 transition-opacity cursor-pointer"
                     >
                       {mod.username}...
                     </button>
@@ -285,7 +285,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
               return (
                 <div
                   key={post.id}
-                  className="bg-[#121212] border border-gray-800 rounded-xl p-6 space-y-4"
+                  className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-6 space-y-4"
                 >
                   {/* Post Header */}
                   <div className="flex items-center justify-between">
@@ -300,7 +300,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                       </div>
                       <button
                         onClick={() => onViewUserProfile && onViewUserProfile(post.username)}
-                        className="text-white font-medium hover:opacity-70 transition-opacity cursor-pointer"
+                        className="text-black dark:text-white font-medium hover:opacity-70 transition-opacity cursor-pointer"
                       >
                         {post.username}
                       </button>
@@ -315,12 +315,12 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
 
                   {/* Post Title */}
                   {post.title && (
-                    <h3 className="text-white font-bold text-lg">{post.title}</h3>
+                    <h3 className="text-black dark:text-white font-bold text-lg">{post.title}</h3>
                   )}
 
                   {/* Post Content */}
                   {post.content && (
-                    <p className="text-gray-300 leading-relaxed">{post.content}</p>
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{post.content}</p>
                   )}
 
                   {/* Post Image (if exists) - 4:3 aspect ratio */}
@@ -335,21 +335,21 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                   )}
 
                   {/* Interaction Icons */}
-                  <div className="flex items-center gap-4 pt-2 border-t border-gray-800">
+                  <div className="flex items-center gap-4 pt-2 border-t border-black dark:border-gray-800">
                     <button
                       onClick={() => handleLike(post.id)}
                       className="flex items-center gap-2 focus:outline-none group"
                     >
                       <Heart
                         className={`w-5 h-5 transition-all ${postLikeData.liked
-                            ? "fill-red-500 text-red-500"
-                            : "text-gray-400 group-hover:text-white"
+                          ? "fill-red-500 text-red-500"
+                          : "text-gray-600 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-white"
                           }`}
                       />
                       <span
                         className={`text-sm ${postLikeData.liked
-                            ? "text-red-500 font-semibold"
-                            : "text-gray-400 group-hover:text-white"
+                          ? "text-red-500 font-semibold"
+                          : "text-gray-600 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-white"
                           }`}
                       >
                         {postLikeData.count}
@@ -357,16 +357,16 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     </button>
                     <button
                       onClick={() => handleCommentClick(post.id)}
-                      className="flex items-center gap-2 text-gray-400 hover:text-white transition"
+                      className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition"
                     >
-                      <img src={commentIcon} alt="comment" className="w-5 h-5" />
+                      <img src={commentIcon} alt="comment" className="w-5 h-5 opacity-70 dark:opacity-100 brightness-0 dark:brightness-100" />
                       <span className="text-sm">{post.comments || 0}</span>
                     </button>
                     <button
                       onClick={() => setIsShareModalOpen(true)}
-                      className="flex items-center gap-2 text-gray-400 hover:text-white transition"
+                      className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition"
                     >
-                      <img src={messageIcon} alt="share" className="w-5 h-5" />
+                      <img src={messageIcon} alt="share" className="w-5 h-5 opacity-70 dark:opacity-100 brightness-0 dark:brightness-100" />
                     </button>
                   </div>
                 </div>
@@ -711,8 +711,8 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                         selectedCategory === category ? null : category
                       )}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition ${selectedCategory === category
-                          ? "bg-orange-500 text-white"
-                          : "bg-[#1a1a1a] text-gray-300 border border-gray-700 hover:border-orange-500/50"
+                        ? "bg-orange-500 text-white"
+                        : "bg-[#1a1a1a] text-gray-300 border border-gray-700 hover:border-orange-500/50"
                         }`}
                     >
                       {category}

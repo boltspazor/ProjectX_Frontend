@@ -141,12 +141,12 @@ export default function Notifications({ setActiveView, onViewUserProfile, previo
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex items-start gap-3 px-4 py-3 rounded-xl border border-gray-800 bg-[#0f0f0f] hover:border-gray-700 transition-all duration-300"
+      className="flex items-start gap-3 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0f0f0f] hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300"
     >
       {/* Avatar */}
       <div className="flex-shrink-0">
         {notification.icon === "code" ? (
-          <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
             <svg
               className="w-6 h-6 text-white"
               fill="none"
@@ -175,7 +175,7 @@ export default function Notifications({ setActiveView, onViewUserProfile, previo
 
       {/* Message */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-white leading-relaxed">
+        <p className="text-sm text-black dark:text-white leading-relaxed">
           {notification.username ? (
             <>
               <button
@@ -198,11 +198,10 @@ export default function Notifications({ setActiveView, onViewUserProfile, previo
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => handleAction(notification.id, section, notification.actionType)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${
-              notification.isFollowing
-                ? "bg-gray-800 text-gray-400 border border-gray-700"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${notification.isFollowing
+              ? "bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-700"
+              : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
           >
             {notification.action}
           </button>
@@ -237,7 +236,7 @@ export default function Notifications({ setActiveView, onViewUserProfile, previo
 
     return (
       <div className="mb-8">
-        <h3 className="text-lg font-semibold text-white mb-4 px-4">{title}</h3>
+        <h3 className="text-lg font-semibold text-black dark:text-white mb-4 px-4">{title}</h3>
         <div className="space-y-3">
           {sectionNotifications.map((notification) =>
             renderNotification(notification, sectionKey)
@@ -248,17 +247,17 @@ export default function Notifications({ setActiveView, onViewUserProfile, previo
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#fffcfa] dark:bg-black text-black dark:text-white pb-20 md:pb-0">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-black border-b border-gray-800">
+      <div className="sticky top-0 z-10 bg-[#fffcfa] dark:bg-black border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-4 px-4 py-3">
           <button
             onClick={() => setActiveView(previousView)}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-white hover:text-gray-300 transition-colors"
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg md:text-2xl font-semibold text-white">Notifications</h1>
+          <h1 className="text-lg md:text-2xl font-semibold text-black dark:text-white">Notifications</h1>
         </div>
       </div>
 

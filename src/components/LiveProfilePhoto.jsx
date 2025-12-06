@@ -10,12 +10,12 @@ import React, { useState, useRef, useEffect } from "react";
  * @param {string} className - Additional CSS classes
  * @param {number} maxDuration - Maximum video duration in seconds (default: 10)
  */
-export default function LiveProfilePhoto({ 
-  imageSrc, 
-  videoSrc, 
-  alt = "Profile", 
-  className = "", 
-  maxDuration = 10 
+export default function LiveProfilePhoto({
+  imageSrc,
+  videoSrc,
+  alt = "Profile",
+  className = "",
+  maxDuration = 10
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -28,10 +28,10 @@ export default function LiveProfilePhoto({
       // Play video on hover
       const video = videoRef.current;
       video.currentTime = 0;
-      
+
       // Try to play the video
       const playPromise = video.play();
-      
+
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
@@ -100,9 +100,8 @@ export default function LiveProfilePhoto({
       <img
         src={imageSrc}
         alt={alt}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${
-          showVideo ? "opacity-0 absolute inset-0" : "opacity-100"
-        }`}
+        className={`w-full h-full object-cover transition-opacity duration-300 ${showVideo ? "opacity-0 absolute inset-0" : "opacity-100"
+          }`}
         loading="lazy"
         decoding="async"
       />
@@ -112,9 +111,8 @@ export default function LiveProfilePhoto({
         <video
           ref={videoRef}
           src={videoSrc}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
-            showVideo ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"
-          }`}
+          className={`w-full h-full object-cover transition-opacity duration-300 ${showVideo ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"
+            }`}
           muted
           playsInline
           loop={false}
@@ -127,4 +125,3 @@ export default function LiveProfilePhoto({
     </div>
   );
 }
-

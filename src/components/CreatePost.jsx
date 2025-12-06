@@ -41,7 +41,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
   const [locationSearch, setLocationSearch] = useState("");
   const [tagSearch, setTagSearch] = useState("");
   const [collabSearch, setCollabSearch] = useState("");
-  
+
   // Mobile-specific states
   const [mobileStep, setMobileStep] = useState("gallery"); // "gallery", "edit", "filters", "adjustments", "final", "crop"
   const [selectedGalleryImage, setSelectedGalleryImage] = useState(null);
@@ -58,7 +58,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
   const [showMusicModal, setShowMusicModal] = useState(false);
   const [showTextModal, setShowTextModal] = useState(false);
   const [finalEditedImage, setFinalEditedImage] = useState(null);
-  
+
   const fileInputRef = useRef(null);
   const cropContainerRef = useRef(null);
   const imageRef = useRef(null);
@@ -267,7 +267,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
 
       // Calculate crop area based on aspect ratio
       const cropDims = calculateCropDimensions(img.width, img.height, aspectRatio);
-      
+
       // The canvas will be the final cropped size
       canvas.width = Math.round(cropDims.width);
       canvas.height = Math.round(cropDims.height);
@@ -413,7 +413,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
 
     // Desktop: process image with edits
     let finalImage = croppedImage || imagePreview;
-    
+
     if (finalImage && (selectedFilter !== "original" || Object.values(adjustments).some(v => v !== 0))) {
       applyAllEdits(finalImage, (finalImage) => {
         const newPost = {
@@ -606,10 +606,10 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
     const opacityStyle = fade !== 1 ? fade : 1;
 
     // Vignette effect using box-shadow
-    const vignetteStyle = adjustments.vignette !== 0 
+    const vignetteStyle = adjustments.vignette !== 0
       ? {
-          boxShadow: `inset 0 0 ${100 + Math.abs(adjustments.vignette) * 2}px ${Math.abs(adjustments.vignette) * 0.5}px rgba(0, 0, 0, ${Math.abs(adjustments.vignette) / 100})`
-        }
+        boxShadow: `inset 0 0 ${100 + Math.abs(adjustments.vignette) * 2}px ${Math.abs(adjustments.vignette) * 0.5}px rgba(0, 0, 0, ${Math.abs(adjustments.vignette) / 100})`
+      }
       : {};
 
     return {
@@ -664,13 +664,13 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
   const getImageBounds = () => {
     const container = drawingCanvasRef.current?.parentElement;
     if (!container) return null;
-    
+
     const img = mobileImageRef.current || container.querySelector('img');
     if (!img) return null;
-    
+
     const containerRect = container.getBoundingClientRect();
     const imgRect = img.getBoundingClientRect();
-    
+
     return {
       left: imgRect.left - containerRect.left,
       top: imgRect.top - containerRect.top,
@@ -686,25 +686,25 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
     if (!isDrawing) return;
     e.preventDefault();
     e.stopPropagation();
-    
+
     const canvas = drawingCanvasRef.current;
     if (!canvas) return;
-    
+
     const bounds = getImageBounds();
     if (!bounds) return;
-    
+
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     const containerRect = canvas.parentElement.getBoundingClientRect();
-    
+
     const x = clientX - containerRect.left - bounds.left;
     const y = clientY - containerRect.top - bounds.top;
-    
+
     // Check if point is within image bounds
     if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
       return;
     }
-    
+
     setCurrentPath([{ x, y }]);
   };
 
@@ -712,30 +712,30 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
     if (!isDrawing || currentPath.length === 0) return;
     e.preventDefault();
     e.stopPropagation();
-    
+
     const canvas = drawingCanvasRef.current;
     if (!canvas) return;
-    
+
     const bounds = getImageBounds();
     if (!bounds) return;
-    
+
     const ctx = canvas.getContext('2d');
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     const containerRect = canvas.parentElement.getBoundingClientRect();
-    
+
     const x = clientX - containerRect.left - bounds.left;
     const y = clientY - containerRect.top - bounds.top;
-    
+
     // Check if point is within image bounds
     if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
       stopDrawing();
       return;
     }
-    
+
     setCurrentPath(prev => {
       const newPath = [...prev, { x, y }];
-      
+
       // Draw immediately to canvas
       if (newPath.length > 1) {
         const prevPoint = newPath[newPath.length - 2];
@@ -748,7 +748,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
         ctx.lineTo(x, y);
         ctx.stroke();
       }
-      
+
       return newPath;
     });
   };
@@ -765,15 +765,15 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
   // Initialize and update drawing canvas to match image bounds
   const updateDrawingCanvas = useCallback(() => {
     if (!drawingCanvasRef.current || mobileStep !== "edit") return;
-    
+
     const bounds = getImageBounds();
     if (!bounds || bounds.width === 0 || bounds.height === 0) {
       return;
     }
-    
+
     const canvas = drawingCanvasRef.current;
     const dpr = window.devicePixelRatio || 1;
-    
+
     canvas.width = bounds.width * dpr;
     canvas.height = bounds.height * dpr;
     canvas.style.width = bounds.width + 'px';
@@ -781,11 +781,11 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
     canvas.style.left = bounds.left + 'px';
     canvas.style.top = bounds.top + 'px';
     canvas.style.position = 'absolute';
-    
+
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, bounds.width, bounds.height);
-    
+
     // Redraw all saved paths
     drawingPaths.forEach(({ path, color, size }) => {
       if (path.length > 1) {
@@ -801,7 +801,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
         ctx.stroke();
       }
     });
-    
+
     // Also draw current path if drawing
     if (currentPath.length > 1) {
       ctx.strokeStyle = drawingColor;
@@ -820,21 +820,21 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
   // Initialize canvas when edit step is active
   useEffect(() => {
     if (mobileStep !== "edit") return;
-    
+
     const initCanvas = () => {
       const img = mobileImageRef.current;
       if (!img) {
         setTimeout(initCanvas, 100);
         return;
       }
-      
+
       if (img.complete && img.naturalWidth > 0) {
         setTimeout(updateDrawingCanvas, 50);
       } else {
         img.addEventListener('load', () => setTimeout(updateDrawingCanvas, 50), { once: true });
       }
     };
-    
+
     initCanvas();
   }, [mobileStep, updateDrawingCanvas]);
 
@@ -871,43 +871,43 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
     // Merge drawings and text into final image
     const canvas = document.createElement('canvas');
     const img = new Image();
-    
+
     // Set crossOrigin for external images
     if (baseImage.startsWith('http://') || baseImage.startsWith('https://')) {
       img.crossOrigin = 'anonymous';
     }
-    
+
     img.onerror = () => {
       // If image fails to load, just proceed with original
       console.warn('Image failed to load, proceeding without merge');
       setMobileStep("final");
     };
-    
+
     img.onload = () => {
       try {
         canvas.width = img.width;
         canvas.height = img.height;
         const ctx = canvas.getContext('2d');
-        
+
         // Draw base image
         ctx.drawImage(img, 0, 0);
-        
+
         // Get image display dimensions from the ref if available
         const imgElement = mobileImageRef.current;
         let displayWidth = img.width;
         let displayHeight = img.height;
-        
+
         if (imgElement) {
           const imgRect = imgElement.getBoundingClientRect();
           displayWidth = imgRect.width;
           displayHeight = imgRect.height;
         }
-        
+
         // Calculate scale factors
         const scaleX = img.width / displayWidth;
         const scaleY = img.height / displayHeight;
         const scale = Math.min(scaleX, scaleY) || 1;
-        
+
         // Add drawings if any
         if (drawingPaths.length > 0) {
           drawingPaths.forEach(({ path, color, size }) => {
@@ -925,7 +925,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
             }
           });
         }
-        
+
         // Add text overlays
         if (textOverlays.length > 0) {
           textOverlays.forEach((overlay) => {
@@ -935,13 +935,13 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(
-              overlay.text, 
-              (overlay.x / 100) * img.width, 
+              overlay.text,
+              (overlay.x / 100) * img.width,
               (overlay.y / 100) * img.height
             );
           });
         }
-        
+
         const finalDataUrl = canvas.toDataURL('image/jpeg', 0.95);
         setFinalEditedImage(finalDataUrl);
         setMobileStep("final");
@@ -951,7 +951,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
         setMobileStep("final");
       }
     };
-    
+
     img.src = baseImage;
   };
 
@@ -999,13 +999,12 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
           {step === "upload" && (
             <div className="flex flex-col items-center justify-center p-12 min-h-[600px]">
               <h2 className="text-xl font-semibold mb-8 text-white">Create new post</h2>
-              
+
               <div
-                className={`w-full max-w-md border-2 border-dashed rounded-lg p-16 text-center cursor-pointer transition-colors ${
-                  isDragging
+                className={`w-full max-w-md border-2 border-dashed rounded-lg p-16 text-center cursor-pointer transition-colors ${isDragging
                     ? "border-blue-500 bg-blue-500/10"
                     : "border-gray-600 hover:border-gray-500"
-                }`}
+                  }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
@@ -1019,7 +1018,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                       alt="Upload"
                       className="w-20 h-20 invert"
                     />
-        </div>
+                  </div>
 
                   <p className="text-gray-300 text-lg">Drag photos and videos here</p>
                   <button
@@ -1137,11 +1136,10 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                             // Reset crop position when aspect ratio changes
                             setCropData({ x: 0, y: 0, zoom: 1 });
                           }}
-                          className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                            aspectRatio === ratio.value
+                          className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${aspectRatio === ratio.value
                               ? "bg-blue-500/20 text-blue-400 font-semibold border border-blue-500/50"
                               : "text-gray-300 hover:bg-gray-800"
-                          }`}
+                            }`}
                         >
                           {ratio.label}
                         </button>
@@ -1215,21 +1213,19 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                   <div className="flex border-b border-gray-800">
                     <button
                       onClick={() => setActiveTab("filters")}
-                      className={`flex-1 py-3 text-sm font-semibold transition-colors ${
-                        activeTab === "filters"
+                      className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === "filters"
                           ? "text-purple-400 border-b-2 border-purple-400"
                           : "text-gray-400 hover:text-gray-300"
-                      }`}
+                        }`}
                     >
                       Filters
                     </button>
                     <button
                       onClick={() => setActiveTab("adjustments")}
-                      className={`flex-1 py-3 text-sm font-semibold transition-colors ${
-                        activeTab === "adjustments"
+                      className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === "adjustments"
                           ? "text-purple-400 border-b-2 border-purple-400"
                           : "text-gray-400 hover:text-gray-300"
-                      }`}
+                        }`}
                     >
                       Adjustments
                     </button>
@@ -1246,11 +1242,10 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                             className="flex flex-col items-center gap-2"
                           >
                             <div
-                              className={`w-20 h-20 rounded border-2 overflow-hidden ${
-                                selectedFilter === filter.name
+                              className={`w-20 h-20 rounded border-2 overflow-hidden ${selectedFilter === filter.name
                                   ? "border-blue-500"
                                   : "border-transparent"
-                              }`}
+                                }`}
                             >
                               <img
                                 src={croppedImage || imagePreview}
@@ -1260,11 +1255,10 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                               />
                             </div>
                             <span
-                              className={`text-xs ${
-                                selectedFilter === filter.name
+                              className={`text-xs ${selectedFilter === filter.name
                                   ? "text-blue-400 font-semibold"
                                   : "text-gray-400"
-                              }`}
+                                }`}
                             >
                               {filter.label}
                             </span>
@@ -1542,8 +1536,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                     </button>
                   </div>
                   <div className="flex-1 overflow-y-auto p-4">
-        <input
-          type="text"
+                    <input
+                      type="text"
                       placeholder="Search for people..."
                       value={tagSearch}
                       onChange={(e) => setTagSearch(e.target.value)}
@@ -1759,11 +1753,10 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                     }
                     setMobileStep("edit");
                   }}
-                  className={`font-semibold transition-colors ${
-                    (selectedGalleryImage || imagePreview) 
-                      ? 'text-blue-500 hover:text-blue-400 cursor-pointer' 
+                  className={`font-semibold transition-colors ${(selectedGalleryImage || imagePreview)
+                      ? 'text-blue-500 hover:text-blue-400 cursor-pointer'
                       : 'text-gray-600 cursor-not-allowed opacity-50'
-                  }`}
+                    }`}
                   disabled={!selectedGalleryImage && !imagePreview}
                 >
                   Next
@@ -1785,7 +1778,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
               <div className="flex-1 overflow-y-auto p-2">
                 <div className="flex items-center justify-between px-2 mb-2">
                   <span className="text-sm text-gray-400">Recents</span>
-                  <button 
+                  <button
                     className="text-gray-400"
                     onClick={() => fileInputRef.current?.click()}
                   >
@@ -1809,9 +1802,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                     <button
                       key={img.id}
                       onClick={() => handleMobileGallerySelect(img)}
-                      className={`aspect-square overflow-hidden rounded transition-all ${
-                        selectedGalleryImage?.id === img.id ? 'ring-2 ring-blue-500' : ''
-                      }`}
+                      className={`aspect-square overflow-hidden rounded transition-all ${selectedGalleryImage?.id === img.id ? 'ring-2 ring-blue-500' : ''
+                        }`}
                     >
                       <img
                         src={img.url}
@@ -1860,15 +1852,15 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
               </div>
 
               {/* Image with Drawing Canvas */}
-              <div 
+              <div
                 className="flex-1 relative bg-black overflow-hidden"
                 onMouseMove={(e) => {
                   if (draggingText !== null) {
                     const rect = e.currentTarget.getBoundingClientRect();
                     const x = ((e.clientX - dragTextStart.x) / rect.width) * 100;
                     const y = ((e.clientY - dragTextStart.y) / rect.height) * 100;
-                    setTextOverlays(textOverlays.map(overlay => 
-                      overlay.id === draggingText 
+                    setTextOverlays(textOverlays.map(overlay =>
+                      overlay.id === draggingText
                         ? { ...overlay, x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) }
                         : overlay
                     ));
@@ -1880,8 +1872,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                     const rect = e.currentTarget.getBoundingClientRect();
                     const x = ((e.touches[0].clientX - dragTextStart.x) / rect.width) * 100;
                     const y = ((e.touches[0].clientY - dragTextStart.y) / rect.height) * 100;
-                    setTextOverlays(textOverlays.map(overlay => 
-                      overlay.id === draggingText 
+                    setTextOverlays(textOverlays.map(overlay =>
+                      overlay.id === draggingText
                         ? { ...overlay, x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) }
                         : overlay
                     ));
@@ -1913,8 +1905,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                   <div
                     key={overlay.id}
                     className="absolute text-white text-2xl font-bold cursor-move select-none"
-                    style={{ 
-                      left: `${overlay.x}%`, 
+                    style={{
+                      left: `${overlay.x}%`,
                       top: `${overlay.y}%`,
                       transform: 'translate(-50%, -50%)',
                       zIndex: 10
@@ -1942,7 +1934,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                 {/* Drawing Canvas - Positioned over image only */}
                 <canvas
                   ref={drawingCanvasRef}
-                  style={{ 
+                  style={{
                     position: 'absolute',
                     pointerEvents: isDrawing ? 'auto' : 'none',
                     touchAction: isDrawing ? 'none' : 'auto',
@@ -2009,9 +2001,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                         stopDrawing();
                       }
                     }}
-                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg ${
-                      isDrawing ? 'bg-gray-800' : ''
-                    }`}
+                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg ${isDrawing ? 'bg-gray-800' : ''
+                      }`}
                   >
                     <Edit3 className={`w-6 h-6 ${isDrawing ? 'text-blue-500' : 'text-gray-400'}`} />
                     <span className={`text-xs ${isDrawing ? 'text-blue-500' : 'text-gray-400'}`}>Draw</span>
@@ -2066,9 +2057,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                           <button
                             key={color}
                             onClick={() => setDrawingColor(color)}
-                            className={`w-8 h-8 rounded-full border-2 ${
-                              drawingColor === color ? 'border-white' : 'border-gray-600'
-                            }`}
+                            className={`w-8 h-8 rounded-full border-2 ${drawingColor === color ? 'border-white' : 'border-gray-600'
+                              }`}
                             style={{ backgroundColor: color }}
                           />
                         ))}
@@ -2134,11 +2124,10 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                         className="flex flex-col items-center gap-2 flex-shrink-0"
                       >
                         <div
-                          className={`w-20 h-20 rounded border-2 overflow-hidden ${
-                            selectedFilter === filter.name
+                          className={`w-20 h-20 rounded border-2 overflow-hidden ${selectedFilter === filter.name
                               ? "border-blue-500"
                               : "border-gray-700"
-                          }`}
+                            }`}
                         >
                           <img
                             src={croppedImage || imagePreview}
@@ -2148,15 +2137,14 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                           />
                         </div>
                         <span
-                          className={`text-xs ${
-                            selectedFilter === filter.name
+                          className={`text-xs ${selectedFilter === filter.name
                               ? "text-blue-500 font-semibold"
                               : "text-gray-400"
-                          }`}
+                            }`}
                         >
                           {filter.label}
-          </span>
-        </button>
+                        </span>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -2189,7 +2177,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                 >
                   Done
                 </button>
-        </div>
+              </div>
 
               {/* Crop Area */}
               <div className="flex-1 relative bg-black overflow-hidden flex items-center justify-center p-4">
@@ -2211,7 +2199,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                     <div className="absolute left-1/3 top-0 bottom-0 w-px bg-white/30" />
                     <div className="absolute left-2/3 top-0 bottom-0 w-px bg-white/30" />
                   </div>
-                  
+
                   {/* Image container - draggable */}
                   <div className="absolute inset-0 overflow-hidden cursor-move">
                     <img
@@ -2266,11 +2254,10 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                       <button
                         key={ratio.value}
                         onClick={() => setAspectRatio(ratio.value)}
-                        className={`px-4 py-2 rounded-lg text-sm whitespace-nowrap ${
-                          aspectRatio === ratio.value
+                        className={`px-4 py-2 rounded-lg text-sm whitespace-nowrap ${aspectRatio === ratio.value
                             ? 'bg-blue-500 text-white'
                             : 'bg-gray-800 text-gray-300'
-                        }`}
+                          }`}
                       >
                         {ratio.label}
                       </button>
@@ -2586,9 +2573,9 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                               className="sr-only peer"
                             />
                             <div className="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-        </label>
-      </div>
-    </div>
+                          </label>
+                        </div>
+                      </div>
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm text-white">Turn off commenting</span>

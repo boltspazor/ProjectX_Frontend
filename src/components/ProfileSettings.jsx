@@ -7,7 +7,7 @@ import { getUserProfile, saveUserProfile } from "../utils/userProfile";
 export default function ProfileSettings({ onBack }) {
   // Load saved profile or use defaults
   const savedProfile = getUserProfile();
-  
+
   const [formData, setFormData] = useState({
     username: savedProfile?.username || "idkwhoisrahul_04",
     bio: savedProfile?.bio || "Wish I was half as interesting as my bio",
@@ -22,7 +22,7 @@ export default function ProfileSettings({ onBack }) {
     messages: true,
     followRequests: true
   });
-  
+
   // Preview states (not saved until "Save Changes" is clicked)
   const [profilePhotoPreview, setProfilePhotoPreview] = useState(
     savedProfile?.profilePhoto || profilePhotoDefault
@@ -30,7 +30,7 @@ export default function ProfileSettings({ onBack }) {
   const [profileVideoPreview, setProfileVideoPreview] = useState(
     savedProfile?.profileVideo || null
   );
-  
+
   const photoInputRef = useRef(null);
   const videoInputRef = useRef(null);
 
@@ -102,21 +102,21 @@ export default function ProfileSettings({ onBack }) {
       bio: formData.bio,
       fullName: "Rahul Chauhan"
     };
-    
+
     saveUserProfile(profileData);
     alert("Profile updated successfully!");
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#fffcfa] dark:bg-black text-black dark:text-white pb-20 md:pb-0">
       {/* Header */}
-      <div className="border-b border-gray-800 px-4 md:px-6 py-4">
+      <div className="border-b border-gray-300 dark:border-gray-800 px-4 md:px-6 py-4">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 md:h-6 md:w-6 text-white" />
+            <ArrowLeft className="h-5 w-5 md:h-6 md:w-6 text-black dark:text-white" />
           </button>
           <h1 className="text-lg md:text-2xl font-semibold">Profile Settings</h1>
         </div>
@@ -148,9 +148,9 @@ export default function ProfileSettings({ onBack }) {
                   onChange={handlePhotoUpload}
                   className="hidden"
                 />
-                <button 
+                <button
                   onClick={() => photoInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors border-2 border-black cursor-pointer"
+                  className="absolute bottom-0 right-0 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors border-2 border-white dark:border-black cursor-pointer"
                   title="Upload profile photo"
                 >
                   <Camera className="h-5 w-5 text-white" />
@@ -236,7 +236,7 @@ export default function ProfileSettings({ onBack }) {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-orange-500 transition-colors"
               />
             </div>
 
@@ -250,7 +250,7 @@ export default function ProfileSettings({ onBack }) {
                 value={formData.bio}
                 onChange={handleInputChange}
                 rows="3"
-                className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors resize-none"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-orange-500 transition-colors resize-none"
               />
             </div>
 
@@ -264,7 +264,7 @@ export default function ProfileSettings({ onBack }) {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-orange-500 transition-colors"
               />
             </div>
 
@@ -279,7 +279,7 @@ export default function ProfileSettings({ onBack }) {
                 value={formData.phone}
                 onChange={handleInputChange}
                 placeholder="Enter phone number"
-                className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
               />
             </div>
 
@@ -294,23 +294,13 @@ export default function ProfileSettings({ onBack }) {
                 value={formData.gender}
                 onChange={handleInputChange}
                 placeholder="Enter gender"
-                className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
               />
             </div>
           </div>
 
           {/* Right Column */}
           <div className="space-y-6">
-            {/* Save Changes Button */}
-            <div className="flex justify-end">
-              <button
-                onClick={handleSaveChanges}
-                className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-
             {/* Account Type */}
             <div>
               <label className="block text-sm font-medium text-orange-500 mb-3">
@@ -326,7 +316,7 @@ export default function ProfileSettings({ onBack }) {
                     onChange={(e) => setAccountType(e.target.value)}
                     className="w-4 h-4 text-orange-500 focus:ring-orange-500"
                   />
-                  <span className="text-white">Public</span>
+                  <span className="text-black dark:text-white">Public</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -337,7 +327,7 @@ export default function ProfileSettings({ onBack }) {
                     onChange={(e) => setAccountType(e.target.value)}
                     className="w-4 h-4 text-orange-500 focus:ring-orange-500"
                   />
-                  <span className="text-white">Private</span>
+                  <span className="text-black dark:text-white">Private</span>
                 </label>
               </div>
             </div>
@@ -348,70 +338,72 @@ export default function ProfileSettings({ onBack }) {
                 Notifications
               </label>
               <div className="space-y-3">
-                <div className="flex items-center justify-between bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3">
-                  <span className="text-white">Likes</span>
+                <div className="flex items-center justify-between bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3">
+                  <span className="text-black dark:text-white">Likes</span>
                   <button
                     onClick={() => handleNotificationToggle("likes")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      notifications.likes ? "bg-orange-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.likes ? "bg-orange-500" : "bg-gray-600"
+                      }`}
                   >
                     <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                        notifications.likes ? "translate-x-6" : ""
-                      }`}
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${notifications.likes ? "translate-x-6" : ""
+                        }`}
                     />
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3">
-                  <span className="text-white">Comments</span>
+                <div className="flex items-center justify-between bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3">
+                  <span className="text-black dark:text-white">Comments</span>
                   <button
                     onClick={() => handleNotificationToggle("comments")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      notifications.comments ? "bg-orange-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.comments ? "bg-orange-500" : "bg-gray-600"
+                      }`}
                   >
                     <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                        notifications.comments ? "translate-x-6" : ""
-                      }`}
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${notifications.comments ? "translate-x-6" : ""
+                        }`}
                     />
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3">
-                  <span className="text-white">Messages</span>
+                <div className="flex items-center justify-between bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3">
+                  <span className="text-black dark:text-white">Messages</span>
                   <button
                     onClick={() => handleNotificationToggle("messages")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      notifications.messages ? "bg-orange-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.messages ? "bg-orange-500" : "bg-gray-600"
+                      }`}
                   >
                     <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                        notifications.messages ? "translate-x-6" : ""
-                      }`}
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${notifications.messages ? "translate-x-6" : ""
+                        }`}
                     />
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3">
-                  <span className="text-white">Follow Requests</span>
+                <div className="flex items-center justify-between bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3">
+                  <span className="text-black dark:text-white">Follow Requests</span>
                   <button
                     onClick={() => handleNotificationToggle("followRequests")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      notifications.followRequests ? "bg-orange-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.followRequests ? "bg-orange-500" : "bg-gray-600"
+                      }`}
                   >
                     <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                        notifications.followRequests ? "translate-x-6" : ""
-                      }`}
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${notifications.followRequests ? "translate-x-6" : ""
+                        }`}
                     />
                   </button>
                 </div>
               </div>
+            </div>
+
+            {/* Save Changes Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleSaveChanges}
+                className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-colors"
+              >
+                Save Changes
+              </button>
             </div>
           </div>
         </div>

@@ -11,7 +11,7 @@ export default function CommunitiesPage({ setActiveView }) {
   }
 
   return (
-    <main className="min-h-full w-full bg-[#0b0b0b]">
+    <main className="min-h-full w-full bg-[#fffcfa] dark:bg-[#0b0b0b]">
       <JoinedCommunities setActiveView={setActiveView} onDiscoverClick={() => setShowDiscover(true)} />
     </main>
   );

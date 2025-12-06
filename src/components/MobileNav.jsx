@@ -9,11 +9,11 @@ import communitiesIcon from "../assets/communities.svg";
 
 export default function MobileNav({ activeView, setActiveView }) {
   const navItems = [
-    { id: "home", icon: homeIcon, view: "home" },
-    { id: "explore", icon: exploreIcon, view: "explore" },
+    { id: "home", icon: homeIcon, view: "home", needsInvert: true },
+    { id: "explore", icon: exploreIcon, view: "explore", needsInvert: true },
     { id: "profile", icon: profilePhoto, view: "profile", isProfile: true },
-    { id: "messages", icon: messageIcon, view: "messages" },
-    { id: "communities", icon: communitiesIcon, view: "communities", isCommunities: true },
+    { id: "messages", icon: messageIcon, view: "messages", needsInvert: true },
+    { id: "communities", icon: communitiesIcon, view: "communities", needsInvert: true },
   ];
 
   const handleNavClick = (view) => {
@@ -30,7 +30,7 @@ export default function MobileNav({ activeView, setActiveView }) {
       <div className="md:hidden fixed bottom-0 left-0 w-full z-50 pb-5 pt-3">
         {/* Background with subtle gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-[#0a0a0a]/90 to-transparent pointer-events-none"></div>
-        
+
         {/* Navigation Container */}
         <div className="relative flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-4">
           {navItems.map((item, index) => {
@@ -65,13 +65,13 @@ export default function MobileNav({ activeView, setActiveView }) {
                   }}
                   transition={{ duration: 0.4, ease: "easeOut" }}
                   style={{
-                    filter: active 
-                      ? "drop-shadow(0 0 10px rgba(251, 146, 60, 0.5)) drop-shadow(0 0 20px rgba(249, 115, 22, 0.4)) drop-shadow(0 0 30px rgba(234, 88, 12, 0.3))" 
+                    filter: active
+                      ? "drop-shadow(0 0 10px rgba(251, 146, 60, 0.5)) drop-shadow(0 0 20px rgba(249, 115, 22, 0.4)) drop-shadow(0 0 30px rgba(234, 88, 12, 0.3))"
                       : "drop-shadow(0 0 5px rgba(251, 146, 60, 0.25))",
                   }}
                 >
                   {/* Inner Circle */}
-                  <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden relative">
+                  <div className="w-full h-full rounded-full bg-white dark:bg-black flex items-center justify-center overflow-hidden relative">
                     {isCenter ? (
                       <motion.img
                         src={item.icon}
@@ -84,7 +84,7 @@ export default function MobileNav({ activeView, setActiveView }) {
                       <motion.img
                         src={item.icon}
                         alt={item.id}
-                        className={`${isCenter ? "w-full h-full" : "w-6 h-6 sm:w-7 sm:h-7"} object-contain`}
+                        className={`${isCenter ? "w-full h-full" : "w-6 h-6 sm:w-7 sm:h-7"} object-contain ${item.needsInvert ? "invert dark:invert-0" : ""}`}
                         whileHover={{ scale: 1.08 }}
                         transition={{ duration: 0.25, ease: "easeOut" }}
                         animate={{

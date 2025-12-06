@@ -16,7 +16,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
   const { username: currentUsername } = useUserProfile();
 
   const viewedUser = viewedUsername || "sheryanne_xoxo";
-  
+
   // Sample user data - in a real app, this would be fetched based on username
   const userData = {
     username: viewedUser,
@@ -25,7 +25,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
     profilePhoto: "https://i.pravatar.cc/200",
     profileVideo: getProfileVideoUrl("https://i.pravatar.cc/200", viewedUser),
   };
-  
+
   // Posts state - counts will be dynamic based on this array length
   const [posts, setPosts] = useState([
     {
@@ -71,7 +71,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
     { username: "john_doe", fullName: "John Doe", image: "https://i.pravatar.cc/100?img=2", isFollowing: false },
     { username: "jane_smith", fullName: "Jane Smith", image: "https://i.pravatar.cc/100?img=3", isFollowing: true },
   ]);
-  
+
   const [followingList, setFollowingList] = useState([
     { username: "idkwhoisrahul_04", fullName: "Rahul Chauhan", image: "https://i.pravatar.cc/100?img=1", isFollowing: true },
     { username: "pxhf_12", fullName: "Pxhf User", image: "https://i.pravatar.cc/100?img=11", isFollowing: true },
@@ -96,7 +96,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
   const handleFollow = () => {
     const newFollowingState = !isFollowing;
     setIsFollowing(newFollowingState);
-    
+
     // Update follower count when following/unfollowing
     if (newFollowingState) {
       // Add current user to their followers list if not already there
@@ -127,24 +127,24 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
 
   const handleFollowUser = (targetUsername) => {
     // Update followers list
-    setFollowersList(followersList.map(user => 
+    setFollowersList(followersList.map(user =>
       user.username === targetUsername ? { ...user, isFollowing: true } : user
     ));
-    
+
     // Update following list
-    setFollowingList(followingList.map(user => 
+    setFollowingList(followingList.map(user =>
       user.username === targetUsername ? { ...user, isFollowing: true } : user
     ));
   };
 
   const handleUnfollowUser = (targetUsername) => {
     // Update followers list
-    setFollowersList(followersList.map(user => 
+    setFollowersList(followersList.map(user =>
       user.username === targetUsername ? { ...user, isFollowing: false } : user
     ));
-    
+
     // Update following list
-    setFollowingList(followingList.map(user => 
+    setFollowingList(followingList.map(user =>
       user.username === targetUsername ? { ...user, isFollowing: false } : user
     ));
   };
@@ -164,17 +164,17 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#fffcfa] dark:bg-black text-black dark:text-white pb-20 md:pb-0">
       {/* Profile Content */}
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
         {/* Back Button */}
         <div className="flex items-center gap-4 mb-4">
           <button
             onClick={handleBack}
-            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors"
             title="Back"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-400 hover:text-white" />
+            <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white" />
           </button>
         </div>
 
@@ -185,7 +185,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-gray-800"
+            className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-black dark:border-gray-800"
           >
             <LiveProfilePhoto
               imageSrc={userData.profilePhoto}
@@ -202,7 +202,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1, duration: 0.5 }}
-              className="text-xl md:text-2xl font-semibold text-white mb-2"
+              className="text-xl md:text-2xl font-semibold text-black dark:text-white mb-2"
             >
               {userData.username}
             </motion.h2>
@@ -212,7 +212,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.5 }}
-              className="text-gray-300 mb-3"
+              className="text-gray-700 dark:text-gray-300 mb-3"
             >
               {userData.fullName}
             </motion.p>
@@ -222,7 +222,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-white mb-6 text-sm md:text-base"
+              className="text-black dark:text-white mb-6 text-sm md:text-base"
             >
               {userData.bio}
             </motion.p>
@@ -235,28 +235,28 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
               className="flex items-center justify-center gap-4 md:gap-6 text-base md:text-lg mb-6"
             >
               <div className="text-center">
-                <p className="font-bold text-white">{postsCount}</p>
-                <p className="text-gray-400 text-xs md:text-sm">Posts</p>
+                <p className="font-bold text-black dark:text-white">{postsCount}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">Posts</p>
               </div>
 
-              <div className="h-6 w-px bg-gray-700"></div>
+              <div className="h-6 w-px bg-gray-400 dark:bg-gray-700"></div>
 
               <button
                 onClick={handleFollowersClick}
                 className="text-center hover:opacity-70 transition-opacity cursor-pointer"
               >
-                <p className="font-bold text-white">{followersCount}</p>
-                <p className="text-gray-400 text-xs md:text-sm">Followers</p>
+                <p className="font-bold text-black dark:text-white">{followersCount}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">Followers</p>
               </button>
 
-              <div className="h-6 w-px bg-gray-700"></div>
+              <div className="h-6 w-px bg-gray-400 dark:bg-gray-700"></div>
 
               <button
                 onClick={handleFollowingClick}
                 className="text-center hover:opacity-70 transition-opacity cursor-pointer"
               >
-                <p className="font-bold text-white">{followingCount}</p>
-                <p className="text-gray-400 text-xs md:text-sm">Following</p>
+                <p className="font-bold text-black dark:text-white">{followingCount}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">Following</p>
               </button>
             </motion.div>
 
@@ -269,17 +269,16 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
             >
               <button
                 onClick={handleFollow}
-                className={`flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
-                  isFollowing
-                    ? "bg-gray-800 text-white hover:bg-gray-700 border border-gray-700"
-                    : "bg-orange-500 text-white hover:bg-orange-600"
-                }`}
+                className={`flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${isFollowing
+                  ? "bg-gray-200 dark:bg-gray-800 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 border border-gray-400 dark:border-gray-700"
+                  : "bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
+                  }`}
               >
                 {isFollowing ? "Following" : "Follow"}
               </button>
               <button
                 onClick={handleMessage}
-                className="flex-1 px-4 py-2 rounded-lg font-semibold text-sm bg-gray-800 text-white hover:bg-gray-700 border border-gray-700 transition-all flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 rounded-lg font-semibold text-sm bg-gray-200 dark:bg-gray-800 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 border border-gray-400 dark:border-gray-700 transition-all flex items-center justify-center gap-2"
               >
                 <MessageCircle className="h-4 w-4" />
                 Message
@@ -302,7 +301,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4 + index * 0.03, duration: 0.4 }}
               onClick={() => handlePostClick(post)}
-              className="aspect-square overflow-hidden bg-gray-900 cursor-pointer group"
+              className="aspect-square overflow-hidden bg-gray-200 dark:bg-gray-900 cursor-pointer group border-2 border-black dark:border-gray-800 transition-all"
             >
               <img
                 src={post.image}
@@ -339,4 +338,3 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
     </div>
   );
 }
-
