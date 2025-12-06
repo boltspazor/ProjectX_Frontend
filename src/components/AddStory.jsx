@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { ArrowLeft, X, Type, Sparkles, Image as ImageIcon, Camera } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/logo.png";
 
-export default function AddStoryPage({ setActiveView }) {
+export default function AddStory({ setActiveView }) {
   const [step, setStep] = useState("select"); // "select", "edit"
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -13,7 +13,6 @@ export default function AddStoryPage({ setActiveView }) {
   const [textValue, setTextValue] = useState("");
   const [textColor, setTextColor] = useState("#FFFFFF");
   const [filter, setFilter] = useState("none");
-  const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
 
   // Mock recent images - in production, these would come from device storage
@@ -45,7 +44,7 @@ export default function AddStoryPage({ setActiveView }) {
   ];
 
   const textColors = [
-    "#FFFFFF", "#000000", "#FF0000", "#00FF00", 
+    "#FFFFFF", "#000000", "#FF0000", "#00FF00",
     "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF",
     "#FFA500", "#FF69B4", "#800080", "#FFC0CB",
   ];
@@ -92,7 +91,6 @@ export default function AddStoryPage({ setActiveView }) {
 
   const handleShare = () => {
     // Handle story sharing
-    console.log("Sharing story with:", { selectedImage, textValue, filter });
     // Close and go back
     setActiveView("home");
   };
@@ -128,7 +126,7 @@ export default function AddStoryPage({ setActiveView }) {
             <h1 className="text-xl font-semibold text-white">Add to Story</h1>
             <div className="w-10" /> {/* Spacer for centering */}
           </div>
-          
+
           {/* Recents Dropdown */}
           <div className="px-4 pb-3">
             <button className="flex items-center gap-1 text-white text-sm hover:text-orange-500 transition">
@@ -156,7 +154,6 @@ export default function AddStoryPage({ setActiveView }) {
             <button
               onClick={() => {
                 // Generate AI image - placeholder
-                console.log("Generate AI image");
               }}
               className="aspect-square rounded-lg flex flex-col items-center justify-center gap-2 border-2 border-orange-500/50 hover:border-orange-500 transition relative overflow-hidden bg-black"
             >
@@ -246,9 +243,8 @@ export default function AddStoryPage({ setActiveView }) {
               setShowFilters(false);
               setShowStickers(false);
             }}
-            className={`p-3 rounded-full transition ${
-              showText ? "bg-orange-500" : "bg-white/20 hover:bg-white/30"
-            }`}
+            className={`p-3 rounded-full transition ${showText ? "bg-orange-500" : "bg-white/20 hover:bg-white/30"
+              }`}
           >
             <Type className="w-6 h-6 text-white" />
           </button>
@@ -260,9 +256,8 @@ export default function AddStoryPage({ setActiveView }) {
               setShowText(false);
               setShowStickers(false);
             }}
-            className={`p-3 rounded-full transition ${
-              showFilters ? "bg-orange-500" : "bg-white/20 hover:bg-white/30"
-            }`}
+            className={`p-3 rounded-full transition ${showFilters ? "bg-orange-500" : "bg-white/20 hover:bg-white/30"
+              }`}
           >
             <ImageIcon className="w-6 h-6 text-white" />
           </button>
@@ -274,9 +269,8 @@ export default function AddStoryPage({ setActiveView }) {
               setShowText(false);
               setShowFilters(false);
             }}
-            className={`p-3 rounded-full transition ${
-              showStickers ? "bg-orange-500" : "bg-white/20 hover:bg-white/30"
-            }`}
+            className={`p-3 rounded-full transition ${showStickers ? "bg-orange-500" : "bg-white/20 hover:bg-white/30"
+              }`}
           >
             <Sparkles className="w-6 h-6 text-white" />
           </button>
@@ -303,9 +297,8 @@ export default function AddStoryPage({ setActiveView }) {
                   <button
                     key={color}
                     onClick={() => setTextColor(color)}
-                    className={`w-10 h-10 rounded-full border-2 transition ${
-                      textColor === color ? "border-white scale-110" : "border-gray-700"
-                    }`}
+                    className={`w-10 h-10 rounded-full border-2 transition ${textColor === color ? "border-white scale-110" : "border-gray-700"
+                      }`}
                     style={{ backgroundColor: color }}
                   />
                 ))}
@@ -328,11 +321,10 @@ export default function AddStoryPage({ setActiveView }) {
                   <button
                     key={filterOption.id}
                     onClick={() => setFilter(filterOption.id)}
-                    className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition ${
-                      filter === filterOption.id
+                    className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition ${filter === filterOption.id
                         ? "bg-orange-500 text-white"
                         : "bg-white/20 text-white hover:bg-white/30"
-                    }`}
+                      }`}
                   >
                     {filterOption.name}
                   </button>
@@ -357,7 +349,6 @@ export default function AddStoryPage({ setActiveView }) {
                     key={index}
                     onClick={() => {
                       // Add sticker to image - placeholder
-                      console.log("Add sticker:", sticker);
                     }}
                     className="flex-shrink-0 w-12 h-12 text-2xl hover:scale-110 transition"
                   >

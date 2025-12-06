@@ -3,17 +3,21 @@ import { ArrowLeft, Camera, Video, Upload, X } from "lucide-react";
 import profilePhotoDefault from "../assets/profile-photo.jpg";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getUserProfile, saveUserProfile } from "../utils/userProfile";
+import { useAuth } from "../context/AuthContext";
+import { userService, uploadService } from "../services";
 
-export default function ProfileSettingsPage({ onBack }) {
+export default function ProfileSettings({ onBack, onProfileUpdate }) {
+  const { user, updateUser } = useAuth();
+  
   // Load saved profile or use defaults
   const savedProfile = getUserProfile();
-  
+
   const [formData, setFormData] = useState({
-    username: savedProfile?.username || "idkwhoisrahul_04",
-    bio: savedProfile?.bio || "Wish I was half as interesting as my bio",
-    email: "rahul@example.com",
-    phone: "",
-    gender: ""
+    username: savedProfile?.username || user?.username || "idkwhoisrahul_04",
+    bio: savedProfile?.bio || user?.bio || "Wish I was half as interesting as my bio",
+    email: user?.email || "rahul@example.com",
+    phone: user?.phone || "",
+    gender: user?.gender || ""
   });
   const [accountType, setAccountType] = useState("private");
   const [notifications, setNotifications] = useState({
@@ -22,7 +26,13 @@ export default function ProfileSettingsPage({ onBack }) {
     messages: true,
     followRequests: true
   });
-  
+
+  // API state
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+
   // Preview states (not saved until "Save Changes" is clicked)
   const [profilePhotoPreview, setProfilePhotoPreview] = useState(
     savedProfile?.profilePhoto || profilePhotoDefault
@@ -30,7 +40,7 @@ export default function ProfileSettingsPage({ onBack }) {
   const [profileVideoPreview, setProfileVideoPreview] = useState(
     savedProfile?.profileVideo || null
   );
-  
+
   const photoInputRef = useRef(null);
   const videoInputRef = useRef(null);
 
@@ -48,16 +58,38 @@ export default function ProfileSettingsPage({ onBack }) {
     });
   };
 
-  const handlePhotoUpload = (e) => {
+  const handlePhotoUpload = async (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUrl = reader.result;
-        // Only update preview, don't save yet
-        setProfilePhotoPreview(dataUrl);
-      };
-      reader.readAsDataURL(file);
+      setUploadingPhoto(true);
+      try {
+        // Convert to base64 for upload
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const dataUrl = reader.result;
+          
+          try {
+            // Upload to backend
+            const response = await uploadService.uploadFromBase64({
+              base64Data: dataUrl,
+              fileName: file.name,
+              folder: 'profiles'
+            });
+            
+            // Update preview with uploaded URL
+            setProfilePhotoPreview(response.url);
+          } catch (err) {
+            console.error("Error uploading photo:", err);
+            alert("Failed to upload photo. Please try again.");
+          } finally {
+            setUploadingPhoto(false);
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (err) {
+        console.error("Error reading file:", err);
+        setUploadingPhoto(false);
+      }
     } else {
       alert("Please select a valid image file.");
     }
@@ -65,7 +97,7 @@ export default function ProfileSettingsPage({ onBack }) {
     e.target.value = '';
   };
 
-  const handleVideoUpload = (e) => {
+  const handleVideoUpload = async (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('video/')) {
       // Check file size (max 10MB)
@@ -74,13 +106,36 @@ export default function ProfileSettingsPage({ onBack }) {
         e.target.value = '';
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUrl = reader.result;
-        // Only update preview, don't save yet
-        setProfileVideoPreview(dataUrl);
-      };
-      reader.readAsDataURL(file);
+      
+      setUploadingVideo(true);
+      try {
+        // Convert to base64 for upload
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const dataUrl = reader.result;
+          
+          try {
+            // Upload to backend
+            const response = await uploadService.uploadFromBase64({
+              base64Data: dataUrl,
+              fileName: file.name,
+              folder: 'profile-videos'
+            });
+            
+            // Update preview with uploaded URL
+            setProfileVideoPreview(response.url);
+          } catch (err) {
+            console.error("Error uploading video:", err);
+            alert("Failed to upload video. Please try again.");
+          } finally {
+            setUploadingVideo(false);
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (err) {
+        console.error("Error reading file:", err);
+        setUploadingVideo(false);
+      }
     } else {
       alert("Please select a valid video file.");
     }
@@ -93,30 +148,71 @@ export default function ProfileSettingsPage({ onBack }) {
     setProfileVideoPreview(null);
   };
 
-  const handleSaveChanges = () => {
-    // Save all changes at once when "Save Changes" is clicked
-    const profileData = {
-      profilePhoto: profilePhotoPreview,
-      profileVideo: profileVideoPreview,
-      username: formData.username,
-      bio: formData.bio,
-      fullName: "Rahul Chauhan"
-    };
+  const handleSaveChanges = async () => {
+    setIsSaving(true);
+    setSaveError(null);
     
-    saveUserProfile(profileData);
-    alert("Profile updated successfully!");
+    try {
+      // Prepare update data
+      const updateData = {
+        username: formData.username,
+        bio: formData.bio,
+        email: formData.email,
+        phone: formData.phone,
+        gender: formData.gender,
+        profilePicture: profilePhotoPreview,
+        profileVideo: profileVideoPreview,
+        // Add notification settings if your backend supports them
+        notificationSettings: notifications
+      };
+
+      // Call API to update profile
+      const updatedProfile = await userService.updateProfile(updateData);
+      
+      // Save to localStorage as well for offline access
+      const profileData = {
+        profilePhoto: profilePhotoPreview,
+        profileVideo: profileVideoPreview,
+        username: formData.username,
+        bio: formData.bio,
+        fullName: user?.displayName || "Rahul Chauhan"
+      };
+      saveUserProfile(profileData);
+      
+      // Update auth context with new user data
+      if (updateUser) {
+        updateUser(updatedProfile);
+      }
+      
+      // Call parent callback to refresh profile page
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
+      
+      alert("Profile updated successfully!");
+      
+      // Go back to profile page
+      if (onBack) {
+        onBack();
+      }
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setSaveError(err.message || "Failed to update profile. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#fffcfa] dark:bg-black text-black dark:text-white pb-20 md:pb-0">
       {/* Header */}
-      <div className="border-b border-gray-800 px-4 md:px-6 py-4">
+      <div className="border-b border-gray-300 dark:border-gray-800 px-4 md:px-6 py-4">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 md:h-6 md:w-6 text-white" />
+            <ArrowLeft className="h-5 w-5 md:h-6 md:w-6 text-black dark:text-white" />
           </button>
           <h1 className="text-lg md:text-2xl font-semibold">Profile Settings</h1>
         </div>
@@ -148,12 +244,17 @@ export default function ProfileSettingsPage({ onBack }) {
                   onChange={handlePhotoUpload}
                   className="hidden"
                 />
-                <button 
+                <button
                   onClick={() => photoInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors border-2 border-black cursor-pointer"
+                  disabled={uploadingPhoto}
+                  className="absolute bottom-0 right-0 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors border-2 border-white dark:border-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Upload profile photo"
                 >
-                  <Camera className="h-5 w-5 text-white" />
+                  {uploadingPhoto ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <Camera className="h-5 w-5 text-white" />
+                  )}
                 </button>
               </div>
               <p className="text-center md:text-left text-sm text-gray-400 mt-2">
@@ -236,7 +337,7 @@ export default function ProfileSettingsPage({ onBack }) {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-orange-500 transition-colors"
               />
             </div>
 
@@ -250,7 +351,7 @@ export default function ProfileSettingsPage({ onBack }) {
                 value={formData.bio}
                 onChange={handleInputChange}
                 rows="3"
-                className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors resize-none"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-orange-500 transition-colors resize-none"
               />
             </div>
 
@@ -264,7 +365,7 @@ export default function ProfileSettingsPage({ onBack }) {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-orange-500 transition-colors"
               />
             </div>
 
@@ -279,7 +380,7 @@ export default function ProfileSettingsPage({ onBack }) {
                 value={formData.phone}
                 onChange={handleInputChange}
                 placeholder="Enter phone number"
-                className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
               />
             </div>
 
@@ -294,23 +395,13 @@ export default function ProfileSettingsPage({ onBack }) {
                 value={formData.gender}
                 onChange={handleInputChange}
                 placeholder="Enter gender"
-                className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
               />
             </div>
           </div>
 
           {/* Right Column */}
           <div className="space-y-6">
-            {/* Save Changes Button */}
-            <div className="flex justify-end">
-              <button
-                onClick={handleSaveChanges}
-                className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-
             {/* Account Type */}
             <div>
               <label className="block text-sm font-medium text-orange-500 mb-3">
@@ -326,7 +417,7 @@ export default function ProfileSettingsPage({ onBack }) {
                     onChange={(e) => setAccountType(e.target.value)}
                     className="w-4 h-4 text-orange-500 focus:ring-orange-500"
                   />
-                  <span className="text-white">Public</span>
+                  <span className="text-black dark:text-white">Public</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -337,7 +428,7 @@ export default function ProfileSettingsPage({ onBack }) {
                     onChange={(e) => setAccountType(e.target.value)}
                     className="w-4 h-4 text-orange-500 focus:ring-orange-500"
                   />
-                  <span className="text-white">Private</span>
+                  <span className="text-black dark:text-white">Private</span>
                 </label>
               </div>
             </div>
@@ -348,69 +439,86 @@ export default function ProfileSettingsPage({ onBack }) {
                 Notifications
               </label>
               <div className="space-y-3">
-                <div className="flex items-center justify-between bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3">
-                  <span className="text-white">Likes</span>
+                <div className="flex items-center justify-between bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3">
+                  <span className="text-black dark:text-white">Likes</span>
                   <button
                     onClick={() => handleNotificationToggle("likes")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      notifications.likes ? "bg-orange-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.likes ? "bg-orange-500" : "bg-gray-600"
+                      }`}
                   >
                     <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                        notifications.likes ? "translate-x-6" : ""
-                      }`}
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${notifications.likes ? "translate-x-6" : ""
+                        }`}
                     />
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3">
-                  <span className="text-white">Comments</span>
+                <div className="flex items-center justify-between bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3">
+                  <span className="text-black dark:text-white">Comments</span>
                   <button
                     onClick={() => handleNotificationToggle("comments")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      notifications.comments ? "bg-orange-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.comments ? "bg-orange-500" : "bg-gray-600"
+                      }`}
                   >
                     <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                        notifications.comments ? "translate-x-6" : ""
-                      }`}
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${notifications.comments ? "translate-x-6" : ""
+                        }`}
                     />
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3">
-                  <span className="text-white">Messages</span>
+                <div className="flex items-center justify-between bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3">
+                  <span className="text-black dark:text-white">Messages</span>
                   <button
                     onClick={() => handleNotificationToggle("messages")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      notifications.messages ? "bg-orange-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.messages ? "bg-orange-500" : "bg-gray-600"
+                      }`}
                   >
                     <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                        notifications.messages ? "translate-x-6" : ""
-                      }`}
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${notifications.messages ? "translate-x-6" : ""
+                        }`}
                     />
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between bg-[#1a1a1a] border border-gray-800 rounded-lg px-4 py-3">
-                  <span className="text-white">Follow Requests</span>
+                <div className="flex items-center justify-between bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3">
+                  <span className="text-black dark:text-white">Follow Requests</span>
                   <button
                     onClick={() => handleNotificationToggle("followRequests")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      notifications.followRequests ? "bg-orange-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.followRequests ? "bg-orange-500" : "bg-gray-600"
+                      }`}
                   >
                     <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                        notifications.followRequests ? "translate-x-6" : ""
-                      }`}
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${notifications.followRequests ? "translate-x-6" : ""
+                        }`}
                     />
                   </button>
                 </div>
+              </div>
+            </div>
+
+            {/* Save Changes Button */}
+            <div>
+              {saveError && (
+                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p className="text-red-600 dark:text-red-400 text-sm">{saveError}</p>
+                </div>
+              )}
+              <div className="flex justify-end">
+                <button
+                  onClick={handleSaveChanges}
+                  disabled={isSaving}
+                  className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </button>
               </div>
             </div>
           </div>

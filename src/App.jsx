@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import MobileNav from "./components/MobileNav";
@@ -11,81 +12,51 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import CreatePost from "./components/CreatePost";
 import CommunitiesPage from "./pages/CommunitiesPage";
-import CreateCommunity from "./pages/CreateCommunity";
-import CommunityDetailPage from "./pages/CommunityDetailPage";
-import NotificationsPage from "./pages/NotificationsPage";
-import AddStoryPage from "./pages/AddStoryPage";
-import OtherUserProfilePage from "./pages/OtherUserProfilePage";
+import CreateCommunity from "./components/CreateCommunity";
+import CommunityDetail from "./components/CommunityDetail";
+import Notifications from "./components/Notifications";
+import AddStory from "./components/AddStory";
+import OtherUserProfile from "./components/OtherUserProfile";
 
 export default function App() {
+  const { isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const [activeView, setActiveView] = useState("home");
   const [selectedCommunityId, setSelectedCommunityId] = useState(null);
   const [viewedUsername, setViewedUsername] = useState(null);
   const [selectedChatUsername, setSelectedChatUsername] = useState(null);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authView, setAuthView] = useState("login"); // "login" or "signup"
 
-  // Check for existing valid token on mount
-  useEffect(() => {
-    const checkAuthToken = () => {
-      const token = localStorage.getItem("authToken");
-      const tokenExpiry = localStorage.getItem("tokenExpiry");
-
-      if (token && tokenExpiry) {
-        const expiryTime = parseInt(tokenExpiry, 10);
-        const currentTime = Date.now();
-
-        // Check if token is still valid (within 2 hours)
-        if (currentTime < expiryTime) {
-          setIsAuthenticated(true);
-        } else {
-          // Token expired, clear storage
-          localStorage.removeItem("authToken");
-          localStorage.removeItem("tokenExpiry");
-          setIsAuthenticated(false);
-        }
-      }
-    };
-
-    checkAuthToken();
-  }, []);
-
-  // Handle login
+  // Handle login success
   const handleLogin = () => {
-    // Generate a simple token (in production, this would come from backend)
-    const token = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const expiryTime = Date.now() + (2 * 60 * 60 * 1000); // 2 hours from now
-
-    // Store token and expiry in localStorage
-    localStorage.setItem("authToken", token);
-    localStorage.setItem("tokenExpiry", expiryTime.toString());
-
-    setIsAuthenticated(true);
+    // Auth context already handles the login, just need to reset view
+    setAuthView("login");
   };
 
-  // Handle signup
+  // Handle signup success
   const handleSignup = () => {
-    // Generate a simple token (in production, this would come from backend)
-    const token = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const expiryTime = Date.now() + (2 * 60 * 60 * 1000); // 2 hours from now
-
-    // Store token and expiry in localStorage
-    localStorage.setItem("authToken", token);
-    localStorage.setItem("tokenExpiry", expiryTime.toString());
-
-    setIsAuthenticated(true);
+    // Auth context already handles the signup, just need to reset view
+    setAuthView("login");
   };
 
   // Handle logout
-  const handleLogout = () => {
-    // Clear token from localStorage
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("tokenExpiry");
-    setIsAuthenticated(false);
+  const handleLogout = async () => {
+    await logout();
     setActiveView("home");
     setAuthView("login");
   };
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#fdecdf] dark:bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // If not authenticated, show login/signup
   if (!isAuthenticated) {
@@ -146,17 +117,17 @@ export default function App() {
       case "createCommunity":
         return <CreateCommunity setActiveView={handleViewChange} />;
       case "communityDetail":
-        return <CommunityDetailPage setActiveView={handleViewChange} communityId={selectedCommunityId} onViewUserProfile={handleViewUserProfile} />;
+        return <CommunityDetail setActiveView={handleViewChange} communityId={selectedCommunityId} onViewUserProfile={handleViewUserProfile} />;
       case "profile":
         return <ProfilePage onLogout={handleLogout} onViewUserProfile={handleViewUserProfile} />;
       case "shop":
         return <ShopPage />;
       case "notifications":
-        return <NotificationsPage setActiveView={setActiveView} onViewUserProfile={handleViewUserProfile} />;
+        return <Notifications setActiveView={setActiveView} onViewUserProfile={handleViewUserProfile} />;
       case "addStory":
-        return <AddStoryPage setActiveView={handleViewChange} />;
+        return <AddStory setActiveView={handleViewChange} />;
       case "userProfile":
-        return <OtherUserProfilePage username={viewedUsername} setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
+        return <OtherUserProfile username={viewedUsername} setActiveView={handleViewChange} onViewUserProfile={handleViewUserProfile} />;
       case "createPost":
         // Legacy full page view - will be handled by modal now
         return <HomePage setActiveView={handleViewChange} />;
@@ -174,7 +145,7 @@ export default function App() {
   const isStoryPage = activeView === "addStory";
 
   return (
-    <div className="bg-black text-white min-h-screen flex flex-col">
+    <div className="bg-[#fffcfa] dark:bg-black text-black dark:text-white min-h-screen flex flex-col">
       {/* Hide Navbar/Sidebar for Story Page */}
       {!isStoryPage && (
         <>

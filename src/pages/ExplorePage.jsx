@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import PostCard from "../components/PostCard";
 import Filters from "../components/Filters";
 import Accounts from "../components/Accounts";
-import Communities from "../components/Communities";
 import Comments from "../components/Comments";
+import { searchService, postService } from "../services";
 
 export default function ExplorePage({ onViewUserProfile }) {
   const [activeTab, setActiveTab] = useState("Posts");
@@ -16,7 +16,99 @@ export default function ExplorePage({ onViewUserProfile }) {
   const [activePostId, setActivePostId] = useState(null);
   const [postsComments, setPostsComments] = useState({});
 
-  const handleCommentClick = (postId) => {
+  // API state
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Fetch trending or AI posts on mount
+  useEffect(() => {
+    if (isAIEnabled) {
+      fetchAIPosts();
+    } else {
+      fetchTrendingPosts();
+    }
+  }, [isAIEnabled]);
+
+  // Search when query changes
+  useEffect(() => {
+    if (searchQuery) {
+      handleSearch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, selectedCategory]);
+
+  const fetchTrendingPosts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const trendingPosts = await postService.getTrending();
+      setPosts(trendingPosts.posts || []);
+    } catch (err) {
+      console.error("Error fetching trending posts:", err);
+      setError(err.message || "Failed to load posts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAIPosts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const aiPosts = await searchService.getAIPosts();
+      setPosts(aiPosts.posts || []);
+    } catch (err) {
+      console.error("Error fetching AI posts:", err);
+      setError(err.message || "Failed to load AI posts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const params = {
+        query: searchQuery,
+        type: activeTab.toLowerCase(),
+        category: selectedCategory
+      };
+
+      const results = await searchService.search(params);
+      
+      if (activeTab === "Posts") {
+        setPosts(results.posts || []);
+      }
+    } catch (err) {
+      console.error("Error searching:", err);
+      setError(err.message || "Search failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCommentClick = async (postId) => {
+    // Fetch comments if not already loaded
+    if (!postsComments[postId]) {
+      try {
+        const comments = await postService.getPostComments(postId);
+        setPostsComments((prev) => ({
+          ...prev,
+          [postId]: comments
+        }));
+      } catch (err) {
+        console.error("Error fetching comments:", err);
+        setPostsComments((prev) => ({
+          ...prev,
+          [postId]: []
+        }));
+      }
+    }
     setActivePostId(postId);
   };
 
@@ -84,10 +176,9 @@ export default function ExplorePage({ onViewUserProfile }) {
                     px-4 md:px-6 py-2 md:py-3 rounded-xl
                     text-sm md:text-base font-medium
                     transition-all duration-200
-                    ${
-                      isSelected
-                        ? "bg-orange-500 text-white shadow-lg shadow-orange-500/50"
-                        : "bg-[#1a1a1a] text-white border border-gray-700 hover:border-orange-500/50 hover:bg-[#222]"
+                    ${isSelected
+                      ? "bg-orange-500 text-white shadow-lg shadow-orange-500/50"
+                      : "bg-gray-100 dark:bg-[#1a1a1a] text-black dark:text-white border border-black dark:border-gray-700 hover:border-orange-500/50 hover:bg-gray-200 dark:hover:bg-[#222]"
                     }
                   `}
                 >
@@ -103,10 +194,30 @@ export default function ExplorePage({ onViewUserProfile }) {
       {activeTab === "Posts" && (
         <>
           {searchQuery && (
-            <h2 className="text-lg md:text-xl font-semibold mb-5 text-white max-w-7xl mx-auto">
-              Results for <span className="text-gray-300">"{searchQuery}"</span>
+            <h2 className="text-lg md:text-xl font-semibold mb-5 text-black dark:text-white max-w-7xl mx-auto">
+              Results for <span className="text-gray-600 dark:text-gray-300">"{searchQuery}"</span>
             </h2>
           )}
+          
+          {loading && (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500"></div>
+            </div>
+          )}
+
+          {error && (
+            <div className="max-w-7xl mx-auto p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-4">
+              <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+
+          {!loading && !error && posts.length === 0 && (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400 max-w-7xl mx-auto">
+              <p>No posts found</p>
+              <p className="text-sm mt-2">Try a different search or category</p>
+            </div>
+          )}
+
           <div
             className="
               grid 
@@ -116,20 +227,21 @@ export default function ExplorePage({ onViewUserProfile }) {
               mx-auto
             "
           >
-            {Array.from({ length: isAIEnabled ? 20 : 20 }).map((_, i) => (
-              <PostCard 
-                key={i} 
-                postId={i}
+            {posts.map((post) => (
+              <PostCard
+                key={post._id}
+                post={post}
+                postId={post._id}
                 onCommentClick={handleCommentClick}
-                isActive={activePostId === i}
+                isActive={activePostId === post._id}
                 onViewUserProfile={onViewUserProfile}
               />
             ))}
           </div>
 
           {/* Comments Section - Overlay for both mobile and desktop */}
-          <Comments 
-            isOpen={activePostId !== null} 
+          <Comments
+            isOpen={activePostId !== null}
             onClose={handleCloseComments}
             variant="overlay"
             initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
@@ -140,10 +252,6 @@ export default function ExplorePage({ onViewUserProfile }) {
 
       {activeTab === "Accounts" && (
         <Accounts searchQuery={searchQuery} hasSearched={searchQuery !== ""} />
-      )}
-
-      {activeTab === "Communities" && (
-        <Communities searchQuery={searchQuery} hasSearched={searchQuery !== ""} />
       )}
     </main>
   );

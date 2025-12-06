@@ -1,28 +1,116 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Stories from "../components/Stories";
 import PostCard from "../components/PostCard";
 import Comments from "../components/Comments";
+import { postService } from "../services";
 
 export default function HomePage({ setActiveView, onViewUserProfile }) {
   const [activePostId, setActivePostId] = useState(null);
-  const [postsComments, setPostsComments] = useState({
-    0: [
-      { id: 1, username: "john_doe", text: "Great post!", likes: 5, liked: false, image: "https://i.pravatar.cc/100?img=1" },
-      { id: 2, username: "jane_smith", text: "Love this!", likes: 3, liked: false, image: "https://i.pravatar.cc/100?img=2" },
-    ],
-    1: [
-      { id: 1, username: "mike_wilson", text: "Amazing content!", likes: 8, liked: false, image: "https://i.pravatar.cc/100?img=3" },
-    ],
-    2: [],
-    3: [],
-  });
+  const [postsComments, setPostsComments] = useState({});
 
-  const handleCommentClick = (postId) => {
+  // Feed state
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [lastDocId, setLastDocId] = useState(null);
+  const loadingRef = useRef(null);
+
+  // Fetch initial posts
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!hasMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchPosts();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasMore, loading, lastDocId]);
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const params = { limit: 10 };
+      if (lastDocId) {
+        params.lastDocId = lastDocId;
+      }
+
+      const response = await postService.getFeed(params);
+      
+      if (response.posts && response.posts.length > 0) {
+        setPosts((prev) => [...prev, ...response.posts]);
+        setLastDocId(response.lastDocId);
+        setHasMore(response.hasMore || false);
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error("Error fetching feed:", err);
+      setError(err.message || "Failed to load posts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCommentClick = async (postId) => {
+    // Fetch comments if not already loaded
+    if (!postsComments[postId]) {
+      try {
+        const comments = await postService.getPostComments(postId);
+        setPostsComments((prev) => ({
+          ...prev,
+          [postId]: comments
+        }));
+      } catch (err) {
+        console.error("Error fetching comments:", err);
+        setPostsComments((prev) => ({
+          ...prev,
+          [postId]: []
+        }));
+      }
+    }
     setActivePostId(postId);
   };
 
   const handleCloseComments = () => {
     setActivePostId(null);
+  };
+
+  const handleAddComment = async (commentText) => {
+    if (!activePostId || !commentText.trim()) return;
+
+    try {
+      const newComment = await postService.addComment(activePostId, { text: commentText });
+      
+      // Update local state with the new comment
+      setPostsComments((prev) => ({
+        ...prev,
+        [activePostId]: [...(prev[activePostId] || []), newComment]
+      }));
+
+      return newComment;
+    } catch (err) {
+      console.error("Error adding comment:", err);
+      throw err;
+    }
   };
 
   const handleAddStory = () => {
@@ -39,39 +127,87 @@ export default function HomePage({ setActiveView, onViewUserProfile }) {
           <Stories onAddStory={handleAddStory} />
         </div>
 
+        {/* Error State */}
+        {error && (
+          <div className="max-w-2xl mx-auto mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+            <button
+              onClick={() => {
+                setPosts([]);
+                setLastDocId(null);
+                setHasMore(true);
+                fetchPosts();
+              }}
+              className="mt-2 text-sm text-red-600 dark:text-red-400 underline hover:no-underline"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
         {/* Posts Section with Comments */}
         <div className={`max-w-2xl mx-auto transition-all duration-300 ${activePostId !== null ? 'md:max-w-none md:grid md:grid-cols-2 md:gap-6' : ''}`}>
           {/* Posts Container */}
           <div className="space-y-6">
-            {Array.from({ length: 4 }).map((_, i) => (
+            {posts.map((post) => (
               <PostCard
-                key={i}
-                postId={i}
+                key={post._id}
+                post={post}
+                postId={post._id}
                 variant="feed"
                 onCommentClick={handleCommentClick}
-                isActive={activePostId === i}
+                isActive={activePostId === post._id}
                 onViewUserProfile={onViewUserProfile}
               />
             ))}
+
+            {/* Loading Indicator */}
+            {loading && (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+              </div>
+            )}
+
+            {/* Load More Trigger */}
+            {hasMore && !loading && (
+              <div ref={loadingRef} className="h-10" />
+            )}
+
+            {/* No More Posts */}
+            {!hasMore && posts.length > 0 && (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p className="text-sm">You're all caught up!</p>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!loading && posts.length === 0 && !error && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400 mb-2">No posts yet</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">Follow some users to see their posts here</p>
+              </div>
+            )}
           </div>
 
           {/* Comments Section - Desktop only, side by side */}
-            <div className="hidden md:block sticky top-0 h-fit">
-              <Comments 
-                isOpen={activePostId !== null} 
-                onClose={handleCloseComments} 
-                initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
-                onViewUserProfile={onViewUserProfile} 
-              />
-            </div>
+          <div className="hidden md:block sticky top-0 h-fit">
+            <Comments
+              isOpen={activePostId !== null}
+              onClose={handleCloseComments}
+              initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
+              onViewUserProfile={onViewUserProfile}
+              onAddComment={handleAddComment}
+            />
+          </div>
 
           {/* Comments Section - Mobile only, overlay */}
           <div className="md:hidden">
-            <Comments 
-              isOpen={activePostId !== null} 
-              onClose={handleCloseComments} 
+            <Comments
+              isOpen={activePostId !== null}
+              onClose={handleCloseComments}
               initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
-              onViewUserProfile={onViewUserProfile} 
+              onViewUserProfile={onViewUserProfile}
+              onAddComment={handleAddComment}
             />
           </div>
         </div>

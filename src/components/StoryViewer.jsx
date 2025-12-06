@@ -16,7 +16,7 @@ export default function StoryViewer({ stories, initialIndex, onClose, onStoryVie
   const handlePrevRef = useRef(null);
 
   const currentStory = stories[currentStoryIndex];
-  
+
   // Get previous viewed stories
   const prevStories = stories
     .slice(0, currentStoryIndex)
@@ -211,7 +211,7 @@ export default function StoryViewer({ stories, initialIndex, onClose, onStoryVie
                 dragElastic={0.2}
                 onDragEnd={(e, { offset, velocity }) => {
                   const swipe = Math.abs(offset.x) * velocity.x;
-                  
+
                   if (swipe < -10000) {
                     // Swiped left - next story
                     handleNext();
@@ -231,7 +231,7 @@ export default function StoryViewer({ stories, initialIndex, onClose, onStoryVie
                     loading="eager"
                     decoding="async"
                   />
-                  
+
                   {/* Pause Indicator */}
                   {isPaused && (
                     <motion.div
@@ -248,7 +248,7 @@ export default function StoryViewer({ stories, initialIndex, onClose, onStoryVie
                       </div>
                     </motion.div>
                   )}
-                  
+
                   {/* Story Info Overlay */}
                   <div className="absolute top-4 left-4 right-4 flex items-center gap-3 z-10">
                     <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white">
@@ -272,18 +272,18 @@ export default function StoryViewer({ stories, initialIndex, onClose, onStoryVie
                       onClick={(e) => e.stopPropagation()}
                       className="flex-1 bg-black/50 backdrop-blur-sm border border-gray-700 rounded-full px-3 md:px-4 py-2 text-sm md:text-base text-white placeholder-gray-400 focus:outline-none focus:border-white"
                     />
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setLiked(!liked);
                       }}
                       className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition"
                     >
-                      <Heart 
+                      <Heart
                         className={`w-5 h-5 transition-all ${liked ? 'fill-red-500 text-red-500' : 'text-white'}`}
                       />
                     </button>
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsShareModalOpen(true);
