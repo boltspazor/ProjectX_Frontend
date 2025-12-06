@@ -1,11 +1,96 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import { notificationService, userService } from "../services";
 
 export default function Notifications({ setActiveView, onViewUserProfile, previousView = "home" }) {
   const [notifications, setNotifications] = useState({
+    today: [],
+    yesterday: [],
+    thisWeek: []
+  });
+  const [allNotifications, setAllNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch notifications on mount
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const notifs = await notificationService.getNotifications();
+      setAllNotifications(notifs || []);
+      
+      // Group notifications by time period
+      const grouped = groupNotificationsByTime(notifs || []);
+      setNotifications(grouped);
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+      setError(err.message || "Failed to load notifications");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const groupNotificationsByTime = (notifs) => {
+    const now = new Date();
+    const today = [];
+    const yesterday = [];
+    const thisWeek = [];
+
+    notifs.forEach(notif => {
+      const createdAt = new Date(notif.createdAt);
+      const diffHours = (now - createdAt) / (1000 * 60 * 60);
+
+      const transformed = {
+        id: notif._id,
+        type: notif.type,
+        avatar: notif.sender?.profilePicture || "https://i.pravatar.cc/100",
+        username: notif.sender?.username || "user",
+        message: notif.message || getNotificationMessage(notif),
+        action: getNotificationAction(notif),
+        actionType: notif.type,
+        isFollowing: notif.isFollowing || false,
+        showDismiss: notif.type === 'follow_request',
+        isRead: notif.isRead
+      };
+
+      if (diffHours < 24) {
+        today.push(transformed);
+      } else if (diffHours < 48) {
+        yesterday.push(transformed);
+      } else if (diffHours < 168) {
+        thisWeek.push(transformed);
+      }
+    });
+
+    return { today, yesterday, thisWeek };
+  };
+
+  const getNotificationMessage = (notif) => {
+    const typeMessages = {
+      follow: 'started following you',
+      like: 'liked your post',
+      comment: `commented: ${notif.content || ''}`,
+      follow_request: 'requested to follow you',
+      mention: 'mentioned you in a post'
+    };
+    return typeMessages[notif.type] || 'sent you a notification';
+  };
+
+  const getNotificationAction = (notif) => {
+    if (notif.type === 'follow') return notif.isFollowing ? 'Following' : 'Follow Back';
+    if (notif.type === 'follow_request') return 'Confirm';
+    return null;
+  };
+
+  const [oldNotifications] = useState({
     today: [
       {
         id: 1,
@@ -104,35 +189,60 @@ export default function Notifications({ setActiveView, onViewUserProfile, previo
     ],
   });
 
-  const handleAction = (notificationId, section, actionType) => {
+  const handleAction = async (notificationId, section, actionType) => {
     if (actionType === "dismiss") {
-      setNotifications((prev) => {
-        const updated = { ...prev };
-        updated[section] = updated[section].filter((n) => n.id !== notificationId);
-        return updated;
-      });
+      try {
+        await notificationService.deleteNotification(notificationId);
+        setNotifications((prev) => {
+          const updated = { ...prev };
+          updated[section] = updated[section].filter((n) => n.id !== notificationId);
+          return updated;
+        });
+      } catch (err) {
+        console.error("Error dismissing notification:", err);
+      }
       return;
     }
 
+    // Find the notification to get username
+    const notif = notifications[section]?.find((n) => n.id === notificationId);
+    if (!notif) return;
+
+    // Optimistically update UI
     setNotifications((prev) => {
       const updated = { ...prev };
-      const notif = updated[section]?.find((n) => n.id === notificationId);
-      if (!notif) return prev;
+      const n = updated[section]?.find((n) => n.id === notificationId);
+      if (!n) return prev;
 
-      if (actionType === "follow_back" || actionType === "confirm_request") {
-        notif.isFollowing = true;
-        notif.action = "Following";
-        notif.actionType = "following";
-        notif.showDismiss = false;
+      if (actionType === "follow_back" || actionType === "confirm_request" || actionType === "follow") {
+        n.isFollowing = true;
+        n.action = "Following";
+        n.actionType = "following";
+        n.showDismiss = false;
       } else if (actionType === "following") {
-        // Toggle back to follow (acts like undo without popup)
-        notif.isFollowing = false;
-        notif.action = notif.type === "follow_request" ? "Follow" : "Follow Back";
-        notif.actionType = "follow_back";
+        n.isFollowing = false;
+        n.action = n.type === "follow_request" ? "Follow" : "Follow Back";
+        n.actionType = "follow_back";
       }
 
       return updated;
     });
+
+    try {
+      // Call API
+      if (actionType === "follow_back" || actionType === "confirm_request" || actionType === "follow") {
+        await userService.followUser(notif.username);
+      } else if (actionType === "following") {
+        await userService.unfollowUser(notif.username);
+      }
+
+      // Mark notification as read
+      await notificationService.markAsRead(notificationId);
+    } catch (err) {
+      console.error("Error handling notification action:", err);
+      // Revert optimistic update on error
+      fetchNotifications();
+    }
   };
 
   const renderNotification = (notification, section) => (
@@ -263,9 +373,38 @@ export default function Notifications({ setActiveView, onViewUserProfile, previo
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 overflow-y-auto scrollbar-hide">
-        {renderSection("Today", "today")}
-        {renderSection("Yesterday", "yesterday")}
-        {renderSection("This Week", "thisWeek")}
+        {loading && (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500"></div>
+          </div>
+        )}
+
+        {error && (
+          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-4">
+            <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+            <button
+              onClick={fetchNotifications}
+              className="mt-2 text-sm text-red-600 dark:text-red-400 underline hover:no-underline"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && allNotifications.length === 0 && (
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            <p>No notifications yet</p>
+            <p className="text-sm mt-2">When you get notifications, they'll show up here</p>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <>
+            {renderSection("Today", "today")}
+            {renderSection("Yesterday", "yesterday")}
+            {renderSection("This Week", "thisWeek")}
+          </>
+        )}
       </div>
 
     </div>

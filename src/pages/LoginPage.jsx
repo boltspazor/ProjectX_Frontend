@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "../context/AuthContext";
+import { authService } from "../services/authService";
 
 export default function LoginPage({ onLogin, onSwitchToSignup }) {
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -248,12 +251,12 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     };
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     if (!username.trim()) {
-      setError("Please enter your username");
+      setError("Please enter your username or email");
       triggerErrorAnimation();
       return;
     }
@@ -270,19 +273,42 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
       return;
     }
 
-    // Success - show loading state
+    // Show loading state
     setIsLoading(true);
     const controller = document.querySelector(".controller");
     if (controller) {
       controller.style.transition = "opacity 0.5s ease, transform 0.5s ease";
       controller.style.opacity = "0.8";
       controller.style.transform = "scale(0.98)";
-      createSuccessParticles();
+    }
 
-      setTimeout(() => {
-        setIsLoading(false);
-        onLogin();
-      }, 500);
+    try {
+      // Call API login - backend expects 'email' field
+      const response = await login({
+        email: username, // Using username as email
+        password: password,
+      });
+
+      if (response.success) {
+        createSuccessParticles();
+        // Wait a moment for animation before redirecting
+        setTimeout(() => {
+          onLogin();
+        }, 500);
+      } else {
+        setError(response.message || "Login failed. Please try again.");
+        triggerErrorAnimation();
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err.message || "Invalid credentials. Please try again.");
+      triggerErrorAnimation();
+    } finally {
+      setIsLoading(false);
+      if (controller) {
+        controller.style.opacity = "1";
+        controller.style.transform = "scale(1)";
+      }
     }
   };
 
@@ -323,15 +349,22 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
     setIsSendingReset(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSendingReset(false);
+    try {
+      // Call API for password reset
+      await authService.forgotPassword(forgotPasswordEmail);
       setForgotPasswordSuccess(true);
+      setForgotPasswordError("");
       // Reset form after showing success message
       setTimeout(() => {
         setForgotPasswordEmail("");
       }, 100);
-    }, 1500);
+    } catch (err) {
+      console.error('Forgot password error:', err);
+      setForgotPasswordError(err.message || "Failed to send reset email. Please try again.");
+      setForgotPasswordSuccess(false);
+    } finally {
+      setIsSendingReset(false);
+    }
   };
 
   const closeForgotPasswordModal = () => {

@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
+import { communityService } from "../services/communityService";
 
 export default function DiscoverCommunities({ onBack }) {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [recommendedCommunities, setRecommendedCommunities] = useState([]);
+  const [categoryCommunities, setCategoryCommunities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [joiningIds, setJoiningIds] = useState(new Set());
 
   const categories = [
     "All",
@@ -16,142 +22,59 @@ export default function DiscoverCommunities({ onBack }) {
     "Art & Design"
   ];
 
-  const recommendedCommunities = [
-    {
-      id: 1,
-      name: "Tech4Good",
-      members: "375 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=20"
-    },
-    {
-      id: 2,
-      name: "Tech4Good",
-      members: "436 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=21"
-    },
-    {
-      id: 3,
-      name: "Tech4Good",
-      members: "288 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=22"
-    },
-    {
-      id: 4,
-      name: "Tech4Good",
-      members: "375 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=23"
-    },
-    {
-      id: 5,
-      name: "Tech4Good",
-      members: "436 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=24"
-    },
-    {
-      id: 6,
-      name: "Tech4Good",
-      members: "288 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=25"
-    }
-  ];
+  useEffect(() => {
+    fetchCommunities();
+  }, [activeCategory]);
 
-  const technologyCommunities = [
-    {
-      id: 7,
-      name: "Tech4Good",
-      members: "375 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=26"
-    },
-    {
-      id: 8,
-      name: "Tech4Good",
-      members: "436 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=27"
-    },
-    {
-      id: 9,
-      name: "Tech4Good",
-      members: "288 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=28"
-    },
-    {
-      id: 10,
-      name: "Tech4Good",
-      members: "375 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=29"
-    },
-    {
-      id: 11,
-      name: "Tech4Good",
-      members: "436 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=30"
-    },
-    {
-      id: 12,
-      name: "Tech4Good",
-      members: "288 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=31"
+  const fetchCommunities = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch recommended communities (always shown)
+      const recommended = await communityService.getPublicCommunities({ limit: 6 });
+      setRecommendedCommunities(recommended || []);
+      
+      // Fetch category-specific communities if not "All"
+      if (activeCategory !== "All") {
+        const categoryData = await communityService.getPublicCommunities({
+          category: activeCategory,
+          limit: 6
+        });
+        setCategoryCommunities(categoryData || []);
+      } else {
+        setCategoryCommunities([]);
+      }
+    } catch (err) {
+      console.error('Error fetching communities:', err);
+      setError(err.message || 'Failed to load communities');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  const gamesCommunities = [
-    {
-      id: 13,
-      name: "Tech4Good",
-      members: "375 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=32"
-    },
-    {
-      id: 14,
-      name: "Tech4Good",
-      members: "436 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=33"
-    },
-    {
-      id: 15,
-      name: "Tech4Good",
-      members: "288 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=34"
-    },
-    {
-      id: 16,
-      name: "Tech4Good",
-      members: "375 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=35"
-    },
-    {
-      id: 17,
-      name: "Tech4Good",
-      members: "436 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=36"
-    },
-    {
-      id: 18,
-      name: "Tech4Good",
-      members: "288 followers",
-      description: "Some long ass description > honestly don't know what to write here",
-      avatar: "https://i.pravatar.cc/100?img=37"
+  const handleJoinCommunity = async (communityId) => {
+    if (joiningIds.has(communityId)) return;
+    
+    try {
+      setJoiningIds(prev => new Set(prev).add(communityId));
+      await communityService.joinCommunity(communityId);
+      
+      // Optimistic update - remove from lists after joining
+      setRecommendedCommunities(prev => prev.filter(c => c.id !== communityId));
+      setCategoryCommunities(prev => prev.filter(c => c.id !== communityId));
+    } catch (err) {
+      console.error('Error joining community:', err);
+    } finally {
+      setJoiningIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(communityId);
+        return newSet;
+      });
     }
-  ];
+  };
 
-  const CommunityCard = ({ community }) => (
+  const CommunityCard = ({ community, onJoin, isJoining }) => (
     <div className="bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 rounded-2xl p-4 hover:border-orange-500 transition-all duration-300">
       <div className="flex items-start gap-3">
         <img
@@ -168,8 +91,12 @@ export default function DiscoverCommunities({ onBack }) {
             {community.description}
           </p>
         </div>
-        <button className="px-4 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-full transition-colors flex-shrink-0">
-          Join
+        <button
+          onClick={() => onJoin(community.id)}
+          disabled={isJoining}
+          className="px-4 py-1.5 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-full transition-colors flex-shrink-0"
+        >
+          {isJoining ? 'Joining...' : 'Join'}
         </button>
       </div>
     </div>
@@ -192,6 +119,26 @@ export default function DiscoverCommunities({ onBack }) {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
+        {loading && (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-12">
+            <p className="text-red-500 mb-4">{error}</p>
+            <button
+              onClick={fetchCommunities}
+              className="px-6 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <>
         {/* Search and Categories */}
         <div className="mb-8">
           <h2 className="text-base md:text-lg text-gray-700 dark:text-gray-300 mb-4">What are you looking for?</h2>
@@ -216,49 +163,48 @@ export default function DiscoverCommunities({ onBack }) {
         </div>
 
         {/* Recommended Section */}
-        <div className="mb-10">
-          <h2 className="text-lg md:text-xl font-semibold text-black dark:text-white mb-4">Recommended for you</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {recommendedCommunities.map((community) => (
-              <CommunityCard key={community.id} community={community} />
-            ))}
+        {recommendedCommunities.length > 0 && (
+          <div className="mb-10">
+            <h2 className="text-lg md:text-xl font-semibold text-black dark:text-white mb-4">Recommended for you</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recommendedCommunities.map((community) => (
+                <CommunityCard
+                  key={community.id}
+                  community={community}
+                  onJoin={handleJoinCommunity}
+                  isJoining={joiningIds.has(community.id)}
+                />
+              ))}
+            </div>
           </div>
-          <div className="flex justify-center mt-6">
-            <button className="px-6 py-2 bg-[#1a1a1a] hover:bg-[#222] text-white text-sm font-medium rounded-lg border border-gray-800 transition-colors">
-              Show More
-            </button>
-          </div>
-        </div>
+        )}
 
-        {/* Technology Section */}
-        <div className="mb-10">
-          <h2 className="text-lg md:text-xl font-semibold text-black dark:text-white mb-4">Technology</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {technologyCommunities.map((community) => (
-              <CommunityCard key={community.id} community={community} />
-            ))}
+        {/* Category-Specific Section */}
+        {activeCategory !== "All" && categoryCommunities.length > 0 && (
+          <div className="mb-10">
+            <h2 className="text-lg md:text-xl font-semibold text-black dark:text-white mb-4">{activeCategory}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {categoryCommunities.map((community) => (
+                <CommunityCard
+                  key={community.id}
+                  community={community}
+                  onJoin={handleJoinCommunity}
+                  isJoining={joiningIds.has(community.id)}
+                />
+              ))}
+            </div>
           </div>
-          <div className="flex justify-center mt-6">
-            <button className="px-6 py-2 bg-[#1a1a1a] hover:bg-[#222] text-white text-sm font-medium rounded-lg border border-gray-800 transition-colors">
-              Show More
-            </button>
-          </div>
-        </div>
+        )}
 
-        {/* Games Section */}
-        <div className="mb-10">
-          <h2 className="text-lg md:text-xl font-semibold text-black dark:text-white mb-4">Games</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {gamesCommunities.map((community) => (
-              <CommunityCard key={community.id} community={community} />
-            ))}
+        {!loading && !error && recommendedCommunities.length === 0 && categoryCommunities.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400">
+              No communities found. Try a different category.
+            </p>
           </div>
-          <div className="flex justify-center mt-6">
-            <button className="px-6 py-2 bg-[#1a1a1a] hover:bg-[#222] text-white text-sm font-medium rounded-lg border border-gray-800 transition-colors">
-              Show More
-            </button>
-          </div>
-        </div>
+        )}
+          </>
+        )}
       </div>
     </div>
   );

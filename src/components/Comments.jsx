@@ -5,9 +5,10 @@ import LiveProfilePhoto from "./LiveProfilePhoto";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 
-export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [], onViewUserProfile }) {
+export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [], onViewUserProfile, onAddComment }) {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState(initialComments);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { profilePhoto, profileVideo, username } = useUserProfile();
 
   // Reset comments when modal opens/closes or initialComments changes
@@ -25,18 +26,42 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
     ));
   };
 
-  const handleSendComment = () => {
-    if (newComment.trim()) {
-      const newCommentObj = {
-        id: comments.length + 1,
-        username: username,
-        text: newComment,
-        likes: 0,
-        liked: false,
-        image: profilePhoto
-      };
-      setComments([...comments, newCommentObj]);
-      setNewComment("");
+  const handleSendComment = async () => {
+    if (!newComment.trim() || isSubmitting) return;
+
+    const commentText = newComment.trim();
+    setNewComment("");
+    setIsSubmitting(true);
+
+    try {
+      if (onAddComment) {
+        // Use the parent's callback to add comment to API
+        const addedComment = await onAddComment(commentText);
+        
+        // The parent will update initialComments, which will trigger useEffect
+        // But we can optimistically add it here too
+        if (addedComment) {
+          setComments(prev => [...prev, addedComment]);
+        }
+      } else {
+        // Fallback to local state if no callback provided
+        const newCommentObj = {
+          id: comments.length + 1,
+          username: username,
+          text: commentText,
+          likes: 0,
+          liked: false,
+          image: profilePhoto
+        };
+        setComments([...comments, newCommentObj]);
+      }
+    } catch (err) {
+      console.error("Error sending comment:", err);
+      // Restore the comment text on error
+      setNewComment(commentText);
+      alert("Failed to post comment. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -143,12 +168,16 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
             />
             <motion.button
               onClick={handleSendComment}
-              disabled={!newComment.trim()}
+              disabled={!newComment.trim() || isSubmitting}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-3 md:px-6 py-2 md:py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded-full text-xs md:text-base font-semibold transition-colors text-white flex-shrink-0"
+              className="px-3 md:px-6 py-2 md:py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 disabled:opacity-50 rounded-full text-xs md:text-base font-semibold transition-colors text-white flex-shrink-0"
             >
-              Send
+              {isSubmitting ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                "Send"
+              )}
             </motion.button>
           </div>
         </div>

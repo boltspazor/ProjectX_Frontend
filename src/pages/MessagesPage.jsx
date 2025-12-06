@@ -5,21 +5,23 @@ import { getProfileVideoUrl } from "../utils/profileVideos";
 import themeIcon from "../assets/theme.svg";
 import catTheme from "../assets/cat_theme.jpg";
 import xoxoTheme from "../assets/xoxo_theme.jpg";
+import { messageService } from "../services";
 
 export default function MessagesPage({ onViewUserProfile, selectedChatUsername }) {
   const [activeChat, setActiveChat] = useState(null);
   const [messageInput, setMessageInput] = useState("");
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Hey! How are you doing?", sender: "receiver", time: "10:30 AM" },
-    { id: 2, text: "I'm good! Thanks for asking", sender: "sender", time: "10:32 AM" },
-    { id: 3, text: "What about you?", sender: "sender", time: "10:32 AM" },
-    { id: 4, text: "I'm doing great! Working on a new project", sender: "receiver", time: "10:35 AM" },
-    { id: 5, text: "That sounds exciting! Tell me more about it", sender: "sender", time: "10:36 AM" },
-    { id: 6, text: "It's a social media app with some cool features", sender: "receiver", time: "10:38 AM" },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [chatThemes, setChatThemes] = useState({}); // key: chat id -> theme key
   const [showThemePicker, setShowThemePicker] = useState(false);
   const themePickerRef = useRef(null);
+  const messagesEndRef = useRef(null);
+
+  // API state
+  const [conversations, setConversations] = useState([]);
+  const [loadingConversations, setLoadingConversations] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [error, setError] = useState(null);
 
   const themes = {
     default: {
@@ -47,45 +49,84 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
     },
   };
 
-  const chats = [
-    { id: 1, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=10", time: "2h", unread: true },
-    { id: 2, username: "Rohan Kumar", lastMessage: "Rohan has sent a post", image: "https://i.pravatar.cc/100?img=11", time: "5h", unread: false },
-    { id: 3, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=12", time: "1d", unread: false },
-    { id: 4, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=13", time: "2d", unread: false },
-    { id: 5, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=14", time: "3d", unread: false },
-    { id: 6, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=15", time: "4d", unread: false },
-    { id: 7, username: "Shreyanne D'Souza", lastMessage: "Shreyanne has sent a message", image: "https://i.pravatar.cc/100?img=16", time: "5d", unread: false },
-  ];
+  // Fetch conversations on mount
+  useEffect(() => {
+    fetchConversations();
+  }, []);
+
+  const fetchConversations = async () => {
+    try {
+      setLoadingConversations(true);
+      setError(null);
+      const convos = await messageService.getConversations();
+      setConversations(convos || []);
+    } catch (err) {
+      console.error("Error fetching conversations:", err);
+      setError(err.message || "Failed to load conversations");
+    } finally {
+      setLoadingConversations(false);
+    }
+  };
+
+  const fetchMessages = async (conversationId) => {
+    try {
+      setLoadingMessages(true);
+      const msgs = await messageService.getMessagesByConversation(conversationId);
+      
+      // Transform API messages to component format
+      const transformedMsgs = msgs.map(msg => ({
+        id: msg._id,
+        text: msg.content,
+        sender: msg.isCurrentUser ? 'sender' : 'receiver',
+        time: new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      }));
+      
+      setMessages(transformedMsgs);
+      
+      // Mark conversation as read
+      await messageService.markConversationAsRead(conversationId);
+    } catch (err) {
+      console.error("Error fetching messages:", err);
+      setMessages([]);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   // Auto-open chat when selectedChatUsername is provided
   useEffect(() => {
-    if (selectedChatUsername) {
-      // Check if chat already exists (case-insensitive comparison)
-      const existingChat = chats.find(chat =>
-        chat.username.toLowerCase() === selectedChatUsername.toLowerCase() ||
-        chat.username === selectedChatUsername
+    if (selectedChatUsername && conversations.length > 0) {
+      // Check if conversation already exists
+      const existingConvo = conversations.find(convo =>
+        convo.otherUser?.username?.toLowerCase() === selectedChatUsername.toLowerCase()
       );
 
-      if (existingChat) {
-        // Open existing chat
-        setActiveChat(existingChat);
+      if (existingConvo) {
+        // Open existing conversation
+        handleChatClick(existingConvo);
       } else {
-        // Create new chat entry for this user
-        const newChat = {
-          id: Date.now(), // Use timestamp for unique ID
-          username: selectedChatUsername,
-          lastMessage: "No messages yet",
-          image: `https://i.pravatar.cc/100?u=${encodeURIComponent(selectedChatUsername)}`,
-          time: "now",
-          unread: false,
-        };
-        setActiveChat(newChat);
-        // Reset messages for new chat
-        setMessages([]);
+        // Create new conversation
+        createNewConversation(selectedChatUsername);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedChatUsername]);
+  }, [selectedChatUsername, conversations]);
+
+  const createNewConversation = async (username) => {
+    try {
+      const newConvo = await messageService.createConversation({ participantUsername: username });
+      setConversations([newConvo, ...conversations]);
+      setActiveChat(newConvo);
+      setMessages([]);
+    } catch (err) {
+      console.error("Error creating conversation:", err);
+      alert("Failed to start conversation. Please try again.");
+    }
+  };
 
   // Close theme picker on outside click
   useEffect(() => {
@@ -99,16 +140,41 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
     return () => document.removeEventListener("mousedown", handler);
   }, [showThemePicker]);
 
-  const handleSendMessage = () => {
-    if (messageInput.trim()) {
-      const newMessage = {
-        id: messages.length + 1,
-        text: messageInput,
-        sender: "sender",
-        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-      };
-      setMessages([...messages, newMessage]);
-      setMessageInput("");
+  const handleSendMessage = async () => {
+    if (!messageInput.trim() || !activeChat || sendingMessage) return;
+
+    const messageText = messageInput.trim();
+    setMessageInput("");
+    setSendingMessage(true);
+
+    // Optimistically add message to UI
+    const tempMessage = {
+      id: Date.now(),
+      text: messageText,
+      sender: 'sender',
+      time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    };
+    setMessages([...messages, tempMessage]);
+
+    try {
+      await messageService.sendMessage(activeChat._id, { content: messageText });
+      
+      // Update conversation list with new last message
+      setConversations(prevConvos =>
+        prevConvos.map(convo =>
+          convo._id === activeChat._id
+            ? { ...convo, lastMessage: { content: messageText, createdAt: new Date() } }
+            : convo
+        )
+      );
+    } catch (err) {
+      console.error("Error sending message:", err);
+      // Remove optimistic message on error
+      setMessages(messages.filter(msg => msg.id !== tempMessage.id));
+      setMessageInput(messageText); // Restore message
+      alert("Failed to send message. Please try again.");
+    } finally {
+      setSendingMessage(false);
     }
   };
 
@@ -119,8 +185,9 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
     setShowThemePicker(false);
   };
 
-  const handleChatClick = (chat) => {
+  const handleChatClick = async (chat) => {
     setActiveChat(chat);
+    await fetchMessages(chat._id);
   };
 
   const handleBackClick = () => {
@@ -138,24 +205,53 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
           <div className="p-4 md:p-6">
             <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Messages</h1>
 
+            {/* Loading State */}
+            {loadingConversations && (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-4">
+                <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!loadingConversations && conversations.length === 0 && (
+              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                <p>No conversations yet</p>
+                <p className="text-sm mt-2">Start chatting with someone!</p>
+              </div>
+            )}
+
             <div className="space-y-2">
-              {chats.map((chat) => (
-                <div
-                  key={chat.id}
-                  onClick={() => handleChatClick(chat)}
-                  className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 hover:border-orange-500 cursor-pointer transition"
-                >
+              {conversations.map((convo) => {
+                const otherUser = convo.otherUser || {};
+                const lastMessage = convo.lastMessage || {};
+                const timeAgo = lastMessage.createdAt
+                  ? new Date(lastMessage.createdAt).toLocaleDateString()
+                  : "";
+                
+                return (
+                  <div
+                    key={convo._id}
+                    onClick={() => handleChatClick(convo)}
+                    className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 hover:border-orange-500 cursor-pointer transition"
+                  >
                   {/* Profile Picture */}
                   <div className="relative flex-shrink-0">
                     <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden">
                       <LiveProfilePhoto
-                        imageSrc={chat.image}
-                        videoSrc={getProfileVideoUrl(chat.image, chat.username)}
-                        alt={chat.username}
+                        imageSrc={otherUser.profilePicture || "https://i.pravatar.cc/100"}
+                        videoSrc={getProfileVideoUrl(otherUser.profilePicture, otherUser.username)}
+                        alt={otherUser.username || "User"}
                         className="w-12 h-12 md:w-14 md:h-14 rounded-full"
                       />
                     </div>
-                    {chat.unread && (
+                    {convo.unreadCount > 0 && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-red-500 rounded-full border-2 border-black"></div>
                     )}
                   </div>
@@ -166,22 +262,23 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onViewUserProfile && onViewUserProfile(chat.username);
+                          onViewUserProfile && onViewUserProfile(otherUser.username);
                         }}
                         className="font-semibold text-sm md:text-base text-black dark:text-white truncate hover:opacity-70 transition-opacity cursor-pointer"
                       >
-                        {chat.username}
+                        {otherUser.username || "Unknown User"}
                       </button>
                       <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
-                        {chat.time}
+                        {timeAgo}
                       </span>
                     </div>
-                    <p className={`text-xs md:text-sm truncate ${chat.unread ? 'text-black dark:text-white font-medium' : 'text-gray-400'}`}>
-                      {chat.lastMessage}
+                    <p className={`text-xs md:text-sm truncate ${convo.unreadCount > 0 ? 'text-black dark:text-white font-medium' : 'text-gray-400'}`}>
+                      {lastMessage.content || "No messages yet"}
                     </p>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           </div>
         </div>
@@ -200,17 +297,17 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                 </button>
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex-shrink-0">
                   <LiveProfilePhoto
-                    imageSrc={activeChat.image}
-                    videoSrc={getProfileVideoUrl(activeChat.image, activeChat.username)}
-                    alt={activeChat.username}
+                    imageSrc={activeChat.otherUser?.profilePicture || "https://i.pravatar.cc/100"}
+                    videoSrc={getProfileVideoUrl(activeChat.otherUser?.profilePicture, activeChat.otherUser?.username)}
+                    alt={activeChat.otherUser?.username || "User"}
                     className="w-10 h-10 md:w-12 md:h-12 rounded-full"
                   />
                 </div>
                 <button
-                  onClick={() => onViewUserProfile && onViewUserProfile(activeChat.username)}
+                  onClick={() => onViewUserProfile && onViewUserProfile(activeChat.otherUser?.username)}
                   className="font-semibold text-base md:text-lg text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
                 >
-                  {activeChat.username}
+                  {activeChat.otherUser?.username || "Unknown User"}
                 </button>
               </div>
               <div className="relative" ref={themePickerRef}>
@@ -248,21 +345,30 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
               className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-[#fffcfa] dark:bg-[#0f0f0f]"
               style={currentTheme !== "default" ? (themes[currentTheme]?.backgroundStyle || {}) : {}}
             >
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.sender === 'sender' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${message.sender === 'sender'
-                      ? themes[currentTheme]?.senderBubble || themes.default.senderBubble
-                      : themes[currentTheme]?.receiverBubble || themes.default.receiverBubble
-                      }`}
-                  >
-                    <p className="text-sm md:text-base">{message.text}</p>
-                  </div>
+              {loadingMessages ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
                 </div>
-              ))}
+              ) : (
+                <>
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${message.sender === 'sender' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${message.sender === 'sender'
+                          ? themes[currentTheme]?.senderBubble || themes.default.senderBubble
+                          : themes[currentTheme]?.receiverBubble || themes.default.receiverBubble
+                          }`}
+                      >
+                        <p className="text-sm md:text-base">{message.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </>
+              )}
             </div>
 
             {/* Message Input */}
@@ -278,10 +384,14 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                 />
                 <button
                   onClick={handleSendMessage}
-                  disabled={!messageInput.trim()}
-                  className="p-2 md:p-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full transition"
+                  disabled={!messageInput.trim() || sendingMessage}
+                  className="p-2 md:p-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full transition flex items-center justify-center"
                 >
-                  <Send className="w-5 h-5 text-white dark:text-white" />
+                  {sendingMessage ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <Send className="w-5 h-5 text-white dark:text-white" />
+                  )}
                 </button>
               </div>
             </div>

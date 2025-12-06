@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import PostDetailModal from "../components/PostDetailModal";
@@ -6,6 +6,7 @@ import FollowersFollowingModal from "../components/FollowersFollowingModal";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { userService, postService } from "../services";
 
 export default function OtherUserProfile({ username: viewedUsername, setActiveView, onViewUserProfile }) {
   const [selectedPost, setSelectedPost] = useState(null);
@@ -17,70 +18,22 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
 
   const viewedUser = viewedUsername || "sheryanne_xoxo";
 
-  // Sample user data - in a real app, this would be fetched based on username
-  const userData = {
-    username: viewedUser,
-    fullName: "Sheryanne Smith",
-    bio: "Living life one adventure at a time 🌍✨",
-    profilePhoto: "https://i.pravatar.cc/200",
-    profileVideo: getProfileVideoUrl("https://i.pravatar.cc/200", viewedUser),
-  };
+  // Profile data state
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Posts state - counts will be dynamic based on this array length
-  const [posts, setPosts] = useState([
-    {
-      id: 0,
-      username: viewedUser,
-      image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop",
-      caption: "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.",
-      profileImage: userData.profilePhoto,
-    },
-    {
-      id: 1,
-      username: viewedUser,
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop",
-      caption: "Sunset vibes 🌅",
-      profileImage: userData.profilePhoto,
-    },
-    {
-      id: 2,
-      username: viewedUser,
-      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
-      caption: "Palm trees and paradise",
-      profileImage: userData.profilePhoto,
-    },
-    {
-      id: 3,
-      username: viewedUser,
-      image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=400&fit=crop",
-      caption: "Beach day 🏖️",
-      profileImage: userData.profilePhoto,
-    },
-    {
-      id: 4,
-      username: viewedUser,
-      image: "https://images.unsplash.com/photo-1490772888775-55fceea286b8?w=400&h=400&fit=crop",
-      caption: "Breakfast of champions",
-      profileImage: userData.profilePhoto,
-    },
-  ]);
+  const [posts, setPosts] = useState([]);
 
   // Followers and Following lists - counts will be dynamic based on these array lengths
-  const [followersList, setFollowersList] = useState([
-    { username: "idkwhoisrahul_04", fullName: "Rahul Chauhan", image: "https://i.pravatar.cc/100?img=1", isFollowing: true },
-    { username: "john_doe", fullName: "John Doe", image: "https://i.pravatar.cc/100?img=2", isFollowing: false },
-    { username: "jane_smith", fullName: "Jane Smith", image: "https://i.pravatar.cc/100?img=3", isFollowing: true },
-  ]);
+  const [followersList, setFollowersList] = useState([]);
+  const [followingList, setFollowingList] = useState([]);
 
-  const [followingList, setFollowingList] = useState([
-    { username: "idkwhoisrahul_04", fullName: "Rahul Chauhan", image: "https://i.pravatar.cc/100?img=1", isFollowing: true },
-    { username: "pxhf_12", fullName: "Pxhf User", image: "https://i.pravatar.cc/100?img=11", isFollowing: true },
-  ]);
-
-  // Dynamic counts based on array lengths
-  const postsCount = posts.length;
-  const followersCount = followersList.length;
-  const followingCount = followingList.length;
+  // Dynamic counts based on array lengths or API data
+  const postsCount = userData?.stats?.posts || posts.length;
+  const followersCount = userData?.stats?.followers || followersList.length;
+  const followingCount = userData?.stats?.following || followingList.length;
 
 
   const handlePostClick = (post) => {
@@ -93,25 +46,40 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
     setSelectedPost(null);
   };
 
-  const handleFollow = () => {
+  const handleFollow = async () => {
     const newFollowingState = !isFollowing;
+    const previousFollowingState = isFollowing;
+    
+    // Optimistic update
     setIsFollowing(newFollowingState);
 
-    // Update follower count when following/unfollowing
-    if (newFollowingState) {
-      // Add current user to their followers list if not already there
-      const currentUserInFollowers = followersList.find(u => u.username === currentUsername);
-      if (!currentUserInFollowers) {
-        setFollowersList([...followersList, {
-          username: currentUsername,
-          fullName: "You",
-          image: "https://i.pravatar.cc/100",
-          isFollowing: true
-        }]);
+    try {
+      if (newFollowingState) {
+        await userService.followUser(viewedUser);
+        
+        // Update follower count
+        if (userData?.stats) {
+          setUserData({
+            ...userData,
+            stats: { ...userData.stats, followers: (userData.stats.followers || 0) + 1 }
+          });
+        }
+      } else {
+        await userService.unfollowUser(viewedUser);
+        
+        // Update follower count
+        if (userData?.stats) {
+          setUserData({
+            ...userData,
+            stats: { ...userData.stats, followers: Math.max(0, (userData.stats.followers || 0) - 1) }
+          });
+        }
       }
-    } else {
-      // Remove current user from their followers list
-      setFollowersList(followersList.filter(u => u.username !== currentUsername));
+    } catch (err) {
+      console.error("Error toggling follow:", err);
+      // Revert on error
+      setIsFollowing(previousFollowingState);
+      alert("Failed to update follow status. Please try again.");
     }
   };
 
@@ -125,28 +93,42 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
     setFollowersModalOpen(true);
   };
 
-  const handleFollowUser = (targetUsername) => {
-    // Update followers list
-    setFollowersList(followersList.map(user =>
-      user.username === targetUsername ? { ...user, isFollowing: true } : user
-    ));
+  const handleFollowUser = async (targetUsername) => {
+    try {
+      await userService.followUser(targetUsername);
+      
+      // Update followers list
+      setFollowersList(followersList.map(user =>
+        user.username === targetUsername ? { ...user, isFollowing: true } : user
+      ));
 
-    // Update following list
-    setFollowingList(followingList.map(user =>
-      user.username === targetUsername ? { ...user, isFollowing: true } : user
-    ));
+      // Update following list
+      setFollowingList(followingList.map(user =>
+        user.username === targetUsername ? { ...user, isFollowing: true } : user
+      ));
+    } catch (err) {
+      console.error("Error following user:", err);
+      alert("Failed to follow user. Please try again.");
+    }
   };
 
-  const handleUnfollowUser = (targetUsername) => {
-    // Update followers list
-    setFollowersList(followersList.map(user =>
-      user.username === targetUsername ? { ...user, isFollowing: false } : user
-    ));
+  const handleUnfollowUser = async (targetUsername) => {
+    try {
+      await userService.unfollowUser(targetUsername);
+      
+      // Update followers list
+      setFollowersList(followersList.map(user =>
+        user.username === targetUsername ? { ...user, isFollowing: false } : user
+      ));
 
-    // Update following list
-    setFollowingList(followingList.map(user =>
-      user.username === targetUsername ? { ...user, isFollowing: false } : user
-    ));
+      // Update following list
+      setFollowingList(followingList.map(user =>
+        user.username === targetUsername ? { ...user, isFollowing: false } : user
+      ));
+    } catch (err) {
+      console.error("Error unfollowing user:", err);
+      alert("Failed to unfollow user. Please try again.");
+    }
   };
 
   const handleMessage = () => {
@@ -162,6 +144,43 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
       setActiveView("home");
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#fffcfa] dark:bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#fffcfa] dark:bg-black flex items-center justify-center p-4">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button
+            onClick={fetchUserProfile}
+            className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // No data state
+  if (!userData) {
+    return (
+      <div className="min-h-screen bg-[#fffcfa] dark:bg-black flex items-center justify-center p-4">
+        <div className="text-center text-gray-500 dark:text-gray-400">
+          <p>User not found</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#fffcfa] dark:bg-black text-black dark:text-white pb-20 md:pb-0">

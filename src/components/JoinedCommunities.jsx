@@ -1,18 +1,41 @@
-import React from "react";
-import { communitiesData } from "../data/communitiesData";
-
-// Use shared communities data
-const joinedCommunities = communitiesData.map((community) => ({
-  id: community.id,
-  name: community.name,
-  description: community.description,
-  members: community.members,
-  cover: community.cover,
-  avatar: community.avatar,
-  badges: community.badges,
-}));
+import React, { useState, useEffect } from "react";
+import { communityService } from "../services/communityService";
 
 export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
+  const [communities, setCommunities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchJoinedCommunities();
+  }, []);
+
+  const fetchJoinedCommunities = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await communityService.getUserCommunities();
+      setCommunities(data || []);
+    } catch (err) {
+      console.error('Error fetching joined communities:', err);
+      setError(err.message || 'Failed to load communities');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLeaveCommunity = async (communityId) => {
+    try {
+      // Optimistic update
+      setCommunities(prev => prev.filter(c => c.id !== communityId));
+      await communityService.leaveCommunity(communityId);
+    } catch (err) {
+      console.error('Error leaving community:', err);
+      // Revert on error
+      fetchJoinedCommunities();
+    }
+  };
+
   const handleCommunityClick = (communityId) => {
     if (setActiveView) {
       setActiveView("communityDetail", communityId);
@@ -46,8 +69,41 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
         </div>
       </div>
 
-      <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2">
-        {joinedCommunities.map((community) => (
+      {loading && (
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        </div>
+      )}
+
+      {error && (
+        <div className="text-center py-12">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button
+            onClick={fetchJoinedCommunities}
+            className="px-6 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && communities.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            You haven&apos;t joined any communities yet.
+          </p>
+          <button
+            onClick={onDiscoverClick}
+            className="px-6 py-2 rounded-lg bg-gradient-to-r from-orange-500 via-orange-500 to-orange-600 text-white hover:shadow-[0_0_24px_rgba(249,115,22,0.35)] transition-all duration-300"
+          >
+            Discover communities
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && communities.length > 0 && (
+        <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2">
+          {communities.map((community) => (
           <article
             key={community.id}
             onClick={() => handleCommunityClick(community.id)}
@@ -109,11 +165,21 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
                 >
                   View latest posts
                 </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLeaveCommunity(community.id);
+                  }}
+                  className="rounded-xl border border-red-500 px-4 py-2 text-sm text-red-500 transition-all duration-300 hover:bg-red-500 hover:text-white"
+                >
+                  Leave
+                </button>
               </div>
             </div>
           </article>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

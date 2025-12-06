@@ -4,6 +4,8 @@ import { ArrowLeft, ChevronDown, ChevronUp, MapPin, UserPlus, Smile, X, Music, T
 import EmojiPickerReact from 'emoji-picker-react';
 import { useUserProfile } from "../hooks/useUserProfile";
 import uploadIcon from "../assets/upload.svg";
+import { uploadService } from "../services/uploadService";
+import { postService } from "../services/postService";
 
 export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreated }) {
   const [step, setStep] = useState("upload"); // "upload", "crop", "edit", "final"
@@ -58,6 +60,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
   const [showMusicModal, setShowMusicModal] = useState(false);
   const [showTextModal, setShowTextModal] = useState(false);
   const [finalEditedImage, setFinalEditedImage] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
 
   const fileInputRef = useRef(null);
   const cropContainerRef = useRef(null);
@@ -379,88 +383,55 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
     setStep("final");
   };
 
-  const handleShare = () => {
-    // Use finalEditedImage if available (mobile), otherwise process
-    if (finalEditedImage) {
-      const newPost = {
-        id: Date.now(),
-        image: finalEditedImage,
-        caption: caption,
-        profileImage: profilePhoto,
-        username: username,
-        taggedPeople: taggedPeople,
-        location: location,
-        collaborators: collaborators,
-        hideLikeCounts: hideLikeCounts,
-        turnOffCommenting: turnOffCommenting,
-        music: selectedMusic,
-        filter: selectedFilter,
-        adjustments: adjustments,
-        createdAt: new Date().toISOString()
-      };
+  const handleShare = async () => {
+    try {
+      setIsUploading(true);
+      setUploadError(null);
 
-      window.dispatchEvent(
-        new CustomEvent("newPostCreated", { detail: newPost })
-      );
-
-      if (onPostCreated) {
-        onPostCreated(newPost);
+      // Determine the final image to upload
+      let imageToUpload = finalEditedImage || croppedImage || imagePreview;
+      
+      if (!imageToUpload) {
+        setUploadError('No image selected');
+        return;
       }
 
-      handleClose();
-      return;
-    }
+      // If filters or adjustments are applied, process them first
+      if ((selectedFilter !== "original" || Object.values(adjustments).some(v => v !== 0)) && !finalEditedImage) {
+        imageToUpload = await new Promise((resolve) => {
+          applyAllEdits(imageToUpload, resolve);
+        });
+      }
 
-    // Desktop: process image with edits
-    let finalImage = croppedImage || imagePreview;
-
-    if (finalImage && (selectedFilter !== "original" || Object.values(adjustments).some(v => v !== 0))) {
-      applyAllEdits(finalImage, (finalImage) => {
-        const newPost = {
-          id: Date.now(),
-          image: finalImage,
-          caption: caption,
-          profileImage: profilePhoto,
-          username: username,
-          taggedPeople: taggedPeople,
-          location: location,
-          collaborators: collaborators,
-          hideLikeCounts: hideLikeCounts,
-          turnOffCommenting: turnOffCommenting,
-          music: selectedMusic,
-          filter: selectedFilter,
-          adjustments: adjustments,
-          createdAt: new Date().toISOString()
-        };
-
-        window.dispatchEvent(
-          new CustomEvent("newPostCreated", { detail: newPost })
-        );
-
-        if (onPostCreated) {
-          onPostCreated(newPost);
-        }
-
-        handleClose();
+      // Upload image to backend
+      const uploadResponse = await uploadService.uploadFromBase64({
+        base64Data: imageToUpload,
+        fileName: selectedFile?.name || `post-${Date.now()}.jpg`,
+        fileType: selectedFile?.type || 'image/jpeg'
       });
-    } else {
-      const newPost = {
-        id: Date.now(),
-        image: finalImage,
+
+      if (!uploadResponse?.url) {
+        throw new Error('Failed to upload image');
+      }
+
+      // Create post data
+      const postData = {
+        imageUrl: uploadResponse.url,
         caption: caption,
-        profileImage: profilePhoto,
-        username: username,
-        taggedPeople: taggedPeople,
+        taggedUsers: taggedPeople.map(p => p.id || p.username).filter(Boolean),
         location: location,
-        collaborators: collaborators,
+        collaborators: collaborators.map(c => c.id || c.username).filter(Boolean),
         hideLikeCounts: hideLikeCounts,
         turnOffCommenting: turnOffCommenting,
         music: selectedMusic,
         filter: selectedFilter,
-        adjustments: adjustments,
-        createdAt: new Date().toISOString()
+        adjustments: Object.values(adjustments).some(v => v !== 0) ? adjustments : undefined
       };
 
+      // Create post via API
+      const newPost = await postService.createPost(postData);
+
+      // Dispatch event for local updates
       window.dispatchEvent(
         new CustomEvent("newPostCreated", { detail: newPost })
       );
@@ -470,6 +441,11 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
       }
 
       handleClose();
+    } catch (error) {
+      console.error('Error creating post:', error);
+      setUploadError(error.message || 'Failed to create post. Please try again.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -1309,15 +1285,22 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                 <button
                   onClick={() => setStep("edit")}
                   className="text-blue-500 font-semibold hover:text-blue-400"
+                  disabled={isUploading}
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
-                <h2 className="text-base font-semibold text-white">Create new post</h2>
+                <div className="flex flex-col items-center">
+                  <h2 className="text-base font-semibold text-white">Create new post</h2>
+                  {uploadError && (
+                    <p className="text-xs text-red-500 mt-1">{uploadError}</p>
+                  )}
+                </div>
                 <button
                   onClick={handleShare}
-                  className="text-blue-500 font-semibold hover:text-blue-400 disabled:text-gray-600"
+                  disabled={isUploading}
+                  className="text-blue-500 font-semibold hover:text-blue-400 disabled:text-gray-600 disabled:cursor-not-allowed"
                 >
-                  Share
+                  {isUploading ? 'Sharing...' : 'Share'}
                 </button>
               </div>
 
@@ -2428,15 +2411,22 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                 <button
                   onClick={() => setMobileStep("edit")}
                   className="text-white"
+                  disabled={isUploading}
                 >
                   <ArrowLeft className="w-6 h-6" />
                 </button>
-                <h2 className="text-base font-semibold text-white">New post</h2>
+                <div className="flex flex-col items-center">
+                  <h2 className="text-base font-semibold text-white">New post</h2>
+                  {uploadError && (
+                    <p className="text-xs text-red-500 mt-1">{uploadError}</p>
+                  )}
+                </div>
                 <button
                   onClick={handleShare}
-                  className="text-blue-500 font-semibold"
+                  disabled={isUploading}
+                  className="text-blue-500 font-semibold disabled:text-gray-600 disabled:cursor-not-allowed"
                 >
-                  Share
+                  {isUploading ? 'Sharing...' : 'Share'}
                 </button>
               </div>
 

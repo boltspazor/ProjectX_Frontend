@@ -3,17 +3,21 @@ import { ArrowLeft, Camera, Video, Upload, X } from "lucide-react";
 import profilePhotoDefault from "../assets/profile-photo.jpg";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getUserProfile, saveUserProfile } from "../utils/userProfile";
+import { useAuth } from "../context/AuthContext";
+import { userService, uploadService } from "../services";
 
-export default function ProfileSettings({ onBack }) {
+export default function ProfileSettings({ onBack, onProfileUpdate }) {
+  const { user, updateUser } = useAuth();
+  
   // Load saved profile or use defaults
   const savedProfile = getUserProfile();
 
   const [formData, setFormData] = useState({
-    username: savedProfile?.username || "idkwhoisrahul_04",
-    bio: savedProfile?.bio || "Wish I was half as interesting as my bio",
-    email: "rahul@example.com",
-    phone: "",
-    gender: ""
+    username: savedProfile?.username || user?.username || "idkwhoisrahul_04",
+    bio: savedProfile?.bio || user?.bio || "Wish I was half as interesting as my bio",
+    email: user?.email || "rahul@example.com",
+    phone: user?.phone || "",
+    gender: user?.gender || ""
   });
   const [accountType, setAccountType] = useState("private");
   const [notifications, setNotifications] = useState({
@@ -22,6 +26,12 @@ export default function ProfileSettings({ onBack }) {
     messages: true,
     followRequests: true
   });
+
+  // API state
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
 
   // Preview states (not saved until "Save Changes" is clicked)
   const [profilePhotoPreview, setProfilePhotoPreview] = useState(
@@ -48,16 +58,38 @@ export default function ProfileSettings({ onBack }) {
     });
   };
 
-  const handlePhotoUpload = (e) => {
+  const handlePhotoUpload = async (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUrl = reader.result;
-        // Only update preview, don't save yet
-        setProfilePhotoPreview(dataUrl);
-      };
-      reader.readAsDataURL(file);
+      setUploadingPhoto(true);
+      try {
+        // Convert to base64 for upload
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const dataUrl = reader.result;
+          
+          try {
+            // Upload to backend
+            const response = await uploadService.uploadFromBase64({
+              base64Data: dataUrl,
+              fileName: file.name,
+              folder: 'profiles'
+            });
+            
+            // Update preview with uploaded URL
+            setProfilePhotoPreview(response.url);
+          } catch (err) {
+            console.error("Error uploading photo:", err);
+            alert("Failed to upload photo. Please try again.");
+          } finally {
+            setUploadingPhoto(false);
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (err) {
+        console.error("Error reading file:", err);
+        setUploadingPhoto(false);
+      }
     } else {
       alert("Please select a valid image file.");
     }
@@ -65,7 +97,7 @@ export default function ProfileSettings({ onBack }) {
     e.target.value = '';
   };
 
-  const handleVideoUpload = (e) => {
+  const handleVideoUpload = async (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('video/')) {
       // Check file size (max 10MB)
@@ -74,13 +106,36 @@ export default function ProfileSettings({ onBack }) {
         e.target.value = '';
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUrl = reader.result;
-        // Only update preview, don't save yet
-        setProfileVideoPreview(dataUrl);
-      };
-      reader.readAsDataURL(file);
+      
+      setUploadingVideo(true);
+      try {
+        // Convert to base64 for upload
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const dataUrl = reader.result;
+          
+          try {
+            // Upload to backend
+            const response = await uploadService.uploadFromBase64({
+              base64Data: dataUrl,
+              fileName: file.name,
+              folder: 'profile-videos'
+            });
+            
+            // Update preview with uploaded URL
+            setProfileVideoPreview(response.url);
+          } catch (err) {
+            console.error("Error uploading video:", err);
+            alert("Failed to upload video. Please try again.");
+          } finally {
+            setUploadingVideo(false);
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (err) {
+        console.error("Error reading file:", err);
+        setUploadingVideo(false);
+      }
     } else {
       alert("Please select a valid video file.");
     }
@@ -93,18 +148,59 @@ export default function ProfileSettings({ onBack }) {
     setProfileVideoPreview(null);
   };
 
-  const handleSaveChanges = () => {
-    // Save all changes at once when "Save Changes" is clicked
-    const profileData = {
-      profilePhoto: profilePhotoPreview,
-      profileVideo: profileVideoPreview,
-      username: formData.username,
-      bio: formData.bio,
-      fullName: "Rahul Chauhan"
-    };
+  const handleSaveChanges = async () => {
+    setIsSaving(true);
+    setSaveError(null);
+    
+    try {
+      // Prepare update data
+      const updateData = {
+        username: formData.username,
+        bio: formData.bio,
+        email: formData.email,
+        phone: formData.phone,
+        gender: formData.gender,
+        profilePicture: profilePhotoPreview,
+        profileVideo: profileVideoPreview,
+        // Add notification settings if your backend supports them
+        notificationSettings: notifications
+      };
 
-    saveUserProfile(profileData);
-    alert("Profile updated successfully!");
+      // Call API to update profile
+      const updatedProfile = await userService.updateProfile(updateData);
+      
+      // Save to localStorage as well for offline access
+      const profileData = {
+        profilePhoto: profilePhotoPreview,
+        profileVideo: profileVideoPreview,
+        username: formData.username,
+        bio: formData.bio,
+        fullName: user?.displayName || "Rahul Chauhan"
+      };
+      saveUserProfile(profileData);
+      
+      // Update auth context with new user data
+      if (updateUser) {
+        updateUser(updatedProfile);
+      }
+      
+      // Call parent callback to refresh profile page
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
+      
+      alert("Profile updated successfully!");
+      
+      // Go back to profile page
+      if (onBack) {
+        onBack();
+      }
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setSaveError(err.message || "Failed to update profile. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -150,10 +246,15 @@ export default function ProfileSettings({ onBack }) {
                 />
                 <button
                   onClick={() => photoInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors border-2 border-white dark:border-black cursor-pointer"
+                  disabled={uploadingPhoto}
+                  className="absolute bottom-0 right-0 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors border-2 border-white dark:border-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Upload profile photo"
                 >
-                  <Camera className="h-5 w-5 text-white" />
+                  {uploadingPhoto ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <Camera className="h-5 w-5 text-white" />
+                  )}
                 </button>
               </div>
               <p className="text-center md:text-left text-sm text-gray-400 mt-2">
@@ -397,13 +498,28 @@ export default function ProfileSettings({ onBack }) {
             </div>
 
             {/* Save Changes Button */}
-            <div className="flex justify-end">
-              <button
-                onClick={handleSaveChanges}
-                className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-colors"
-              >
-                Save Changes
-              </button>
+            <div>
+              {saveError && (
+                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p className="text-red-600 dark:text-red-400 text-sm">{saveError}</p>
+                </div>
+              )}
+              <div className="flex justify-end">
+                <button
+                  onClick={handleSaveChanges}
+                  disabled={isSaving}
+                  className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -6,25 +6,54 @@ import messageIcon from "../assets/message.svg";
 import postSampleImage from "../assets/post-sample.jpg";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import { postService } from "../services";
 
-export default function PostCard({ variant = "grid", postId, onCommentClick, isActive, onViewUserProfile }) {
-  const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(234);
+export default function PostCard({ 
+  variant = "grid", 
+  post, 
+  postId, 
+  onCommentClick, 
+  isActive, 
+  onViewUserProfile 
+}) {
+  // Use post data if provided, otherwise fallback to defaults
+  const postData = post || {};
+  const author = postData.author || {};
+  
+  const [liked, setLiked] = useState(postData.isLiked || false);
+  const [likes, setLikes] = useState(postData.likes || 0);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
-  const postImage = postSampleImage;
-  const profileImage = "https://i.pravatar.cc/100";
-  const username = "sheryanne_xoxo";
-  const caption = "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.";
+  const postImage = postData.images?.[0] || postSampleImage;
+  const profileImage = author.profilePicture || "https://i.pravatar.cc/100";
+  const username = author.username || "sheryanne_xoxo";
+  const caption = postData.caption || "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.";
 
-  const handleLike = () => {
+  const handleLike = async () => {
+    const previousLiked = liked;
+    const previousLikes = likes;
+
+    // Optimistic update
     setLiked(!liked);
     setLikes(liked ? likes - 1 : likes + 1);
+
+    try {
+      if (liked) {
+        await postService.unlikePost(postData._id || postId);
+      } else {
+        await postService.likePost(postData._id || postId);
+      }
+    } catch (err) {
+      console.error("Error toggling like:", err);
+      // Revert on error
+      setLiked(previousLiked);
+      setLikes(previousLikes);
+    }
   };
 
   const handleCommentClick = () => {
-    if (onCommentClick && postId !== undefined) {
-      onCommentClick(postId);
+    if (onCommentClick && (postData._id || postId !== undefined)) {
+      onCommentClick(postData._id || postId);
     }
   };
 

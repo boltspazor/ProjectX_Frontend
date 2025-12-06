@@ -7,49 +7,50 @@ import messageIcon from "../assets/message.svg";
 import profilePhoto from "../assets/profile-photo.jpg";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import { postService } from "../services/postService";
 
 export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfile }) {
-  const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(234);
+  const [liked, setLiked] = useState(post?.isLiked || false);
+  const [likes, setLikes] = useState(post?.likesCount || 0);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
   const commentsEndRef = useRef(null);
   const commentsContainerRef = useRef(null);
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      username: "john_doe",
-      text: "This is amazing! 🔥",
-      likes: 12,
-      liked: false,
-      image: "https://i.pravatar.cc/100?img=20",
-      time: "2h"
-    },
-    {
-      id: 2,
-      username: "jane_smith",
-      text: "Love this content!",
-      likes: 8,
-      liked: false,
-      image: "https://i.pravatar.cc/100?img=21",
-      time: "1h"
-    },
-    {
-      id: 3,
-      username: "mike_ross",
-      text: "Keep it up! 💪",
-      likes: 15,
-      liked: true,
-      image: "https://i.pravatar.cc/100?img=22",
-      time: "30m"
-    },
-  ]);
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Sample post data if not provided
-  const postImage = post?.image || "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=800&h=800&fit=crop";
-  const profileImage = post?.profileImage || profilePhoto;
-  const username = post?.username || "idkwhoisrahul_04";
+  const postImage = post?.imageUrl || post?.image || "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=800&h=800&fit=crop";
+  const profileImage = post?.user?.profilePhoto || post?.profileImage || profilePhoto;
+  const username = post?.user?.username || post?.username || "idkwhoisrahul_04";
   const caption = post?.caption || "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.";
+
+  // Fetch comments when modal opens or post changes
+  useEffect(() => {
+    if (isOpen && post?.id) {
+      fetchComments();
+      // Update like state from post prop
+      setLiked(post?.isLiked || false);
+      setLikes(post?.likesCount || 0);
+    }
+  }, [isOpen, post?.id]);
+
+  const fetchComments = async () => {
+    if (!post?.id) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await postService.getPostComments(post.id);
+      setComments(response.comments || []);
+    } catch (err) {
+      console.error('Error fetching comments:', err);
+      setError(err.message || 'Failed to load comments');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -70,9 +71,27 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
     }
   }, [comments]);
 
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikes(liked ? likes - 1 : likes + 1);
+  const handleLike = async () => {
+    if (!post?.id) return;
+    
+    try {
+      // Optimistic update
+      const wasLiked = liked;
+      setLiked(!liked);
+      setLikes(liked ? likes - 1 : likes + 1);
+
+      // API call
+      if (wasLiked) {
+        await postService.unlikePost(post.id);
+      } else {
+        await postService.likePost(post.id);
+      }
+    } catch (error) {
+      console.error('Error liking post:', error);
+      // Revert on error
+      setLiked(!liked);
+      setLikes(liked ? likes + 1 : likes - 1);
+    }
   };
 
   const handleLikeComment = (commentId) => {
@@ -83,19 +102,38 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
     ));
   };
 
-  const handleSendComment = () => {
-    if (newComment.trim()) {
-      const newCommentObj = {
-        id: comments.length + 1,
-        username: "idkwhoisrahul_04",
+  const handleSendComment = async () => {
+    if (!newComment.trim() || !post?.id) return;
+    
+    try {
+      const optimisticComment = {
+        id: `temp-${Date.now()}`,
         text: newComment,
-        likes: 0,
-        liked: false,
-        image: profilePhoto,
-        time: "now"
+        user: {
+          username: "idkwhoisrahul_04",
+          profilePhoto: profilePhoto
+        },
+        likesCount: 0,
+        isLiked: false,
+        createdAt: new Date().toISOString()
       };
-      setComments([...comments, newCommentObj]);
+      
+      // Optimistic update
+      setComments([...comments, optimisticComment]);
       setNewComment("");
+
+      // API call
+      const response = await postService.addComment(post.id, { text: newComment });
+      
+      // Replace optimistic comment with real one
+      setComments(prev => prev.map(c => 
+        c.id === optimisticComment.id ? response.comment : c
+      ));
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      // Remove optimistic comment on error
+      setComments(prev => prev.filter(c => !c.id.toString().startsWith('temp-')));
+      setNewComment(newComment); // Restore comment text
     }
   };
 
@@ -220,7 +258,22 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                   ref={commentsContainerRef}
                   className="flex-1 overflow-y-auto p-3 md:p-5 space-y-3 md:space-y-5 scrollbar-hide"
                 >
-                  {comments.length === 0 ? (
+                  {loading ? (
+                    <div className="flex flex-col items-center justify-center h-full py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
+                      <p className="text-gray-400 text-sm mt-4">Loading comments...</p>
+                    </div>
+                  ) : error ? (
+                    <div className="flex flex-col items-center justify-center h-full py-12">
+                      <p className="text-red-500 text-sm mb-4">{error}</p>
+                      <button
+                        onClick={fetchComments}
+                        className="px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+                      >
+                        Try again
+                      </button>
+                    </div>
+                  ) : comments.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full py-12">
                       <p className="text-gray-400 text-center">No comments yet. Be the first to comment!</p>
                     </div>
@@ -236,19 +289,19 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                         >
                           <div className="w-9 h-9 md:w-10 md:h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-700">
                             <LiveProfilePhoto
-                              imageSrc={comment.image}
-                              videoSrc={getProfileVideoUrl(comment.image, comment.username)}
-                              alt={comment.username}
+                              imageSrc={comment.user?.profilePhoto || comment.image}
+                              videoSrc={getProfileVideoUrl(comment.user?.profilePhoto || comment.image, comment.user?.username || comment.username)}
+                              alt={comment.user?.username || comment.username}
                               className="w-9 h-9 md:w-10 md:h-10 rounded-full"
                             />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="bg-gray-200 dark:bg-[#1a1a1a] rounded-2xl px-4 py-2.5 md:px-5 md:py-3 hover:bg-gray-300 dark:hover:bg-[#1f1f1f] transition-colors">
                               <button
-                                onClick={() => onViewUserProfile && onViewUserProfile(comment.username)}
+                                onClick={() => onViewUserProfile && onViewUserProfile(comment.user?.username || comment.username)}
                                 className="font-semibold text-sm md:text-base text-black dark:text-white mb-1 hover:opacity-70 transition-opacity cursor-pointer"
                               >
-                                {comment.username}
+                                {comment.user?.username || comment.username}
                               </button>
                               <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed break-words">
                                 {comment.text}
@@ -260,16 +313,18 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                                 className="flex items-center gap-1.5 text-xs md:text-sm hover:scale-105 transition-transform group"
                               >
                                 <Heart
-                                  className={`h-4 w-4 md:h-5 md:w-5 transition-all group-hover:scale-110 ${comment.liked ? "fill-red-500 text-red-500" : "text-gray-400 dark:text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300"
+                                  className={`h-4 w-4 md:h-5 md:w-5 transition-all group-hover:scale-110 ${(comment.isLiked || comment.liked) ? "fill-red-500 text-red-500" : "text-gray-400 dark:text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300"
                                     }`}
                                 />
                                 <span
-                                  className={comment.liked ? "text-red-500 font-semibold" : "text-gray-400 dark:text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300"}
+                                  className={(comment.isLiked || comment.liked) ? "text-red-500 font-semibold" : "text-gray-400 dark:text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300"}
                                 >
-                                  {comment.likes > 0 ? comment.likes.toLocaleString() : "Like"}
+                                  {(comment.likesCount || comment.likes || 0) > 0 ? (comment.likesCount || comment.likes).toLocaleString() : "Like"}
                                 </span>
                               </button>
-                              <span className="text-xs md:text-sm text-gray-500">{comment.time}</span>
+                              <span className="text-xs md:text-sm text-gray-500">
+                                {comment.time || (comment.createdAt ? new Date(comment.createdAt).toLocaleDateString() : 'now')}
+                              </span>
                             </div>
                           </div>
                         </motion.div>

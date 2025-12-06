@@ -9,6 +9,8 @@ import FollowersFollowingModal from "../components/FollowersFollowingModal";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import { useAuth } from "../context/AuthContext";
+import { userService, postService } from "../services";
 
 export default function ProfilePage({ onLogout, onViewUserProfile }) {
   const [selectedPost, setSelectedPost] = useState(null);
@@ -18,6 +20,12 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
   const [followersModalOpen, setFollowersModalOpen] = useState(false);
   const [followersModalType, setFollowersModalType] = useState("followers");
   const { profilePhoto, profileVideo, username, profile } = useUserProfile();
+  const { user } = useAuth();
+
+  // Profile data state
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Posts state - counts will be dynamic based on this array length
   const [posts, setPosts] = useState([
@@ -87,27 +95,18 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
   ]);
 
   // Followers and Following lists - counts will be dynamic based on these array lengths
-  const [followersList, setFollowersList] = useState([
-    { username: "sheryanne_xoxo", fullName: "Sheryanne Smith", image: "https://i.pravatar.cc/100?img=10", isFollowing: false },
-    { username: "john_doe", fullName: "John Doe", image: "https://i.pravatar.cc/100?img=1", isFollowing: true },
-    { username: "jane_smith", fullName: "Jane Smith", image: "https://i.pravatar.cc/100?img=2", isFollowing: false },
-    { username: "mike_ross", fullName: "Mike Ross", image: "https://i.pravatar.cc/100?img=3", isFollowing: true },
-    { username: "sarah_jones", fullName: "Sarah Jones", image: "https://i.pravatar.cc/100?img=4", isFollowing: false },
-    { username: "david_wilson", fullName: "David Wilson", image: "https://i.pravatar.cc/100?img=5", isFollowing: true },
-  ]);
+  const [followersList, setFollowersList] = useState([]);
+  const [followingList, setFollowingList] = useState([]);
 
-  const [followingList, setFollowingList] = useState([
-    { username: "sheryanne_xoxo", fullName: "Sheryanne Smith", image: "https://i.pravatar.cc/100?img=10", isFollowing: true },
-    { username: "pxhf_12", fullName: "Pxhf User", image: "https://i.pravatar.cc/100?img=11", isFollowing: true },
-    { username: "xsd_hgf", fullName: "Xsd User", image: "https://i.pravatar.cc/100?img=12", isFollowing: true },
-    { username: "shane_xd", fullName: "Shane XD", image: "https://i.pravatar.cc/100?img=13", isFollowing: true },
-    { username: "garvv_pvt", fullName: "Garvv Private", image: "https://i.pravatar.cc/100?img=14", isFollowing: true },
-  ]);
+  // Dynamic counts based on array lengths or API data
+  const postsCount = profileData?.stats?.posts || posts.length;
+  const followersCount = profileData?.stats?.followers || followersList.length;
+  const followingCount = profileData?.stats?.following || followingList.length;
 
-  // Dynamic counts based on array lengths
-  const postsCount = posts.length;
-  const followersCount = followersList.length;
-  const followingCount = followingList.length;
+  // Fetch profile data on mount
+  useEffect(() => {
+    fetchProfileData();
+  }, [username]);
 
   // Listen for new posts created from CreatePost component
   useEffect(() => {
@@ -122,6 +121,34 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
       window.removeEventListener("newPostCreated", handleNewPost);
     };
   }, []);
+
+  const fetchProfileData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch user profile data
+      const userData = await userService.getUserByUsername(username);
+      setProfileData(userData);
+
+      // Fetch user posts
+      const userPosts = await postService.getUserPosts(username);
+      setPosts(userPosts.posts || []);
+
+      // Fetch followers
+      const followers = await userService.getUserFollowers(username);
+      setFollowersList(followers || []);
+
+      // Fetch following
+      const following = await userService.getUserFollowing(username);
+      setFollowingList(following || []);
+    } catch (err) {
+      console.error("Error fetching profile data:", err);
+      setError(err.message || "Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePostClick = (post) => {
     setSelectedPost(post);
@@ -154,42 +181,82 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
     setFollowersModalOpen(true);
   };
 
-  const handleFollow = (targetUsername) => {
-    // Update followers list (if following back)
-    setFollowersList(followersList.map(user =>
-      user.username === targetUsername ? { ...user, isFollowing: true } : user
-    ));
-
-    // Add to following list if not already there
-    const isInFollowing = followingList.find(u => u.username === targetUsername);
-    if (!isInFollowing) {
-      const userToAdd = followersList.find(u => u.username === targetUsername) || {
-        username: targetUsername,
-        fullName: targetUsername,
-        image: `https://i.pravatar.cc/100?u=${encodeURIComponent(targetUsername)}`,
-        isFollowing: true
-      };
-      setFollowingList([...followingList, userToAdd]);
-    } else {
-      setFollowingList(followingList.map(user =>
+  const handleFollow = async (targetUsername) => {
+    try {
+      await userService.followUser(targetUsername);
+      
+      // Update followers list (if following back)
+      setFollowersList(followersList.map(user =>
         user.username === targetUsername ? { ...user, isFollowing: true } : user
       ));
+
+      // Add to following list if not already there
+      const isInFollowing = followingList.find(u => u.username === targetUsername);
+      if (!isInFollowing) {
+        const userToAdd = followersList.find(u => u.username === targetUsername) || {
+          username: targetUsername,
+          fullName: targetUsername,
+          image: `https://i.pravatar.cc/100?u=${encodeURIComponent(targetUsername)}`,
+          isFollowing: true
+        };
+        setFollowingList([...followingList, userToAdd]);
+      } else {
+        setFollowingList(followingList.map(user =>
+          user.username === targetUsername ? { ...user, isFollowing: true } : user
+        ));
+      }
+    } catch (err) {
+      console.error("Error following user:", err);
+      alert("Failed to follow user. Please try again.");
     }
   };
 
-  const handleUnfollow = (targetUsername) => {
-    // Update followers list
-    setFollowersList(followersList.map(user =>
-      user.username === targetUsername ? { ...user, isFollowing: false } : user
-    ));
+  const handleUnfollow = async (targetUsername) => {
+    try {
+      await userService.unfollowUser(targetUsername);
+      
+      // Update followers list
+      setFollowersList(followersList.map(user =>
+        user.username === targetUsername ? { ...user, isFollowing: false } : user
+      ));
 
-    // Remove from following list
-    setFollowingList(followingList.filter(u => u.username !== targetUsername));
+      // Remove from following list
+      setFollowingList(followingList.filter(u => u.username !== targetUsername));
+    } catch (err) {
+      console.error("Error unfollowing user:", err);
+      alert("Failed to unfollow user. Please try again.");
+    }
   };
 
   // Show settings page if active
   if (showSettings) {
-    return <ProfileSettings onBack={() => setShowSettings(false)} />;
+    return <ProfileSettings onBack={() => setShowSettings(false)} onProfileUpdate={fetchProfileData} />;
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#fffcfa] dark:bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#fffcfa] dark:bg-black flex items-center justify-center p-4">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button
+            onClick={fetchProfileData}
+            className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -253,7 +320,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               transition={{ delay: 0.15, duration: 0.5 }}
               className="text-gray-600 dark:text-gray-300 mb-3"
             >
-              Rahul Chauhan
+              {profileData?.displayName || user?.displayName || "Rahul Chauhan"}
             </motion.p>
 
             {/* Bio */}
@@ -263,7 +330,7 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
               transition={{ delay: 0.2, duration: 0.5 }}
               className="text-black dark:text-white mb-6 text-sm md:text-base"
             >
-              {profile?.bio || "Wish I was half as interesting as my bio"}
+              {profileData?.bio || profile?.bio || "Wish I was half as interesting as my bio"}
             </motion.p>
 
             {/* Stats */}

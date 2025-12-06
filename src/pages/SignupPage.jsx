@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function SignupPage({ onSignup, onSwitchToLogin }) {
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -282,7 +284,7 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
     if (error) setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -300,6 +302,14 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
 
     if (!formData.email.trim()) {
       setError("Please enter your email");
+      triggerErrorAnimation();
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
       triggerErrorAnimation();
       return;
     }
@@ -322,18 +332,43 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
       return;
     }
 
-    // Success - show loading state
+    // Show loading state
     setIsLoading(true);
     const controller = document.querySelector(".controller");
     if (controller) {
       controller.style.animation = "none";
       controller.style.transform = "scale(1.05) rotateY(10deg)";
-      createSuccessParticles();
+    }
 
-      setTimeout(() => {
-        setIsLoading(false);
-        onSignup();
-      }, 800);
+    try {
+      // Call API register
+      const response = await register({
+        email: formData.email,
+        password: formData.password,
+        username: formData.username,
+        displayName: formData.name,
+      });
+
+      if (response.success) {
+        createSuccessParticles();
+        // Wait for animation before redirecting
+        setTimeout(() => {
+          onSignup();
+        }, 800);
+      } else {
+        setError(response.message || "Registration failed. Please try again.");
+        triggerErrorAnimation();
+      }
+    } catch (err) {
+      console.error('Signup error:', err);
+      setError(err.message || "Registration failed. Please try again.");
+      triggerErrorAnimation();
+    } finally {
+      setIsLoading(false);
+      if (controller) {
+        controller.style.transform = "scale(1)";
+        controller.style.animation = "controllerFloat 8s ease-in-out infinite";
+      }
     }
   };
 
