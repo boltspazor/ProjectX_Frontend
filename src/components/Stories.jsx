@@ -13,19 +13,47 @@ export default function Stories({ onAddStory }) {
   const [viewedStoryIds, setViewedStoryIds] = useState([]);
   const { profilePhoto, profileVideo } = useUserProfile();
 
+  // Helper function to get ring style based on creator tier
+  const getRingStyle = (tier, isViewed) => {
+    if (!tier || tier === "normal") {
+      // Default ring style for normal users
+      return isViewed
+        ? "bg-gray-600"
+        : "bg-gradient-to-tr from-orange-400 via-orange-500 to-orange-600";
+    }
+
+    // Special creator tier rings
+    const tierStyles = {
+      gold: isViewed
+        ? "bg-gradient-to-tr from-amber-600 via-yellow-500 to-amber-400 opacity-60"
+        : "bg-gradient-to-tr from-amber-400 via-yellow-400 to-amber-600 shadow-[0_0_8px_rgba(245,158,11,0.6)]",
+      silver: isViewed
+        ? "bg-gradient-to-tr from-gray-500 via-gray-300 to-gray-400 opacity-60"
+        : "bg-gradient-to-tr from-gray-300 via-silver-200 to-gray-500 shadow-[0_0_8px_rgba(156,163,175,0.6)]",
+      ruby: isViewed
+        ? "bg-gradient-to-tr from-red-700 via-pink-600 to-red-500 opacity-60"
+        : "bg-gradient-to-tr from-red-500 via-pink-500 to-red-700 shadow-[0_0_8px_rgba(239,68,68,0.6)]",
+      emerald: isViewed
+        ? "bg-gradient-to-tr from-emerald-700 via-green-500 to-emerald-500 opacity-60"
+        : "bg-gradient-to-tr from-emerald-400 via-green-400 to-emerald-600 shadow-[0_0_8px_rgba(16,185,129,0.6)]",
+    };
+
+    return tierStyles[tier] || tierStyles.gold;
+  };
+
   const stories = [
-    { id: 1, username: "shresque", image: "https://i.pravatar.cc/100?img=1" },
-    { id: 2, username: "aaravgoel_", image: "https://i.pravatar.cc/100?img=2" },
-    { id: 3, username: "nandihknee", image: "https://i.pravatar.cc/100?img=3" },
-    { id: 4, username: "_anirudhp...", image: "https://i.pravatar.cc/100?img=4" },
-    { id: 5, username: "slayyush", image: "https://i.pravatar.cc/100?img=5" },
-    { id: 6, username: "excuseyo...", image: "https://i.pravatar.cc/100?img=6" },
-    { id: 7, username: "samad_123", image: "https://i.pravatar.cc/100?img=7" },
-    { id: 8, username: "rahul_04", image: "https://i.pravatar.cc/100?img=8" },
-    { id: 9, username: "sheryanne_xoxo", image: "https://i.pravatar.cc/100?img=9" },
-    { id: 10, username: "idkwhoisrahul", image: "https://i.pravatar.cc/100?img=10" },
-    { id: 11, username: "user_123", image: "https://i.pravatar.cc/100?img=11" },
-    { id: 12, username: "creative_mind", image: "https://i.pravatar.cc/100?img=12" },
+    { id: 1, username: "shresque", image: "https://i.pravatar.cc/100?img=1", creatorTier: "gold" },
+    { id: 2, username: "aaravgoel_", image: "https://i.pravatar.cc/100?img=2", creatorTier: "silver" },
+    { id: 3, username: "nandihknee", image: "https://i.pravatar.cc/100?img=3", creatorTier: "ruby" },
+    { id: 4, username: "_anirudhp...", image: "https://i.pravatar.cc/100?img=4", creatorTier: "emerald" },
+    { id: 5, username: "slayyush", image: "https://i.pravatar.cc/100?img=5" }, // Normal user
+    { id: 6, username: "excuseyo...", image: "https://i.pravatar.cc/100?img=6", creatorTier: "gold" },
+    { id: 7, username: "samad_123", image: "https://i.pravatar.cc/100?img=7" }, // Normal user
+    { id: 8, username: "rahul_04", image: "https://i.pravatar.cc/100?img=8", creatorTier: "silver" },
+    { id: 9, username: "sheryanne_xoxo", image: "https://i.pravatar.cc/100?img=9", creatorTier: "ruby" },
+    { id: 10, username: "idkwhoisrahul", image: "https://i.pravatar.cc/100?img=10", creatorTier: "emerald" },
+    { id: 11, username: "user_123", image: "https://i.pravatar.cc/100?img=11" }, // Normal user
+    { id: 12, username: "creative_mind", image: "https://i.pravatar.cc/100?img=12" }, // Normal user
   ];
 
   // Sort stories: unseen first, then seen (stable by id)
@@ -151,10 +179,7 @@ export default function Stories({ onAddStory }) {
               >
                 <div className="relative group py-1">
                   <div
-                    className={`w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] cursor-pointer hover:scale-105 transition-transform duration-200 ${viewedStoryIds.includes(story.id)
-                        ? "bg-gray-600"
-                        : "bg-gradient-to-tr from-orange-400 via-orange-500 to-orange-600"
-                      }`}
+                    className={`w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] cursor-pointer hover:scale-105 transition-transform duration-200 ${getRingStyle(story.creatorTier, viewedStoryIds.includes(story.id))}`}
                     onClick={() => handleStoryClick(originalIndex, story.id)}
                   >
                     <div className="w-full h-full rounded-full border-2 border-white dark:border-black overflow-hidden relative">
