@@ -8,7 +8,9 @@ import { AnimatePresence } from "framer-motion";
 import { getCommunityById, addPostToCommunity } from "../data/communitiesData";
 import { saveCommunityDraft, getCommunityDrafts, deleteCommunityDraft } from "../utils/drafts";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
+import LiveBanner from "../components/LiveBanner";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import { getCommunityBannerVideoUrl, getCommunityProfileVideoUrl } from "../utils/communityVideos";
 
 export default function CommunityDetail({ setActiveView, communityId, onViewUserProfile }) {
   const [isJoined, setIsJoined] = useState(false);
@@ -127,12 +129,14 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
       <div className="relative w-full">
         {/* Banner Image */}
         <div className="w-full h-64 md:h-80 overflow-hidden relative">
-          <img
-            src={community.banner}
+          <LiveBanner
+            imageSrc={community.banner}
+            videoSrc={getCommunityBannerVideoUrl(community.id, community.banner, community)}
             alt={`${community.name} banner`}
-            className="w-full h-full object-cover"
+            className="w-full h-full"
+            maxDuration={10}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60 pointer-events-none" />
         </div>
 
         {/* Header Content */}
@@ -142,10 +146,12 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
               {/* Community Icon - Circular */}
               <div className="relative -mb-4 md:-mb-6">
                 <div className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-white overflow-hidden shadow-xl bg-white">
-                  <img
-                    src={community.icon}
+                  <LiveProfilePhoto
+                    imageSrc={community.icon}
+                    videoSrc={getCommunityProfileVideoUrl(community.id, community.icon, community)}
                     alt={`${community.name} icon`}
-                    className="w-full h-full object-cover rounded-full"
+                    className="w-full h-full rounded-full"
+                    maxDuration={10}
                   />
                 </div>
               </div>

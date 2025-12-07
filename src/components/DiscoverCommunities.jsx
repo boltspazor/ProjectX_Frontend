@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { communityService } from "../services/communityService";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { getCommunityProfileVideoUrl } from "../utils/communityVideos";
 
 export default function DiscoverCommunities({ onBack }) {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -77,13 +79,15 @@ export default function DiscoverCommunities({ onBack }) {
   const CommunityCard = ({ community, onJoin, isJoining }) => (
     <div className="bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 rounded-2xl p-4 hover:border-orange-500 transition-all duration-300">
       <div className="flex items-start gap-3">
-        <img
-          src={community.avatar}
-          alt={community.name}
-          className="w-12 h-12 rounded-xl object-cover"
-          loading="lazy"
-          decoding="async"
-        />
+        <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+          <LiveProfilePhoto
+            imageSrc={community.avatar}
+            videoSrc={getCommunityProfileVideoUrl(community.id, community.avatar, community)}
+            alt={community.name}
+            className="w-12 h-12 rounded-xl"
+            maxDuration={10}
+          />
+        </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-black dark:text-white font-medium">{community.name}</h3>
           <p className="text-gray-600 dark:text-gray-400 text-xs">{community.members}</p>
