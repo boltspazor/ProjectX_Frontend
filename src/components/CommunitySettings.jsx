@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Settings, Upload, X, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Settings, Upload, X, Plus, Trash2, Eye, EyeOff, Globe, Lock, Eye as EyeIcon, RefreshCw } from "lucide-react";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { getCommunityById } from "../data/communitiesData";
 import { communityService } from "../services/communityService";
@@ -30,6 +30,8 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
     showNewPassword: false,
     showConfirmPassword: false,
     communityCode: "",
+    communityType: "Public",
+    hasPassword: false,
   });
 
   // Media state
@@ -57,6 +59,8 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
         showNewPassword: false,
         showConfirmPassword: false,
         communityCode: community.code || community.id?.toString() || "",
+        communityType: community.type || "Public",
+        hasPassword: community.hasPassword || !!community.password,
       });
       setModerators(community.moderators || []);
       setBannerPreview(community.banner);
@@ -226,11 +230,17 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
         avatar: profilePreview,
         profileVideo: profileVideoPreview,
         moderators: moderators,
+        type: formData.communityType,
       };
 
       // Add password if changing (only for private communities)
-      if (community.type === "Private" && formData.newPassword) {
+      if (formData.communityType === "Private" && formData.newPassword) {
         updateData.password = formData.newPassword;
+        updateData.hasPassword = true;
+      } else if (formData.communityType !== "Private") {
+        // Clear password if switching away from private
+        updateData.password = null;
+        updateData.hasPassword = false;
       }
 
       // Update community locally first
@@ -469,12 +479,86 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
             </div>
           </div>
 
+          {/* Community Type */}
+          <div className="bg-white dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-6">
+            <label className="block text-sm font-medium text-black dark:text-white mb-3">
+              Community Type
+            </label>
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, communityType: "Public" })}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition ${formData.communityType === "Public"
+                    ? "bg-orange-500/20 border-orange-500 text-black dark:text-white"
+                    : "bg-gray-100 dark:bg-gray-900 border-black dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600"
+                  }`}
+              >
+                <Globe className="w-5 h-5" />
+                <span className="font-medium">Public</span>
+                <span className="ml-auto text-xs text-gray-500">Anyone can view and join</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, communityType: "Restricted" })}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition ${formData.communityType === "Restricted"
+                    ? "bg-orange-500/20 border-orange-500 text-black dark:text-white"
+                    : "bg-gray-100 dark:bg-gray-900 border-black dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600"
+                  }`}
+              >
+                <EyeIcon className="w-5 h-5" />
+                <span className="font-medium">Restricted</span>
+                <span className="ml-auto text-xs text-gray-500">Anyone can view, approval required to join</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, communityType: "Private" })}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition ${formData.communityType === "Private"
+                    ? "bg-orange-500/20 border-orange-500 text-black dark:text-white"
+                    : "bg-gray-100 dark:bg-gray-900 border-black dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600"
+                  }`}
+              >
+                <Lock className="w-5 h-5" />
+                <span className="font-medium">Private</span>
+                <span className="ml-auto text-xs text-gray-500">Requires password to join</span>
+              </button>
+            </div>
+          </div>
+
           {/* Password (Private Communities Only) */}
-          {community.type === "Private" && (
+          {formData.communityType === "Private" && (
             <div className="bg-white dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-6">
-              <label className="block text-sm font-medium text-black dark:text-white mb-3">
-                Change Community Password
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-black dark:text-white">
+                  Community Password
+                </label>
+                {!formData.hasPassword && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const resetPassword = prompt("Enter a new password for this community (minimum 6 characters):");
+                      if (resetPassword && resetPassword.length >= 6) {
+                        setFormData({
+                          ...formData,
+                          newPassword: resetPassword,
+                          confirmPassword: resetPassword,
+                          hasPassword: true,
+                        });
+                        setSuccess("Password set successfully!");
+                        setTimeout(() => setSuccess(""), 3000);
+                      } else if (resetPassword) {
+                        setError("Password must be at least 6 characters");
+                        setTimeout(() => setError(""), 3000);
+                      }
+                    }}
+                    className="px-3 py-1.5 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 transition flex items-center gap-2"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    Set Password
+                  </button>
+                )}
+              </div>
               
               <div className="space-y-4">
                 <div>
