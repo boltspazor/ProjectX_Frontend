@@ -170,7 +170,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
     if (!messageInput.trim() || !activeChat || sendingMessage) return;
 
     const messageText = messageInput.trim();
-    setMessageInput("");
+      setMessageInput("");
     setSendingMessage(true);
 
     // Optimistically add message to UI
@@ -279,11 +279,11 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                   : "";
                 
                 return (
-                  <div
+                <div
                     key={convo._id}
                     onClick={() => handleChatClick(convo)}
                     className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 hover:border-orange-500 cursor-pointer transition"
-                  >
+                >
                   {/* Profile Picture */}
                   <div className="relative flex-shrink-0">
                     <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden">
@@ -292,7 +292,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                         videoSrc={getProfileVideoUrl(otherUser.profilePicture, otherUser.username)}
                         alt={otherUser.username || "User"}
                         className="w-12 h-12 md:w-14 md:h-14 rounded-full"
-                      />
+                    />
                     </div>
                     {convo.unreadCount > 0 && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-orange-500 rounded-full border-2 border-black dark:border-gray-800"></div>
@@ -332,10 +332,10 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
             {/* Chat Header */}
             <div className="flex items-center justify-between p-4 border-b border-black dark:border-gray-800 bg-[#fffcfa] dark:bg-[#0f0f0f] relative">
               <div className="flex items-center gap-3">
-                <button
-                  onClick={handleBackClick}
+              <button
+                onClick={handleBackClick}
                   className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition"
-                >
+              >
                   <ArrowLeft className="w-5 h-5 text-black dark:text-white" />
                 </button>
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex-shrink-0">
@@ -366,7 +366,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                   aria-label="Change chat theme"
                 >
                   <img src={themeIcon} alt="theme" className="w-5 h-5 dark:invert" />
-                </button>
+              </button>
                 {showThemePicker && (
                   <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 rounded-xl shadow-2xl p-3 z-20">
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">Chat themes</p>
@@ -376,7 +376,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                         className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "cat" ? "border-orange-500" : "border-gray-300 dark:border-gray-700"}`}
                         style={{ backgroundImage: `url(${catTheme})`, backgroundSize: "cover", backgroundPosition: "center" }}
                         aria-label="Cat theme"
-                      />
+              />
                       <button
                         onClick={() => handleSelectTheme("xoxo")}
                         className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "xoxo" ? "border-orange-500" : "border-gray-300 dark:border-gray-700"}`}
@@ -407,18 +407,18 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                     const isLastSenderMessage = message.id === lastSenderMessage?.id;
                     
                     return (
-                      <div
-                        key={message.id}
+                <div
+                  key={message.id}
                         className={`flex flex-col ${message.sender === 'sender' ? 'items-end' : 'items-start'}`}
-                      >
-                        <div
+                >
+                  <div
                           className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${message.sender === 'sender'
                             ? themes[currentTheme]?.senderBubble || themes.default.senderBubble
                             : themes[currentTheme]?.receiverBubble || themes.default.receiverBubble
-                            }`}
-                        >
-                          <p className="text-sm md:text-base">{message.text}</p>
-                        </div>
+                    }`}
+                  >
+                    <p className="text-sm md:text-base">{message.text}</p>
+                  </div>
                         {/* Read Receipts - Only show on the last sender message and if read receipts are enabled */}
                         {message.sender === 'sender' && isLastSenderMessage && readReceiptsEnabled && (
                           <div className="mt-1 px-1">
@@ -431,7 +431,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                             )}
                           </div>
                         )}
-                      </div>
+                </div>
                     );
                   })}
                   <div ref={messagesEndRef} />
