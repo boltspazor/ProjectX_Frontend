@@ -502,6 +502,28 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
           z-index: 10;
         }
 
+        @media (max-width: 480px) {
+          .signup-page-body {
+            height: 100vh;
+            min-height: 100vh;
+            max-height: 100vh;
+            padding: 10px 15px;
+            overflow: hidden;
+            box-sizing: border-box;
+          }
+
+          .controller-container {
+            max-width: 320px;
+            transform: scale(0.8);
+            transform-origin: center;
+            margin: auto;
+            max-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+
         .controller {
           background: linear-gradient(145deg, #2d2d2d, #3a3a3a);
           border-radius: 20px;
@@ -1354,21 +1376,88 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
 
         @media (max-width: 480px) {
           .controller {
-            padding: 25px;
+            padding: 12px;
+            border-radius: 14px;
+            width: 100%;
+            box-sizing: border-box;
+          }
+
+          .logo {
+            margin-bottom: 12px;
+          }
+
+          .logo h1 {
+            font-size: 20px;
+            letter-spacing: 1px;
+            margin: 0;
+          }
+
+          .controller h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+          }
+
+          .input-group {
+            margin-bottom: 10px;
+          }
+
+          .input-group:last-of-type {
+            margin-bottom: 8px;
+          }
+
+          .input-field {
+            padding: 9px 11px;
+            font-size: 13px;
+          }
+
+          .input-group label {
+            font-size: 10px;
+            margin-bottom: 5px;
+          }
+
+          .terms-checkbox {
+            margin-top: 8px;
+            margin-bottom: 0;
+            padding: 6px;
+            gap: 6px;
+          }
+
+          .terms-checkbox label {
+            font-size: 10px;
+            line-height: 1.3;
+          }
+
+          .terms-checkbox input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            margin-top: 1px;
+            flex-shrink: 0;
           }
 
           .button-group {
             flex-direction: column;
+            margin-top: 12px;
+            gap: 8px;
           }
 
           .signup-btn, .login-btn {
-            margin: 5px 0;
+            margin: 0;
             width: 100%;
+            padding: 9px 16px;
+            font-size: 12px;
           }
 
           .controller-buttons {
             flex-direction: column;
-            gap: 20px;
+            gap: 10px;
+            margin-top: 12px;
+          }
+
+          .d-pad {
+            width: 75px;
+            height: 75px;
+            gap: 3px;
+            margin: 0 auto;
           }
 
           .action-buttons {
@@ -1376,7 +1465,21 @@ export default function SignupPage({ onSignup, onSwitchToLogin }) {
             height: auto;
             width: 100%;
             justify-content: center;
-            gap: 20px;
+            gap: 10px;
+          }
+
+          .action-btn {
+            width: 38px;
+            height: 38px;
+            font-size: 10px;
+          }
+
+          .forgot-password {
+            margin-top: 10px;
+          }
+
+          .forgot-password a {
+            font-size: 10px;
           }
         }
       `}</style>

@@ -502,6 +502,18 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           z-index: 10;
         }
 
+        @media (max-width: 480px) {
+          .login-page-body {
+            padding: 60px 25px;
+          }
+
+          .controller-container {
+            max-width: 320px;
+            transform: scale(0.75);
+            transform-origin: center;
+          }
+        }
+
         .controller {
           background: linear-gradient(145deg, #2d2d2d, #3a3a3a);
           border-radius: 20px;
@@ -1315,21 +1327,61 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
         @media (max-width: 480px) {
           .controller {
-            padding: 25px;
+            padding: 18px;
+            border-radius: 16px;
+          }
+
+          .logo {
+            margin-bottom: 25px;
+          }
+
+          .logo h1 {
+            font-size: 24px;
+            letter-spacing: 2px;
+          }
+
+          .controller h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+          }
+
+          .input-group {
+            margin-bottom: 16px;
+          }
+
+          .input-field {
+            padding: 12px 14px;
+            font-size: 14px;
+          }
+
+          .input-group label {
+            font-size: 12px;
           }
 
           .button-group {
             flex-direction: column;
+            margin-top: 25px;
+            gap: 12px;
           }
 
           .login-btn, .signup-btn {
-            margin: 5px 0;
+            margin: 0;
             width: 100%;
+            padding: 12px 20px;
+            font-size: 14px;
           }
 
           .controller-buttons {
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
+            margin-top: 20px;
+          }
+
+          .d-pad {
+            width: 90px;
+            height: 90px;
+            gap: 5px;
+            margin: 0 auto;
           }
 
           .action-buttons {
@@ -1337,7 +1389,21 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
             height: auto;
             width: 100%;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
+          }
+
+          .action-btn {
+            width: 45px;
+            height: 45px;
+            font-size: 12px;
+          }
+
+          .forgot-password {
+            margin-top: 18px;
+          }
+
+          .forgot-password a {
+            font-size: 12px;
           }
         }
 
