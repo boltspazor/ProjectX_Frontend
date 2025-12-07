@@ -22,6 +22,27 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Read receipt settings - load from localStorage
+  const [readReceiptsEnabled, setReadReceiptsEnabled] = useState(() => {
+    const saved = localStorage.getItem('readReceiptsEnabled');
+    return saved !== null ? saved === 'true' : true; // Default to enabled
+  });
+
+  // Listen for changes to read receipts setting
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem('readReceiptsEnabled');
+      setReadReceiptsEnabled(saved !== null ? saved === 'true' : true);
+    };
+    window.addEventListener('storage', handleStorageChange);
+    // Also check periodically for same-tab updates
+    const interval = setInterval(handleStorageChange, 500);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
 
   const themes = {
     default: {
@@ -78,7 +99,12 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
         id: msg._id,
         text: msg.content,
         sender: msg.isCurrentUser ? 'sender' : 'receiver',
-        time: new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+        time: new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+        // Read receipt status - check if message was delivered/seen
+        // Assuming API returns: delivered (when received), read (when seen)
+        status: msg.isCurrentUser ? (msg.read ? 'read' : (msg.delivered ? 'delivered' : 'sent')) : null,
+        delivered: msg.delivered || false,
+        read: msg.read || false,
       }));
       
       setMessages(transformedMsgs);
@@ -152,12 +178,29 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
       id: Date.now(),
       text: messageText,
       sender: 'sender',
-      time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      status: 'sent',
+      delivered: false,
+      read: false,
     };
     setMessages([...messages, tempMessage]);
 
     try {
-      await messageService.sendMessage(activeChat._id, { content: messageText });
+      const sentMessage = await messageService.sendMessage(activeChat._id, { content: messageText });
+      
+      // Update the optimistic message with actual message data and mark as delivered
+      setMessages(prevMsgs =>
+        prevMsgs.map(msg =>
+          msg.id === tempMessage.id
+            ? {
+                ...msg,
+                id: sentMessage._id || sentMessage.id || msg.id,
+                status: 'delivered', // Assume delivered after successful send
+                delivered: true,
+              }
+            : msg
+        )
+      );
       
       // Update conversation list with new last message
       setConversations(prevConvos =>
@@ -357,21 +400,40 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                 </div>
               ) : (
                 <>
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.sender === 'sender' ? 'justify-end' : 'justify-start'}`}
-                    >
+                  {messages.map((message, index) => {
+                    // Find the last sender message to show read receipt only on it
+                    const senderMessages = messages.filter(msg => msg.sender === 'sender');
+                    const lastSenderMessage = senderMessages[senderMessages.length - 1];
+                    const isLastSenderMessage = message.id === lastSenderMessage?.id;
+                    
+                    return (
                       <div
-                        className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${message.sender === 'sender'
-                          ? themes[currentTheme]?.senderBubble || themes.default.senderBubble
-                          : themes[currentTheme]?.receiverBubble || themes.default.receiverBubble
-                          }`}
+                        key={message.id}
+                        className={`flex flex-col ${message.sender === 'sender' ? 'items-end' : 'items-start'}`}
                       >
-                        <p className="text-sm md:text-base">{message.text}</p>
+                        <div
+                          className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${message.sender === 'sender'
+                            ? themes[currentTheme]?.senderBubble || themes.default.senderBubble
+                            : themes[currentTheme]?.receiverBubble || themes.default.receiverBubble
+                            }`}
+                        >
+                          <p className="text-sm md:text-base">{message.text}</p>
+                        </div>
+                        {/* Read Receipts - Only show on the last sender message and if read receipts are enabled */}
+                        {message.sender === 'sender' && isLastSenderMessage && readReceiptsEnabled && (
+                          <div className="mt-1 px-1">
+                            {message.status === 'read' ? (
+                              <span className="text-xs text-gray-400 dark:text-gray-500">Seen</span>
+                            ) : message.status === 'delivered' ? (
+                              <span className="text-xs text-gray-400 dark:text-gray-500">Delivered</span>
+                            ) : (
+                              <span className="text-xs text-gray-400 dark:text-gray-500">Sent</span>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <div ref={messagesEndRef} />
                 </>
               )}

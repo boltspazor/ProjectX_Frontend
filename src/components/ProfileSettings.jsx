@@ -26,6 +26,12 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
     messages: true,
     followRequests: true
   });
+  
+  // Read receipts setting - load from localStorage
+  const [readReceiptsEnabled, setReadReceiptsEnabled] = useState(() => {
+    const saved = localStorage.getItem('readReceiptsEnabled');
+    return saved !== null ? saved === 'true' : true; // Default to enabled
+  });
 
   // API state
   const [isSaving, setIsSaving] = useState(false);
@@ -490,6 +496,37 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                   >
                     <span
                       className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${notifications.followRequests ? "translate-x-6" : ""
+                        }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Read Receipts */}
+            <div>
+              <label className="block text-sm font-medium text-orange-500 mb-3">
+                Read Receipts
+              </label>
+              <div className="bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex-1">
+                    <span className="text-black dark:text-white font-medium">Read Receipts</span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      When disabled, you won't see read receipts from others and others won't see yours
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newValue = !readReceiptsEnabled;
+                      setReadReceiptsEnabled(newValue);
+                      localStorage.setItem('readReceiptsEnabled', newValue.toString());
+                    }}
+                    className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${readReceiptsEnabled ? "bg-orange-500" : "bg-gray-600"
+                      }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${readReceiptsEnabled ? "translate-x-6" : ""
                         }`}
                     />
                   </button>
