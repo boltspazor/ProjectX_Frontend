@@ -12,6 +12,7 @@ import LiveBanner from "../components/LiveBanner";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 import { getCommunityBannerVideoUrl, getCommunityProfileVideoUrl } from "../utils/communityVideos";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { communityService } from "../services/communityService";
 
 export default function CommunityDetail({ setActiveView, communityId, onViewUserProfile }) {
   const { username } = useUserProfile();
@@ -23,6 +24,13 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
   const [refreshKey, setRefreshKey] = useState(0);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [codeInput, setCodeInput] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [codeError, setCodeError] = useState("");
+  const [error, setError] = useState("");
 
   // Get community data by ID
   const community = getCommunityById(communityId);
@@ -70,7 +78,76 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
   const posts = currentCommunity?.posts || [];
 
   const handleJoin = () => {
-    setIsJoined(!isJoined);
+    // If already joined, leave
+    if (isJoined) {
+      setIsJoined(false);
+      return;
+    }
+
+    // Restricted communities cannot be joined from outside
+    if (community.type === "Restricted") {
+      setError("This community is restricted. Only moderators can add members.");
+      setTimeout(() => setError(""), 5000);
+      return;
+    }
+
+    // Show community code modal first for all communities
+    setShowCodeModal(true);
+  };
+
+  const handleCodeSubmit = () => {
+    const communityCode = community.code || community.id?.toString() || "";
+    
+    if (codeInput.trim() !== communityCode) {
+      setCodeError("Invalid community code. Please try again.");
+      return;
+    }
+
+    setCodeError("");
+    setShowCodeModal(false);
+    setCodeInput("");
+
+    // If private community, show password modal after code is correct
+    if (community.type === "Private") {
+      setShowPasswordModal(true);
+    } else {
+      // For public communities, join after code verification
+      setIsJoined(true);
+      // Call API if needed
+      try {
+        communityService.joinCommunity(community.id);
+      } catch (err) {
+        console.error("Error joining community:", err);
+      }
+    }
+  };
+
+  const handlePasswordSubmit = () => {
+    // In a real app, verify password from API
+    // For now, check if password matches (this should come from community data or API)
+    const correctPassword = community.password || "";
+
+    if (!passwordInput.trim()) {
+      setPasswordError("Please enter a password.");
+      return;
+    }
+
+    if (passwordInput.trim() !== correctPassword && correctPassword) {
+      setPasswordError("Incorrect password. Please try again.");
+      return;
+    }
+
+    setPasswordError("");
+    setShowPasswordModal(false);
+    setPasswordInput("");
+    setIsJoined(true);
+
+    // Call API if needed
+    try {
+      communityService.joinCommunity(community.id, { password: passwordInput });
+    } catch (err) {
+      console.error("Error joining community:", err);
+    }
   };
 
   const handleTopicClick = (topic) => {
@@ -473,6 +550,112 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
 
       {/* Share Modal */}
       <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} onViewUserProfile={onViewUserProfile} />
+
+      {/* Community Code Modal */}
+      {showCodeModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#121212] rounded-xl p-6 max-w-md w-full border border-black dark:border-gray-800">
+            <h2 className="text-xl font-semibold text-black dark:text-white mb-2">Enter Community Code</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Please enter the community code to join this community.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="text"
+                  value={codeInput}
+                  onChange={(e) => {
+                    setCodeInput(e.target.value);
+                    setCodeError("");
+                  }}
+                  placeholder="Enter community code"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  autoFocus
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleCodeSubmit();
+                    }
+                  }}
+                />
+                {codeError && (
+                  <p className="text-sm text-red-500 mt-2">{codeError}</p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowCodeModal(false);
+                    setCodeInput("");
+                    setCodeError("");
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCodeSubmit}
+                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#121212] rounded-xl p-6 max-w-md w-full border border-black dark:border-gray-800">
+            <h2 className="text-xl font-semibold text-black dark:text-white mb-2">Enter Password</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              This is a private community. Please enter the password to join.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  value={passwordInput}
+                  onChange={(e) => {
+                    setPasswordInput(e.target.value);
+                    setPasswordError("");
+                  }}
+                  placeholder="Enter password"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  autoFocus
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handlePasswordSubmit();
+                    }
+                  }}
+                />
+                {passwordError && (
+                  <p className="text-sm text-red-500 mt-2">{passwordError}</p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setPasswordInput("");
+                    setPasswordError("");
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePasswordSubmit}
+                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                >
+                  Join
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create Post Modal */}
       <CreateCommunityPost
