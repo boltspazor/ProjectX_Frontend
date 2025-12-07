@@ -252,7 +252,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                       />
                     </div>
                     {convo.unreadCount > 0 && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-red-500 rounded-full border-2 border-black"></div>
+                      <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-orange-500 rounded-full border-2 border-black dark:border-gray-800"></div>
                     )}
                   </div>
 
@@ -303,12 +303,18 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                     className="w-10 h-10 md:w-12 md:h-12 rounded-full"
                   />
                 </div>
-                <button
-                  onClick={() => onViewUserProfile && onViewUserProfile(activeChat.otherUser?.username)}
-                  className="font-semibold text-base md:text-lg text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
-                >
-                  {activeChat.otherUser?.username || "Unknown User"}
-                </button>
+                <div className="flex flex-col">
+                  <button
+                    onClick={() => onViewUserProfile && onViewUserProfile(activeChat.otherUser?.username)}
+                    className="font-semibold text-base md:text-lg text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer text-left"
+                  >
+                    {activeChat.otherUser?.username || "Unknown User"}
+                  </button>
+                  {/* Online Status Indicator */}
+                  {activeChat.otherUser?.isOnline && (
+                    <span className="text-xs text-orange-500 font-medium">online</span>
+                  )}
+                </div>
               </div>
               <div className="relative" ref={themePickerRef}>
                 <button
