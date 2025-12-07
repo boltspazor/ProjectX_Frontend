@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { ArrowLeft, Globe, Eye, Lock, Upload } from "lucide-react";
 import { addCommunity } from "../data/communitiesData";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function CreateCommunity({ setActiveView }) {
+  const { username } = useUserProfile();
   const [communityName, setCommunityName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedTopics, setSelectedTopics] = useState([]);
@@ -83,6 +85,9 @@ export default function CreateCommunity({ setActiveView }) {
       avatar: iconPreview || "https://i.pravatar.cc/100?img=60",
       bannerVideo: bannerVideoPreview || null,
       profileVideo: profileVideoPreview || null,
+      creator: username,
+      creatorId: username,
+      code: `COMM${Date.now().toString().slice(-6)}`, // Temporary code, will be replaced by addCommunity
       type: communityType.charAt(0).toUpperCase() + communityType.slice(1),
       topics: selectedTopics,
       rules: [

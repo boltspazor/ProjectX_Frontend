@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ArrowLeft, Globe, Pencil, Heart, Bookmark, X } from "lucide-react";
+import { ArrowLeft, Globe, Pencil, Heart, Bookmark, X, Settings } from "lucide-react";
 import ShareModal from "../components/ShareModal";
 import Comments from "../components/Comments";
 import commentIcon from "../assets/comment.svg";
@@ -11,8 +11,10 @@ import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import LiveBanner from "../components/LiveBanner";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 import { getCommunityBannerVideoUrl, getCommunityProfileVideoUrl } from "../utils/communityVideos";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function CommunityDetail({ setActiveView, communityId, onViewUserProfile }) {
+  const { username } = useUserProfile();
   const [isJoined, setIsJoined] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
@@ -22,6 +24,11 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
 
   // Get community data by ID
   const community = getCommunityById(communityId);
+
+  // Check if user is admin/moderator
+  const isAdmin = community?.creator === username || community?.creatorId === username;
+  const isModerator = community?.moderators?.some(mod => mod.username === username || mod.id === username);
+  const canManageSettings = isAdmin || isModerator;
 
   // Initialize posts likes state from community posts
   useEffect(() => {
@@ -187,6 +194,15 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     >
                       Add Post
                     </button>
+                    {canManageSettings && (
+                      <button
+                        onClick={() => setActiveView("communitySettings", communityId)}
+                        className="px-6 py-2.5 rounded-lg bg-transparent text-white border border-orange-500 text-sm font-medium hover:bg-orange-500/10 transition flex items-center gap-2"
+                      >
+                        <Settings className="w-4 h-4" />
+                        Settings
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

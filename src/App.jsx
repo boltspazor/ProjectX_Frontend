@@ -14,6 +14,7 @@ import CreatePost from "./components/CreatePost";
 import CommunitiesPage from "./pages/CommunitiesPage";
 import CreateCommunity from "./components/CreateCommunity";
 import CommunityDetail from "./components/CommunityDetail";
+import CommunitySettings from "./components/CommunitySettings";
 import Notifications from "./components/Notifications";
 import AddStory from "./components/AddStory";
 import OtherUserProfile from "./components/OtherUserProfile";
@@ -118,6 +119,8 @@ export default function App() {
         return <CreateCommunity setActiveView={handleViewChange} />;
       case "communityDetail":
         return <CommunityDetail setActiveView={handleViewChange} communityId={selectedCommunityId} onViewUserProfile={handleViewUserProfile} />;
+      case "communitySettings":
+        return <CommunitySettings setActiveView={handleViewChange} communityId={selectedCommunityId} onViewUserProfile={handleViewUserProfile} />;
       case "profile":
         return <ProfilePage onLogout={handleLogout} onViewUserProfile={handleViewUserProfile} />;
       case "shop":
