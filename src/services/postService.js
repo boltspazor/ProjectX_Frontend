@@ -8,12 +8,13 @@ export const postService = {
   /**
    * Get feed posts
    */
-  async getFeed(limit = 10, lastDocId = null) {
+  async getFeed(params = {}) {
     try {
-      const params = { limit };
-      if (lastDocId) params.lastDocId = lastDocId;
+      const { limit = 10, lastDocId = null } = params;
+      const queryParams = { limit };
+      if (lastDocId) queryParams.lastDocId = lastDocId;
       
-      const response = await api.get(API_ENDPOINTS.POSTS.FEED, params);
+      const response = await api.get(API_ENDPOINTS.POSTS.FEED, queryParams);
       return response.success ? response.data : { posts: [], lastDocId: null, hasMore: false };
     } catch (error) {
       console.error('Get feed error:', error);

@@ -35,6 +35,41 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
   const followersCount = userData?.stats?.followers || followersList.length;
   const followingCount = userData?.stats?.following || followingList.length;
 
+  // Fetch user profile data
+  const fetchUserProfile = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Fetch user data
+      const user = await userService.getUserByUsername(viewedUser);
+      setUserData(user);
+      setIsFollowing(user?.isFollowing || false);
+
+      // Fetch user posts
+      const userPosts = await postService.getUserPosts(viewedUser);
+      setPosts(userPosts?.posts || userPosts || []);
+
+      // Fetch followers
+      const followersData = await userService.getUserFollowers(viewedUser);
+      setFollowersList(followersData?.followers || followersData || []);
+
+      // Fetch following
+      const followingData = await userService.getUserFollowing(viewedUser);
+      setFollowingList(followingData?.following || followingData || []);
+
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+      setError(err.message || 'Failed to load user profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, [viewedUser]);
+
 
   const handlePostClick = (post) => {
     setSelectedPost(post);

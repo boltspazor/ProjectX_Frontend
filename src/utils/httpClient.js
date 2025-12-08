@@ -350,14 +350,27 @@ export const api = {
         return mockApi.getUserPosts(username);
       }
       if (endpoint.includes('/api/users/')) {
-        const username = endpoint.split('/').pop();
-        if (endpoint.includes('/followers')) return mockApi.getUserFollowers(username);
-        if (endpoint.includes('/following')) return mockApi.getUserFollowing(username);
-        return mockApi.getUserByUsername(username);
+        const parts = endpoint.split('/');
+        const userId = parts[3];
+        if (endpoint.includes('/followers')) return mockApi.getUserFollowers(userId);
+        if (endpoint.includes('/following')) return mockApi.getUserFollowing(userId);
+        if (endpoint.includes('/stats')) return mockApi.getUserStats(userId);
+        // Check if it's a numeric ID (user profile by ID) or username
+        if (/^\d+$/.test(userId)) {
+          return mockApi.getUserById(userId);
+        }
+        return mockApi.getUserByUsername(userId);
       }
       if (endpoint.includes('/api/posts/') && endpoint.includes('/comments')) {
         const postId = endpoint.split('/')[3];
         return mockApi.getPostComments(postId);
+      }
+      if (endpoint.includes('/api/communities/')) {
+        const slug = endpoint.split('/').pop();
+        if (endpoint.includes('/posts')) {
+          return mockApi.getCommunityPosts(slug);
+        }
+        return mockApi.getCommunityBySlug(slug);
       }
       if (endpoint.includes('/api/messages/')) {
         const conversationId = endpoint.split('/')[3];

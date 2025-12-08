@@ -20,44 +20,96 @@ const mockUser = {
   isVerified: true,
 };
 
-// Mock posts
+// Mock posts - Complete with all fields
 const mockPosts = Array.from({ length: 20 }, (_, i) => ({
   id: `post-${i + 1}`,
+  _id: `post-${i + 1}`, // Support both id and _id
   imageUrl: `https://picsum.photos/600/600?random=${i + 1}`,
-  caption: `This is an awesome post #${i + 1} 🔥`,
+  image: `https://picsum.photos/600/600?random=${i + 1}`, // Fallback for different components
+  caption: `This is an awesome post #${i + 1} 🔥 Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
   user: {
+    id: `user-${i + 1}`,
     username: `user_${i + 1}`,
     profilePhoto: `https://i.pravatar.cc/100?img=${i + 1}`,
+    isVerified: i % 3 === 0,
   },
-  likesCount: Math.floor(Math.random() * 1000),
-  commentsCount: Math.floor(Math.random() * 100),
+  username: `user_${i + 1}`, // Fallback
+  profileImage: `https://i.pravatar.cc/100?img=${i + 1}`, // Fallback
+  likesCount: Math.floor(Math.random() * 1000) + 100,
+  commentsCount: Math.floor(Math.random() * 100) + 10,
   isLiked: Math.random() > 0.5,
   createdAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+  location: i % 4 === 0 ? 'New York, USA' : null,
+  tags: [`tag${i}`, `awesome`],
 }));
 
-// Mock comments
+// Mock comments - Complete with all fields
 const mockComments = Array.from({ length: 10 }, (_, i) => ({
   id: `comment-${i + 1}`,
-  text: `Great post! This is comment number ${i + 1} 🎉`,
+  text: `Great post! This is comment number ${i + 1} 🎉 Lorem ipsum dolor sit amet.`,
   user: {
+    id: `commenter-${i + 1}`,
     username: `commenter_${i + 1}`,
     profilePhoto: `https://i.pravatar.cc/50?img=${i + 20}`,
   },
+  username: `commenter_${i + 1}`, // Fallback
+  image: `https://i.pravatar.cc/50?img=${i + 20}`, // Fallback
   likesCount: Math.floor(Math.random() * 50),
+  likes: Math.floor(Math.random() * 50), // Fallback
   isLiked: Math.random() > 0.5,
+  liked: Math.random() > 0.5, // Fallback
   createdAt: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
+  time: `${Math.floor(Math.random() * 24)}h`, // Fallback
 }));
 
-// Mock communities
+// Mock communities - Complete with all fields
 const mockCommunities = Array.from({ length: 12 }, (_, i) => ({
-  id: `community-${i + 1}`,
-  name: `Community ${i + 1}`,
-  description: 'A great community for enthusiasts',
-  members: `${Math.floor(Math.random() * 10000)} members`,
+  id: i + 1,
+  slug: `community-${i + 1}`,
+  name: `${['Music Lovers', 'Tech Enthusiasts', 'Gaming Squad', 'Art Lovers', 'Music Fans', 'Food Critics', 'Sports Fans', 'Book Club', 'Fitness Freaks', 'Travel Bugs', 'Photo Club', 'Coding Ninjas'][i]}`,
+  description: 'A great community for enthusiasts to share ideas, connect, and grow together. Join us for amazing discussions!',
+  members: `${Math.floor(Math.random() * 10000) + 500}`,
+  followers: `${Math.floor(Math.random() * 10000) + 500}`,
+  membersCount: Math.floor(Math.random() * 10000) + 500,
+  contributors: `${Math.floor(Math.random() * 200) + 50}`,
   avatar: `https://i.pravatar.cc/100?img=${i + 30}`,
+  icon: `https://i.pravatar.cc/100?img=${i + 30}`,
   cover: `https://picsum.photos/800/400?random=${i + 50}`,
+  banner: `https://picsum.photos/1200/400?random=${i + 50}`,
   badges: ['Active', 'Trending'],
-  category: ['Technology', 'Games', 'Art & Design'][i % 3],
+  category: ['Technology', 'Games', 'Art & Design', 'Music', 'Food', 'Sports'][i % 6],
+  type: i % 2 === 0 ? 'Public' : 'Private',
+  createdDate: 'Jan 15, 2020',
+  isJoined: i % 3 === 0,
+  creator: 'admin_user',
+  creatorId: 'admin-1',
+  topics: ['Discussion', 'Events', 'News', 'Q&A'],
+  moderators: [
+    { id: 1, username: `mod_${i}_1`, avatar: `https://i.pravatar.cc/50?img=${i * 3 + 1}` },
+    { id: 2, username: `mod_${i}_2`, avatar: `https://i.pravatar.cc/50?img=${i * 3 + 2}` },
+  ],
+  rules: [
+    'Be respectful to all members',
+    'No spam or self-promotion',
+    'Keep content relevant',
+    'Follow community guidelines',
+  ],
+  posts: Array.from({ length: 8 }, (_, j) => ({
+    id: i * 10 + j + 1,
+    username: `user_${j + 1}`,
+    avatar: `https://i.pravatar.cc/100?img=${j + 10}`,
+    title: `Community Post ${j + 1}`,
+    content: `This is post number ${j + 1} in the community. Great discussion happening here!`,
+    image: j % 2 === 0 ? `https://picsum.photos/600/600?random=${i * 10 + j}` : null,
+    imageUrl: j % 2 === 0 ? `https://picsum.photos/600/600?random=${i * 10 + j}` : null,
+    likes: Math.floor(Math.random() * 500),
+    likesCount: Math.floor(Math.random() * 500),
+    comments: Math.floor(Math.random() * 100),
+    commentsCount: Math.floor(Math.random() * 100),
+    liked: j % 3 === 0,
+    isLiked: j % 3 === 0,
+    createdAt: new Date(Date.now() - j * 3600000).toISOString(),
+  })),
 }));
 
 // Mock notifications
@@ -210,9 +262,104 @@ export const mockApi = {
   // Users
   async getUserByUsername(username) {
     await delay();
+    // Generate consistent mock data based on username
+    const userHash = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const avatarNum = (userHash % 70) + 1;
+    
     return {
       success: true,
-      data: { ...mockUser, username },
+      data: { 
+        id: 'user-' + username,
+        username,
+        displayName: username.replace('_', ' ').charAt(0).toUpperCase() + username.replace('_', ' ').slice(1),
+        fullName: username.replace('_', ' ').toUpperCase(),
+        email: `${username}@example.com`,
+        avatar: `https://i.pravatar.cc/150?img=${avatarNum}`,
+        profilePhoto: `https://i.pravatar.cc/150?img=${avatarNum}`,
+        profileVideo: null,
+        coverImage: `https://picsum.photos/1200/40${avatarNum % 10}`,
+        bio: `Hey there! I'm ${username}. Welcome to my profile 👋`,
+        location: ['New York, NY', 'Los Angeles, CA', 'San Francisco, CA', 'Austin, TX', 'Seattle, WA'][userHash % 5],
+        website: `https://${username}.com`,
+        joinDate: '2023-0' + ((userHash % 9) + 1) + '-15',
+        isFollowing: userHash % 3 === 0,
+        isVerified: userHash % 4 === 0,
+        stats: {
+          posts: 50 + (userHash % 100),
+          followers: 500 + (userHash % 5000),
+          following: 100 + (userHash % 500),
+          communities: 10 + (userHash % 20),
+        },
+      },
+    };
+  },
+
+  async getUserStats(username) {
+    await delay();
+    return {
+      success: true,
+      data: {
+        postsCount: Math.floor(Math.random() * 100) + 20,
+        followersCount: Math.floor(Math.random() * 5000) + 500,
+        followingCount: Math.floor(Math.random() * 1000) + 100,
+      },
+    };
+  },
+
+  async getUserById(userId) {
+    await delay();
+    // Return different user data based on userId
+    const users = [
+      {
+        id: '1',
+        username: 'johndoe',
+        displayName: 'John Doe',
+        email: 'john@example.com',
+        avatar: `https://i.pravatar.cc/150?img=${userId || 1}`,
+        profilePhoto: `https://i.pravatar.cc/150?img=${userId || 1}`,
+        coverImage: 'https://picsum.photos/1200/400',
+        bio: 'Software developer and tech enthusiast. Love building cool stuff!',
+        location: 'San Francisco, CA',
+        website: 'https://johndoe.dev',
+        joinDate: '2023-01-15',
+        isFollowing: false,
+        isVerified: true,
+        stats: {
+          posts: 127,
+          followers: 4523,
+          following: 342,
+          communities: 23,
+        },
+      },
+      {
+        id: '2',
+        username: 'jansmith',
+        displayName: 'Jane Smith',
+        email: 'jane@example.com',
+        avatar: `https://i.pravatar.cc/150?img=${parseInt(userId) + 1 || 2}`,
+        profilePhoto: `https://i.pravatar.cc/150?img=${parseInt(userId) + 1 || 2}`,
+        coverImage: 'https://picsum.photos/1200/401',
+        bio: 'Designer, photographer, and coffee lover ☕',
+        location: 'New York, NY',
+        website: 'https://janesmith.com',
+        joinDate: '2023-03-20',
+        isFollowing: true,
+        isVerified: true,
+        stats: {
+          posts: 89,
+          followers: 2341,
+          following: 189,
+          communities: 15,
+        },
+      },
+    ];
+    
+    const userIndex = (parseInt(userId) - 1) % users.length;
+    const user = users[userIndex] || users[0];
+    
+    return {
+      success: true,
+      data: { ...user, id: userId },
     };
   },
 
@@ -220,11 +367,16 @@ export const mockApi = {
     await delay();
     return {
       success: true,
-      data: Array.from({ length: 10 }, (_, i) => ({
-        id: `user-${i}`,
-        username: `follower_${i}`,
-        profilePhoto: `https://i.pravatar.cc/50?img=${i}`,
-      })),
+      data: {
+        followers: Array.from({ length: 10 }, (_, i) => ({
+          id: `user-${i}`,
+          username: `follower_${i}`,
+          displayName: `Follower ${i}`,
+          profilePhoto: `https://i.pravatar.cc/50?img=${i}`,
+          avatar: `https://i.pravatar.cc/50?img=${i}`,
+          isFollowing: i % 3 === 0,
+        })),
+      },
     };
   },
 
@@ -232,11 +384,16 @@ export const mockApi = {
     await delay();
     return {
       success: true,
-      data: Array.from({ length: 10 }, (_, i) => ({
-        id: `user-${i}`,
-        username: `following_${i}`,
-        profilePhoto: `https://i.pravatar.cc/50?img=${i + 10}`,
-      })),
+      data: {
+        following: Array.from({ length: 10 }, (_, i) => ({
+          id: `user-${i}`,
+          username: `following_${i}`,
+          displayName: `Following ${i}`,
+          profilePhoto: `https://i.pravatar.cc/50?img=${i + 10}`,
+          avatar: `https://i.pravatar.cc/50?img=${i + 10}`,
+          isFollowing: true,
+        })),
+      },
     };
   },
 
@@ -287,6 +444,31 @@ export const mockApi = {
   async leaveCommunity(communityId) {
     await delay(200);
     return { success: true, data: { joined: false } };
+  },
+
+  async getCommunityBySlug(slug) {
+    await delay();
+    // Try to find by slug, id, or number
+    const communityId = typeof slug === 'string' ? parseInt(slug.replace(/\D/g, '')) || 1 : slug;
+    const community = mockCommunities.find(c => 
+      c.slug === slug || 
+      c.id === slug || 
+      c.id === communityId ||
+      c.id === parseInt(slug)
+    ) || mockCommunities[0];
+    return {
+      success: true,
+      data: community,
+    };
+  },
+
+  async getCommunityPosts(communityId) {
+    await delay();
+    const community = mockCommunities.find(c => c.id === parseInt(communityId) || c.slug === communityId) || mockCommunities[0];
+    return {
+      success: true,
+      data: { posts: community.posts || mockPosts.slice(0, 8) },
+    };
   },
 
   // Notifications
