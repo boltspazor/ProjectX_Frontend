@@ -18,16 +18,16 @@ export default function PostCard({
 }) {
   // Use post data if provided, otherwise fallback to defaults
   const postData = post || {};
-  const author = postData.author || {};
+  const author = postData.author || postData.user || {};
   
   const [liked, setLiked] = useState(postData.isLiked || false);
-  const [likes, setLikes] = useState(postData.likes || 0);
+  const [likes, setLikes] = useState(postData.likesCount || postData.likes || 0);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
-  const postImage = postData.images?.[0] || postSampleImage;
-  const profileImage = author.profilePicture || "https://i.pravatar.cc/100";
-  const username = author.username || "sheryanne_xoxo";
-  const caption = postData.caption || "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.";
+  const postImage = postData.imageUrl || postData.image || postData.images?.[0] || postSampleImage;
+  const profileImage = author.profilePhoto || author.profilePicture || postData.profileImage || "https://i.pravatar.cc/100";
+  const username = author.username || postData.username || "sheryanne_xoxo";
+  const caption = postData.caption || postData.content || "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.";
 
   const handleLike = async () => {
     const previousLiked = liked;
@@ -52,8 +52,8 @@ export default function PostCard({
   };
 
   const handleCommentClick = () => {
-    if (onCommentClick && (postData._id || postId !== undefined)) {
-      onCommentClick(postData._id || postId);
+    if (onCommentClick && (postData.id || postData._id || postId !== undefined)) {
+      onCommentClick(postData.id || postData._id || postId);
     }
   };
 

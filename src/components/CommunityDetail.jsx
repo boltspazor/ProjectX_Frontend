@@ -5,7 +5,6 @@ import Comments from "../components/Comments";
 import commentIcon from "../assets/comment.svg";
 import messageIcon from "../assets/message.svg";
 import { AnimatePresence } from "framer-motion";
-import { getCommunityById, addPostToCommunity } from "../data/communitiesData";
 import { saveCommunityDraft, getCommunityDrafts, deleteCommunityDraft } from "../utils/drafts";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import LiveBanner from "../components/LiveBanner";
@@ -31,29 +30,63 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
   const [passwordError, setPasswordError] = useState("");
   const [codeError, setCodeError] = useState("");
   const [error, setError] = useState("");
+  
+  // Community data state
+  const [community, setCommunity] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Get community data by ID
-  const community = getCommunityById(communityId);
+  // Fetch community data
+  useEffect(() => {
+    const fetchCommunityData = async () => {
+      setLoading(true);
+      try {
+        // Fetch community details
+        const communityData = await communityService.getCommunityBySlug(communityId);
+        setCommunity(communityData);
+        setIsJoined(communityData?.isJoined || false);
+
+        // Fetch community posts
+        const postsData = await communityService.getCommunityPosts(communityId);
+        setPosts(postsData?.posts || []);
+
+        // Initialize likes state
+        if (postsData?.posts) {
+          const likes = {};
+          postsData.posts.forEach(post => {
+            likes[post.id] = {
+              liked: post.liked || post.isLiked || false,
+              count: post.likesCount || post.likes || 0
+            };
+          });
+          setPostsLikes(likes);
+        }
+      } catch (err) {
+        console.error('Error fetching community data:', err);
+        setError('Failed to load community');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (communityId) {
+      fetchCommunityData();
+    }
+  }, [communityId, refreshKey]);
 
   // Check if user is admin/moderator
   const isAdmin = community?.creator === username || community?.creatorId === username;
   const isModerator = community?.moderators?.some(mod => mod.username === username || mod.id === username);
   const canManageSettings = isAdmin || isModerator;
 
-  // Initialize posts likes state from community posts
-  useEffect(() => {
-    const currentCommunity = getCommunityById(communityId);
-    if (currentCommunity && currentCommunity.posts) {
-      const likes = {};
-      currentCommunity.posts.forEach(post => {
-        likes[post.id] = {
-          liked: post.liked || false,
-          count: post.likes || 0
-        };
-      });
-      setPostsLikes(likes);
-    }
-  }, [communityId, refreshKey]);
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full bg-[#0b0b0b] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
 
   // If community not found, show error or redirect
   if (!community) {
@@ -71,11 +104,6 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
       </div>
     );
   }
-
-  // Get fresh community data (in case it was updated)
-  const currentCommunity = getCommunityById(communityId);
-  // Use community posts or empty array
-  const posts = currentCommunity?.posts || [];
 
   const handleJoin = () => {
     // If already joined, leave
@@ -179,22 +207,30 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
     setIsCreatePostOpen(true);
   };
 
-  const handlePostCreated = (postData) => {
-    // Add post to community
-    const newPost = addPostToCommunity(communityId, {
-      username: "idkwhoisrahul_04",
-      avatar: "https://i.pravatar.cc/100?img=30",
-      title: postData.title || "New Post",
-      content: postData.content || "",
-      category: postData.category || null,
-      image: postData.image || null,
-      likes: 0,
-      comments: 0,
-      commentsList: [],
-    });
+  const handlePostCreated = async (postData) => {
+    try {
+      // For now, just add post optimistically (API endpoint may not exist yet)
+      const newPost = {
+        id: 'post-' + Date.now(),
+        username: username,
+        avatar: "https://i.pravatar.cc/100?img=30",
+        title: postData.title || "New Post",
+        content: postData.content || "",
+        category: postData.category || null,
+        image: postData.image || null,
+        imageUrl: postData.image || null,
+        likes: 0,
+        likesCount: 0,
+        comments: 0,
+        commentsCount: 0,
+        commentsList: [],
+        isLiked: false,
+        liked: false,
+        createdAt: new Date().toISOString(),
+      };
 
-    // Update likes state for new post
-    if (newPost) {
+      // Update local state
+      setPosts(prev => [newPost, ...prev]);
       setPostsLikes(prev => ({
         ...prev,
         [newPost.id]: {
@@ -202,11 +238,14 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
           count: 0
         }
       }));
-    }
 
-    setIsCreatePostOpen(false);
-    // Force re-render by updating refresh key
-    setRefreshKey(prev => prev + 1);
+      setIsCreatePostOpen(false);
+      // Force re-render by updating refresh key
+      setRefreshKey(prev => prev + 1);
+    } catch (err) {
+      console.error('Error creating post:', err);
+      setError('Failed to create post');
+    }
   };
 
   return (

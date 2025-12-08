@@ -74,10 +74,10 @@ export default function HomePage({ setActiveView, onViewUserProfile }) {
     // Fetch comments if not already loaded
     if (!postsComments[postId]) {
       try {
-        const comments = await postService.getPostComments(postId);
+        const response = await postService.getPostComments(postId);
         setPostsComments((prev) => ({
           ...prev,
-          [postId]: comments
+          [postId]: response.comments || []
         }));
       } catch (err) {
         console.error("Error fetching comments:", err);
@@ -151,12 +151,12 @@ export default function HomePage({ setActiveView, onViewUserProfile }) {
           <div className="space-y-6">
             {posts.map((post) => (
               <PostCard
-                key={post._id}
+                key={post.id || post._id}
                 post={post}
-                postId={post._id}
+                postId={post.id || post._id}
                 variant="feed"
                 onCommentClick={handleCommentClick}
-                isActive={activePostId === post._id}
+                isActive={activePostId === (post.id || post._id)}
                 onViewUserProfile={onViewUserProfile}
               />
             ))}
