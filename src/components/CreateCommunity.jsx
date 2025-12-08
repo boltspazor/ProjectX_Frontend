@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { ArrowLeft, Globe, Eye, Lock, Upload } from "lucide-react";
 import { addCommunity } from "../data/communitiesData";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function CreateCommunity({ setActiveView }) {
+  const { username } = useUserProfile();
   const [communityName, setCommunityName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [communityType, setCommunityType] = useState("restricted");
   const [bannerPreview, setBannerPreview] = useState(null);
   const [iconPreview, setIconPreview] = useState(null);
+  const [bannerVideoPreview, setBannerVideoPreview] = useState(null);
+  const [profileVideoPreview, setProfileVideoPreview] = useState(null);
 
   const topics = ["Art", "Cooking", "Coding", "Law", "Business", "Design", "Finance", "Music", "Dance", "Technology", "Cars", "Food", "Places"];
 
@@ -40,6 +44,28 @@ export default function CreateCommunity({ setActiveView }) {
     }
   };
 
+  const handleBannerVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBannerVideoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleProfileVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileVideoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -57,6 +83,11 @@ export default function CreateCommunity({ setActiveView }) {
       cover: bannerPreview || "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
       icon: iconPreview || "https://i.pravatar.cc/100?img=60",
       avatar: iconPreview || "https://i.pravatar.cc/100?img=60",
+      bannerVideo: bannerVideoPreview || null,
+      profileVideo: profileVideoPreview || null,
+      creator: username,
+      creatorId: username,
+      code: `COMM${Date.now().toString().slice(-6)}`, // Temporary code, will be replaced by addCommunity
       type: communityType.charAt(0).toUpperCase() + communityType.slice(1),
       topics: selectedTopics,
       rules: [
@@ -152,6 +183,30 @@ export default function CreateCommunity({ setActiveView }) {
                     className="hidden"
                   />
                 </label>
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mt-2 mb-1">
+                  Live Banner Video (Optional)
+                </label>
+                <label className="block w-full h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-orange-500/50 rounded-lg cursor-pointer hover:border-orange-400 transition flex items-center justify-center">
+                  {bannerVideoPreview ? (
+                    <video
+                      src={bannerVideoPreview}
+                      className="w-full h-full object-cover rounded-lg"
+                      muted
+                      playsInline
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <Upload className="w-5 h-5 text-orange-500/70 mx-auto mb-1" />
+                      <span className="text-xs text-gray-500">Upload Video (10s max)</span>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleBannerVideoUpload}
+                    className="hidden"
+                  />
+                </label>
               </div>
 
               {/* Community Icon */}
@@ -175,6 +230,29 @@ export default function CreateCommunity({ setActiveView }) {
                     type="file"
                     accept="image/*"
                     onChange={handleIconUpload}
+                    className="hidden"
+                  />
+                </label>
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mt-2 mb-1">
+                  Live Profile Video (Optional)
+                </label>
+                <label className="block w-24 h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-orange-500/50 rounded-full cursor-pointer hover:border-orange-400 transition flex items-center justify-center overflow-hidden">
+                  {profileVideoPreview ? (
+                    <video
+                      src={profileVideoPreview}
+                      className="w-full h-full object-cover rounded-full"
+                      muted
+                      playsInline
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <Upload className="w-4 h-4 text-orange-500/70" />
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleProfileVideoUpload}
                     className="hidden"
                   />
                 </label>

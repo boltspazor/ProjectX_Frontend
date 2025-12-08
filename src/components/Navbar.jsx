@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../assets/logo.png";
+import logo from "../assets/baithub.svg";
 import bell from "../assets/bell.svg";
 import shop from "../assets/shop.svg";
 import ThemeToggle from "./ThemeToggle";
@@ -22,12 +22,12 @@ export default function Navbar({ setActiveView, onCreatePostClick }) {
     <header className="w-full h-14 md:h-16 border-b border-black dark:border-gray-800 px-4 md:px-2 flex items-center justify-between sticky top-0 bg-gradient-to-r from-orange-100 via-orange-50 to-orange-100 dark:from-black dark:via-gray-950 dark:to-black z-20">
       <div
         onClick={handleLogoClick}
-        className="flex items-center py-2 cursor-pointer hover:opacity-80 transition-opacity"
+        className="flex items-center py-2 cursor-pointer hover:opacity-80 transition-opacity ml-2 md:ml-4"
       >
         <img
           src={logo}
           alt="Project Logo"
-          className="h-10 md:h-12 w-auto select-none object-contain"
+          className="h-12 md:h-16 w-auto select-none object-contain"
         />
 
       </div>

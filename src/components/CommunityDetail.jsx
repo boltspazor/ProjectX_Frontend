@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ArrowLeft, Globe, Pencil, Heart, Bookmark, X } from "lucide-react";
+import { ArrowLeft, Globe, Pencil, Heart, Bookmark, X, Settings, Share2, Copy, Check } from "lucide-react";
 import ShareModal from "../components/ShareModal";
 import Comments from "../components/Comments";
 import commentIcon from "../assets/comment.svg";
@@ -8,18 +8,37 @@ import { AnimatePresence } from "framer-motion";
 import { getCommunityById, addPostToCommunity } from "../data/communitiesData";
 import { saveCommunityDraft, getCommunityDrafts, deleteCommunityDraft } from "../utils/drafts";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
+import LiveBanner from "../components/LiveBanner";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import { getCommunityBannerVideoUrl, getCommunityProfileVideoUrl } from "../utils/communityVideos";
+import { useUserProfile } from "../hooks/useUserProfile";
+import { communityService } from "../services/communityService";
 
 export default function CommunityDetail({ setActiveView, communityId, onViewUserProfile }) {
+  const { username } = useUserProfile();
   const [isJoined, setIsJoined] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [openCommentsPostId, setOpenCommentsPostId] = useState(null);
   const [postsLikes, setPostsLikes] = useState({});
   const [refreshKey, setRefreshKey] = useState(0);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [codeInput, setCodeInput] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [codeError, setCodeError] = useState("");
+  const [error, setError] = useState("");
 
   // Get community data by ID
   const community = getCommunityById(communityId);
+
+  // Check if user is admin/moderator
+  const isAdmin = community?.creator === username || community?.creatorId === username;
+  const isModerator = community?.moderators?.some(mod => mod.username === username || mod.id === username);
+  const canManageSettings = isAdmin || isModerator;
 
   // Initialize posts likes state from community posts
   useEffect(() => {
@@ -59,7 +78,76 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
   const posts = currentCommunity?.posts || [];
 
   const handleJoin = () => {
-    setIsJoined(!isJoined);
+    // If already joined, leave
+    if (isJoined) {
+      setIsJoined(false);
+      return;
+    }
+
+    // Restricted communities cannot be joined from outside
+    if (community.type === "Restricted") {
+      setError("This community is restricted. Only moderators can add members.");
+      setTimeout(() => setError(""), 5000);
+      return;
+    }
+
+    // Show community code modal first for all communities
+    setShowCodeModal(true);
+  };
+
+  const handleCodeSubmit = () => {
+    const communityCode = community.code || community.id?.toString() || "";
+    
+    if (codeInput.trim() !== communityCode) {
+      setCodeError("Invalid community code. Please try again.");
+      return;
+    }
+
+    setCodeError("");
+    setShowCodeModal(false);
+    setCodeInput("");
+
+    // If private community, show password modal after code is correct
+    if (community.type === "Private") {
+      setShowPasswordModal(true);
+    } else {
+      // For public communities, join after code verification
+      setIsJoined(true);
+      // Call API if needed
+      try {
+        communityService.joinCommunity(community.id);
+      } catch (err) {
+        console.error("Error joining community:", err);
+      }
+    }
+  };
+
+  const handlePasswordSubmit = () => {
+    // In a real app, verify password from API
+    // For now, check if password matches (this should come from community data or API)
+    const correctPassword = community.password || "";
+
+    if (!passwordInput.trim()) {
+      setPasswordError("Please enter a password.");
+      return;
+    }
+
+    if (passwordInput.trim() !== correctPassword && correctPassword) {
+      setPasswordError("Incorrect password. Please try again.");
+      return;
+    }
+
+    setPasswordError("");
+    setShowPasswordModal(false);
+    setPasswordInput("");
+    setIsJoined(true);
+
+    // Call API if needed
+    try {
+      communityService.joinCommunity(community.id, { password: passwordInput });
+    } catch (err) {
+      console.error("Error joining community:", err);
+    }
   };
 
   const handleTopicClick = (topic) => {
@@ -126,38 +214,42 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
       {/* Header with Banner */}
       <div className="relative w-full">
         {/* Banner Image */}
-        <div className="w-full h-64 md:h-80 overflow-hidden relative">
-          <img
-            src={community.banner}
+        <div className="w-full h-48 sm:h-64 md:h-80 overflow-hidden relative">
+          <LiveBanner
+            imageSrc={community.banner}
+            videoSrc={getCommunityBannerVideoUrl(community.id, community.banner, community)}
             alt={`${community.name} banner`}
-            className="w-full h-full object-cover"
+            className="w-full h-full"
+            maxDuration={10}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60 pointer-events-none" />
         </div>
 
         {/* Header Content */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-6 lg:px-8 pb-6">
+        <div className="absolute bottom-0 left-0 right-0 px-3 sm:px-4 md:px-6 lg:px-8 pb-4 sm:pb-6">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-start gap-4 md:gap-6">
+            <div className="flex items-start gap-3 sm:gap-4 md:gap-6">
               {/* Community Icon - Circular */}
-              <div className="relative -mb-4 md:-mb-6">
-                <div className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-white overflow-hidden shadow-xl bg-white">
-                  <img
-                    src={community.icon}
+              <div className="relative -mb-3 sm:-mb-4 md:-mb-6 flex-shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 rounded-full border-2 border-white overflow-hidden shadow-xl bg-white">
+                  <LiveProfilePhoto
+                    imageSrc={community.icon}
+                    videoSrc={getCommunityProfileVideoUrl(community.id, community.icon, community)}
                     alt={`${community.name} icon`}
-                    className="w-full h-full object-cover rounded-full"
+                    className="w-full h-full rounded-full"
+                    maxDuration={10}
                   />
                 </div>
               </div>
 
               {/* Community Info */}
-              <div className="flex-1 pt-2">
-                <div className="space-y-3">
+              <div className="flex-1 pt-1 sm:pt-2 min-w-0">
+                <div className="space-y-2 sm:space-y-3">
                   <div>
-                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 break-words">
                       {community.name}
                     </h1>
-                    <div className="flex items-center gap-4 text-sm md:text-base text-white/90">
+                    <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm md:text-base text-white/90 flex-wrap">
                       <span>{community.followers} Followers</span>
                       <span className="w-1 h-1 rounded-full bg-white/50" />
                       <span>{community.contributors} Contributors</span>
@@ -165,10 +257,10 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <button
                       onClick={handleJoin}
-                      className={`px-6 py-2.5 rounded-lg text-sm font-medium transition ${isJoined
+                      className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition flex-shrink-0 ${isJoined
                         ? "bg-gray-700 text-white border border-gray-600"
                         : "bg-orange-500 text-white hover:bg-orange-600"
                         }`}
@@ -177,10 +269,19 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     </button>
                     <button
                       onClick={handleAddPost}
-                      className="px-6 py-2.5 rounded-lg bg-transparent text-white border border-orange-500 text-sm font-medium hover:bg-orange-500/10 transition"
+                      className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg bg-transparent text-white border border-orange-500 text-xs sm:text-sm font-medium hover:bg-orange-500/10 transition flex-shrink-0"
                     >
                       Add Post
                     </button>
+                    {canManageSettings && (
+                      <button
+                        onClick={() => setActiveView("communitySettings", communityId)}
+                        className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg bg-transparent text-white border border-orange-500 text-xs sm:text-sm font-medium hover:bg-orange-500/10 transition flex items-center gap-1 sm:gap-2 flex-shrink-0"
+                      >
+                        <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">Settings</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -191,18 +292,18 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
         {/* Back Button */}
         <button
           onClick={() => setActiveView("communities", null)}
-          className="absolute top-4 left-4 p-2 bg-black/50 hover:bg-black/70 dark:bg-black/50 dark:hover:bg-black/70 rounded-full transition backdrop-blur-sm"
+          className="absolute top-2 sm:top-4 left-2 sm:left-4 p-1.5 sm:p-2 bg-black/50 hover:bg-black/70 dark:bg-black/50 dark:hover:bg-black/70 rounded-full transition backdrop-blur-sm z-10"
         >
-          <ArrowLeft className="w-5 h-5 text-white" />
+          <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
         </button>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Left Sidebar */}
           <aside className="lg:col-span-1 space-y-6">
             {/* Community Information */}
-            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-4 space-y-4">
+            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-3 sm:p-4 space-y-3 sm:space-y-4">
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                 <Pencil className="w-4 h-4 text-orange-500" />
                 <span>Created {community.createdDate}</span>
@@ -231,10 +332,68 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                   ))}
                 </ul>
               </div>
+
+              {/* Community Code */}
+              <div>
+                <h3 className="text-black dark:text-white font-semibold mb-2">Community Code</h3>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                  Share this code with others to invite them to join this community
+                </p>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3">
+                  <div className="flex-1 px-3 sm:px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg min-w-0">
+                    <p className="text-xs sm:text-sm font-mono text-black dark:text-white break-all">
+                      {community.code || community.id?.toString() || "N/A"}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const code = community.code || community.id?.toString() || "";
+                      navigator.clipboard.writeText(code);
+                      setCopiedCode(true);
+                      setTimeout(() => setCopiedCode(false), 2000);
+                    }}
+                    className="px-3 sm:px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2 text-xs sm:text-sm whitespace-nowrap"
+                  >
+                    {copiedCode ? (
+                      <>
+                        <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
+                <button
+                  onClick={() => {
+                    const communityLink = `${window.location.origin}/community/${community.id}`;
+                    navigator.clipboard.writeText(communityLink);
+                    setCopiedLink(true);
+                    setTimeout(() => setCopiedLink(false), 2000);
+                  }}
+                  className="w-full px-3 sm:px-4 py-2 bg-transparent border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500/10 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+                >
+                  {copiedLink ? (
+                    <>
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                      Link Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Share Community Link</span>
+                      <span className="sm:hidden">Share Link</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Search By Topic */}
-            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-4">
+            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-3 sm:p-4">
               <h3 className="text-black dark:text-white font-semibold mb-3">Search By Topic</h3>
               <div className="flex flex-wrap gap-2">
                 {community.topics.map((topic, index) => (
@@ -253,7 +412,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
             </div>
 
             {/* Moderators */}
-            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-4">
+            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-3 sm:p-4">
               <h3 className="text-black dark:text-white font-semibold mb-3">Moderators</h3>
               <div className="space-y-3">
                 {community.moderators.map((mod) => (
@@ -279,35 +438,35 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
           </aside>
 
           {/* Main Content - Posts */}
-          <main className="lg:col-span-2 space-y-6">
+          <main className="lg:col-span-2 space-y-4 sm:space-y-6">
             {posts.map((post) => {
               const postLikeData = postsLikes[post.id] || { liked: false, count: post.likes || 0 };
               return (
                 <div
                   key={post.id}
-                  className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-6 space-y-4"
+                  className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4"
                 >
                   {/* Post Header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex-shrink-0">
                         <LiveProfilePhoto
                           imageSrc={post.avatar}
                           videoSrc={getProfileVideoUrl(post.avatar, post.username)}
                           alt={post.username}
-                          className="w-10 h-10 rounded-full"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
                         />
                       </div>
                       <button
                         onClick={() => onViewUserProfile && onViewUserProfile(post.username)}
-                        className="text-black dark:text-white font-medium hover:opacity-70 transition-opacity cursor-pointer"
+                        className="text-sm sm:text-base text-black dark:text-white font-medium hover:opacity-70 transition-opacity cursor-pointer truncate"
                       >
                         {post.username}
                       </button>
                     </div>
                     {/* Category Badge (Reddit-style) */}
                     {post.category && (
-                      <span className="px-3 py-1 text-xs font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full">
+                      <span className="px-2 sm:px-3 py-1 text-xs font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full flex-shrink-0">
                         {post.category}
                       </span>
                     )}
@@ -315,12 +474,12 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
 
                   {/* Post Title */}
                   {post.title && (
-                    <h3 className="text-black dark:text-white font-bold text-lg">{post.title}</h3>
+                    <h3 className="text-black dark:text-white font-bold text-base sm:text-lg">{post.title}</h3>
                   )}
 
                   {/* Post Content */}
                   {post.content && (
-                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{post.content}</p>
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">{post.content}</p>
                   )}
 
                   {/* Post Image (if exists) - 4:3 aspect ratio */}
@@ -335,19 +494,19 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                   )}
 
                   {/* Interaction Icons */}
-                  <div className="flex items-center gap-4 pt-2 border-t border-black dark:border-gray-800">
+                  <div className="flex items-center gap-3 sm:gap-4 pt-2 border-t border-black dark:border-gray-800">
                     <button
                       onClick={() => handleLike(post.id)}
-                      className="flex items-center gap-2 focus:outline-none group"
+                      className="flex items-center gap-1.5 sm:gap-2 focus:outline-none group"
                     >
                       <Heart
-                        className={`w-5 h-5 transition-all ${postLikeData.liked
+                        className={`w-4 h-4 sm:w-5 sm:h-5 transition-all ${postLikeData.liked
                           ? "fill-red-500 text-red-500"
                           : "text-gray-600 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-white"
                           }`}
                       />
                       <span
-                        className={`text-sm ${postLikeData.liked
+                        className={`text-xs sm:text-sm ${postLikeData.liked
                           ? "text-red-500 font-semibold"
                           : "text-gray-600 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-white"
                           }`}
@@ -357,16 +516,16 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     </button>
                     <button
                       onClick={() => handleCommentClick(post.id)}
-                      className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition"
+                      className="flex items-center gap-1.5 sm:gap-2 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition"
                     >
-                      <img src={commentIcon} alt="comment" className="w-5 h-5 opacity-70 dark:opacity-100 brightness-0 dark:brightness-100" />
-                      <span className="text-sm">{post.comments || 0}</span>
+                      <img src={commentIcon} alt="comment" className="w-4 h-4 sm:w-5 sm:h-5 opacity-70 dark:opacity-100 brightness-0 dark:brightness-100" />
+                      <span className="text-xs sm:text-sm">{post.comments || 0}</span>
                     </button>
                     <button
                       onClick={() => setIsShareModalOpen(true)}
-                      className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition"
+                      className="flex items-center gap-1.5 sm:gap-2 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition"
                     >
-                      <img src={messageIcon} alt="share" className="w-5 h-5 opacity-70 dark:opacity-100 brightness-0 dark:brightness-100" />
+                      <img src={messageIcon} alt="share" className="w-4 h-4 sm:w-5 sm:h-5 opacity-70 dark:opacity-100 brightness-0 dark:brightness-100" />
                     </button>
                   </div>
                 </div>
@@ -391,6 +550,112 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
 
       {/* Share Modal */}
       <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} onViewUserProfile={onViewUserProfile} />
+
+      {/* Community Code Modal */}
+      {showCodeModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#121212] rounded-xl p-6 max-w-md w-full border border-black dark:border-gray-800">
+            <h2 className="text-xl font-semibold text-black dark:text-white mb-2">Enter Community Code</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Please enter the community code to join this community.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="text"
+                  value={codeInput}
+                  onChange={(e) => {
+                    setCodeInput(e.target.value);
+                    setCodeError("");
+                  }}
+                  placeholder="Enter community code"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  autoFocus
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleCodeSubmit();
+                    }
+                  }}
+                />
+                {codeError && (
+                  <p className="text-sm text-red-500 mt-2">{codeError}</p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowCodeModal(false);
+                    setCodeInput("");
+                    setCodeError("");
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCodeSubmit}
+                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#121212] rounded-xl p-6 max-w-md w-full border border-black dark:border-gray-800">
+            <h2 className="text-xl font-semibold text-black dark:text-white mb-2">Enter Password</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              This is a private community. Please enter the password to join.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  value={passwordInput}
+                  onChange={(e) => {
+                    setPasswordInput(e.target.value);
+                    setPasswordError("");
+                  }}
+                  placeholder="Enter password"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  autoFocus
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handlePasswordSubmit();
+                    }
+                  }}
+                />
+                {passwordError && (
+                  <p className="text-sm text-red-500 mt-2">{passwordError}</p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setPasswordInput("");
+                    setPasswordError("");
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePasswordSubmit}
+                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                >
+                  Join
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create Post Modal */}
       <CreateCommunityPost

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { communityService } from "../services/communityService";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { getCommunityProfileVideoUrl } from "../utils/communityVideos";
 
 export default function DiscoverCommunities({ onBack }) {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -9,6 +11,13 @@ export default function DiscoverCommunities({ onBack }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [joiningIds, setJoiningIds] = useState(new Set());
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [codeInput, setCodeInput] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [codeError, setCodeError] = useState("");
+  const [selectedCommunity, setSelectedCommunity] = useState(null);
 
   const categories = [
     "All",
@@ -53,9 +62,70 @@ export default function DiscoverCommunities({ onBack }) {
     }
   };
 
-  const handleJoinCommunity = async (communityId) => {
-    if (joiningIds.has(communityId)) return;
+  const handleJoinCommunity = (community) => {
+    if (joiningIds.has(community.id)) return;
+
+    // Restricted communities cannot be joined
+    if (community.type === "Restricted") {
+      setError("This community is restricted. Only moderators can add members.");
+      setTimeout(() => setError(""), 5000);
+      return;
+    }
+
+    setSelectedCommunity(community);
+    setShowCodeModal(true);
+  };
+
+  const handleCodeSubmit = () => {
+    if (!selectedCommunity) return;
+
+    const communityCode = selectedCommunity.code || selectedCommunity.id?.toString() || "";
     
+    if (codeInput.trim() !== communityCode) {
+      setCodeError("Invalid community code. Please try again.");
+      return;
+    }
+
+    setCodeError("");
+    setShowCodeModal(false);
+    setCodeInput("");
+
+    // If private community, show password modal after code is correct
+    if (selectedCommunity.type === "Private") {
+      setShowPasswordModal(true);
+    } else {
+      // For public communities, join after code verification
+      joinCommunityAfterVerification();
+    }
+  };
+
+  const handlePasswordSubmit = async () => {
+    if (!selectedCommunity) return;
+
+    // In a real app, verify password from API
+    const correctPassword = selectedCommunity.password || "";
+
+    if (!passwordInput.trim()) {
+      setPasswordError("Please enter a password.");
+      return;
+    }
+
+    if (passwordInput.trim() !== correctPassword && correctPassword) {
+      setPasswordError("Incorrect password. Please try again.");
+      return;
+    }
+
+    setPasswordError("");
+    setShowPasswordModal(false);
+    setPasswordInput("");
+    
+    await joinCommunityAfterVerification();
+  };
+
+  const joinCommunityAfterVerification = async () => {
+    if (!selectedCommunity) return;
+    const communityId = selectedCommunity.id;
+
     try {
       setJoiningIds(prev => new Set(prev).add(communityId));
       await communityService.joinCommunity(communityId);
@@ -65,25 +135,30 @@ export default function DiscoverCommunities({ onBack }) {
       setCategoryCommunities(prev => prev.filter(c => c.id !== communityId));
     } catch (err) {
       console.error('Error joining community:', err);
+      setError("Failed to join community. Please try again.");
+      setTimeout(() => setError(""), 5000);
     } finally {
       setJoiningIds(prev => {
         const newSet = new Set(prev);
         newSet.delete(communityId);
         return newSet;
       });
+      setSelectedCommunity(null);
     }
   };
 
   const CommunityCard = ({ community, onJoin, isJoining }) => (
     <div className="bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 rounded-2xl p-4 hover:border-orange-500 transition-all duration-300">
       <div className="flex items-start gap-3">
-        <img
-          src={community.avatar}
-          alt={community.name}
-          className="w-12 h-12 rounded-xl object-cover"
-          loading="lazy"
-          decoding="async"
-        />
+        <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+          <LiveProfilePhoto
+            imageSrc={community.avatar}
+            videoSrc={getCommunityProfileVideoUrl(community.id, community.avatar, community)}
+            alt={community.name}
+            className="w-12 h-12 rounded-xl"
+            maxDuration={10}
+          />
+        </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-black dark:text-white font-medium">{community.name}</h3>
           <p className="text-gray-600 dark:text-gray-400 text-xs">{community.members}</p>
@@ -91,13 +166,23 @@ export default function DiscoverCommunities({ onBack }) {
             {community.description}
           </p>
         </div>
-        <button
-          onClick={() => onJoin(community.id)}
-          disabled={isJoining}
-          className="px-4 py-1.5 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-full transition-colors flex-shrink-0"
-        >
-          {isJoining ? 'Joining...' : 'Join'}
-        </button>
+        {community.type === "Restricted" ? (
+          <button
+            disabled
+            className="px-4 py-1.5 bg-gray-500/50 text-gray-400 text-sm font-medium rounded-full cursor-not-allowed flex-shrink-0"
+            title="Restricted communities can only be joined by invitation"
+          >
+            Restricted
+          </button>
+        ) : (
+          <button
+            onClick={() => onJoin(community)}
+            disabled={isJoining}
+            className="px-4 py-1.5 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-full transition-colors flex-shrink-0"
+          >
+            {isJoining ? 'Joining...' : 'Join'}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -125,7 +210,13 @@ export default function DiscoverCommunities({ onBack }) {
           </div>
         )}
 
-        {error && (
+        {error && typeof error === 'string' && error.includes('restricted') && (
+          <div className="mb-4 p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm">
+            {error}
+          </div>
+        )}
+        
+        {error && typeof error === 'string' && !error.includes('restricted') && (
           <div className="text-center py-12">
             <p className="text-red-500 mb-4">{error}</p>
             <button
@@ -205,7 +296,122 @@ export default function DiscoverCommunities({ onBack }) {
         )}
           </>
         )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="mt-4 p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm">
+            {error}
+          </div>
+        )}
       </div>
+
+      {/* Community Code Modal */}
+      {showCodeModal && selectedCommunity && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#121212] rounded-xl p-6 max-w-md w-full border border-black dark:border-gray-800">
+            <h2 className="text-xl font-semibold text-black dark:text-white mb-2">Enter Community Code</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Please enter the community code to join this community.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="text"
+                  value={codeInput}
+                  onChange={(e) => {
+                    setCodeInput(e.target.value);
+                    setCodeError("");
+                  }}
+                  placeholder="Enter community code"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  autoFocus
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleCodeSubmit();
+                    }
+                  }}
+                />
+                {codeError && (
+                  <p className="text-sm text-red-500 mt-2">{codeError}</p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowCodeModal(false);
+                    setCodeInput("");
+                    setCodeError("");
+                    setSelectedCommunity(null);
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCodeSubmit}
+                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password Modal */}
+      {showPasswordModal && selectedCommunity && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#121212] rounded-xl p-6 max-w-md w-full border border-black dark:border-gray-800">
+            <h2 className="text-xl font-semibold text-black dark:text-white mb-2">Enter Password</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              This is a private community. Please enter the password to join.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  value={passwordInput}
+                  onChange={(e) => {
+                    setPasswordInput(e.target.value);
+                    setPasswordError("");
+                  }}
+                  placeholder="Enter password"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  autoFocus
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handlePasswordSubmit();
+                    }
+                  }}
+                />
+                {passwordError && (
+                  <p className="text-sm text-red-500 mt-2">{passwordError}</p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setPasswordInput("");
+                    setPasswordError("");
+                    setSelectedCommunity(null);
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePasswordSubmit}
+                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                >
+                  Join
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

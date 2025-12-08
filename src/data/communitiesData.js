@@ -182,9 +182,12 @@ export const getCommunityById = (id) => {
 // Add new community
 export const addCommunity = (communityData) => {
   const newId = Math.max(...communitiesData.map((c) => c.id), 0) + 1;
+  // Generate unique community code
+  const communityCode = `COMM${newId.toString().padStart(6, '0')}`;
   const newCommunity = {
     id: newId,
     ...communityData,
+    code: communityCode,
     followers: "0",
     contributors: "0",
     createdDate: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),

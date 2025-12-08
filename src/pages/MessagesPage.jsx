@@ -22,6 +22,27 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Read receipt settings - load from localStorage
+  const [readReceiptsEnabled, setReadReceiptsEnabled] = useState(() => {
+    const saved = localStorage.getItem('readReceiptsEnabled');
+    return saved !== null ? saved === 'true' : true; // Default to enabled
+  });
+
+  // Listen for changes to read receipts setting
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem('readReceiptsEnabled');
+      setReadReceiptsEnabled(saved !== null ? saved === 'true' : true);
+    };
+    window.addEventListener('storage', handleStorageChange);
+    // Also check periodically for same-tab updates
+    const interval = setInterval(handleStorageChange, 500);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
 
   const themes = {
     default: {
@@ -78,7 +99,12 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
         id: msg._id,
         text: msg.content,
         sender: msg.isCurrentUser ? 'sender' : 'receiver',
-        time: new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+        time: new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+        // Read receipt status - check if message was delivered/seen
+        // Assuming API returns: delivered (when received), read (when seen)
+        status: msg.isCurrentUser ? (msg.read ? 'read' : (msg.delivered ? 'delivered' : 'sent')) : null,
+        delivered: msg.delivered || false,
+        read: msg.read || false,
       }));
       
       setMessages(transformedMsgs);
@@ -144,7 +170,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
     if (!messageInput.trim() || !activeChat || sendingMessage) return;
 
     const messageText = messageInput.trim();
-    setMessageInput("");
+      setMessageInput("");
     setSendingMessage(true);
 
     // Optimistically add message to UI
@@ -152,12 +178,29 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
       id: Date.now(),
       text: messageText,
       sender: 'sender',
-      time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      status: 'sent',
+      delivered: false,
+      read: false,
     };
     setMessages([...messages, tempMessage]);
 
     try {
-      await messageService.sendMessage(activeChat._id, { content: messageText });
+      const sentMessage = await messageService.sendMessage(activeChat._id, { content: messageText });
+      
+      // Update the optimistic message with actual message data and mark as delivered
+      setMessages(prevMsgs =>
+        prevMsgs.map(msg =>
+          msg.id === tempMessage.id
+            ? {
+                ...msg,
+                id: sentMessage._id || sentMessage.id || msg.id,
+                status: 'delivered', // Assume delivered after successful send
+                delivered: true,
+              }
+            : msg
+        )
+      );
       
       // Update conversation list with new last message
       setConversations(prevConvos =>
@@ -236,11 +279,11 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                   : "";
                 
                 return (
-                  <div
+                <div
                     key={convo._id}
                     onClick={() => handleChatClick(convo)}
                     className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 hover:border-orange-500 cursor-pointer transition"
-                  >
+                >
                   {/* Profile Picture */}
                   <div className="relative flex-shrink-0">
                     <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden">
@@ -249,10 +292,10 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                         videoSrc={getProfileVideoUrl(otherUser.profilePicture, otherUser.username)}
                         alt={otherUser.username || "User"}
                         className="w-12 h-12 md:w-14 md:h-14 rounded-full"
-                      />
+                    />
                     </div>
                     {convo.unreadCount > 0 && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-red-500 rounded-full border-2 border-black"></div>
+                      <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-orange-500 rounded-full border-2 border-black dark:border-gray-800"></div>
                     )}
                   </div>
 
@@ -289,10 +332,10 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
             {/* Chat Header */}
             <div className="flex items-center justify-between p-4 border-b border-black dark:border-gray-800 bg-[#fffcfa] dark:bg-[#0f0f0f] relative">
               <div className="flex items-center gap-3">
-                <button
-                  onClick={handleBackClick}
+              <button
+                onClick={handleBackClick}
                   className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition"
-                >
+              >
                   <ArrowLeft className="w-5 h-5 text-black dark:text-white" />
                 </button>
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex-shrink-0">
@@ -303,12 +346,18 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                     className="w-10 h-10 md:w-12 md:h-12 rounded-full"
                   />
                 </div>
-                <button
-                  onClick={() => onViewUserProfile && onViewUserProfile(activeChat.otherUser?.username)}
-                  className="font-semibold text-base md:text-lg text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
-                >
-                  {activeChat.otherUser?.username || "Unknown User"}
-                </button>
+                <div className="flex flex-col">
+                  <button
+                    onClick={() => onViewUserProfile && onViewUserProfile(activeChat.otherUser?.username)}
+                    className="font-semibold text-base md:text-lg text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer text-left"
+                  >
+                    {activeChat.otherUser?.username || "Unknown User"}
+                  </button>
+                  {/* Online Status Indicator */}
+                  {activeChat.otherUser?.isOnline && (
+                    <span className="text-xs text-orange-500 font-medium">online</span>
+                  )}
+                </div>
               </div>
               <div className="relative" ref={themePickerRef}>
                 <button
@@ -317,7 +366,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                   aria-label="Change chat theme"
                 >
                   <img src={themeIcon} alt="theme" className="w-5 h-5 dark:invert" />
-                </button>
+              </button>
                 {showThemePicker && (
                   <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 rounded-xl shadow-2xl p-3 z-20">
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">Chat themes</p>
@@ -327,7 +376,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                         className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "cat" ? "border-orange-500" : "border-gray-300 dark:border-gray-700"}`}
                         style={{ backgroundImage: `url(${catTheme})`, backgroundSize: "cover", backgroundPosition: "center" }}
                         aria-label="Cat theme"
-                      />
+              />
                       <button
                         onClick={() => handleSelectTheme("xoxo")}
                         className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "xoxo" ? "border-orange-500" : "border-gray-300 dark:border-gray-700"}`}
@@ -351,21 +400,40 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                 </div>
               ) : (
                 <>
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.sender === 'sender' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${message.sender === 'sender'
-                          ? themes[currentTheme]?.senderBubble || themes.default.senderBubble
-                          : themes[currentTheme]?.receiverBubble || themes.default.receiverBubble
-                          }`}
-                      >
-                        <p className="text-sm md:text-base">{message.text}</p>
-                      </div>
-                    </div>
-                  ))}
+                  {messages.map((message, index) => {
+                    // Find the last sender message to show read receipt only on it
+                    const senderMessages = messages.filter(msg => msg.sender === 'sender');
+                    const lastSenderMessage = senderMessages[senderMessages.length - 1];
+                    const isLastSenderMessage = message.id === lastSenderMessage?.id;
+                    
+                    return (
+                <div
+                  key={message.id}
+                        className={`flex flex-col ${message.sender === 'sender' ? 'items-end' : 'items-start'}`}
+                >
+                  <div
+                          className={`max-w-[75%] md:max-w-[60%] rounded-2xl px-4 py-2 ${message.sender === 'sender'
+                            ? themes[currentTheme]?.senderBubble || themes.default.senderBubble
+                            : themes[currentTheme]?.receiverBubble || themes.default.receiverBubble
+                    }`}
+                  >
+                    <p className="text-sm md:text-base">{message.text}</p>
+                  </div>
+                        {/* Read Receipts - Only show on the last sender message and if read receipts are enabled */}
+                        {message.sender === 'sender' && isLastSenderMessage && readReceiptsEnabled && (
+                          <div className="mt-1 px-1">
+                            {message.status === 'read' ? (
+                              <span className="text-xs text-gray-400 dark:text-gray-500">Seen</span>
+                            ) : message.status === 'delivered' ? (
+                              <span className="text-xs text-gray-400 dark:text-gray-500">Delivered</span>
+                            ) : (
+                              <span className="text-xs text-gray-400 dark:text-gray-500">Sent</span>
+                            )}
+                          </div>
+                        )}
+                </div>
+                    );
+                  })}
                   <div ref={messagesEndRef} />
                 </>
               )}

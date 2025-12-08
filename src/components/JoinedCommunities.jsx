@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { communityService } from "../services/communityService";
+import LiveBanner from "./LiveBanner";
+import LiveProfilePhoto from "./LiveProfilePhoto";
+import { getCommunityBannerVideoUrl, getCommunityProfileVideoUrl } from "../utils/communityVideos";
 
 export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
   const [communities, setCommunities] = useState([]);
@@ -110,21 +113,25 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
             className="group relative rounded-3xl border border-black dark:border-gray-800 bg-white dark:bg-[#121212] transition-all duration-500 hover:border-orange-500 hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] cursor-pointer"
           >
             <div className="relative h-40 overflow-hidden rounded-t-3xl">
-              <img
-                src={community.cover}
+              <LiveBanner
+                imageSrc={community.cover}
+                videoSrc={getCommunityBannerVideoUrl(community.id, community.cover, community)}
                 alt={`${community.name} cover`}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="h-full w-full transition-transform duration-500 group-hover:scale-105"
+                maxDuration={10}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent opacity-60" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent opacity-60 pointer-events-none" />
             </div>
 
             <div className="relative pt-12 pb-6 px-6">
               <div className="absolute -top-8 left-6">
                 <div className="w-16 h-16 rounded-2xl border-4 border-[#121212] overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.35)]">
-                  <img
-                    src={community.avatar}
+                  <LiveProfilePhoto
+                    imageSrc={community.avatar}
+                    videoSrc={getCommunityProfileVideoUrl(community.id, community.avatar, community)}
                     alt={`${community.name} avatar`}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full rounded-2xl"
+                    maxDuration={10}
                   />
                 </div>
               </div>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ChevronDown, ChevronUp, MapPin, UserPlus, Smile, X, Music, Type, Filter, Edit3, Crop, Sun, Contrast, Droplet, Thermometer, Circle } from "lucide-react";
 import EmojiPickerReact from 'emoji-picker-react';
@@ -16,6 +16,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
   const [aspectRatio, setAspectRatio] = useState("4:3");
   const [cropData, setCropData] = useState({ x: 0, y: 0, zoom: 1 });
   const [imageDimensions, setImageDimensions] = useState({ width: 1000, height: 1000 });
+  const [containerDimensions, setContainerDimensions] = useState({ width: 600, height: 600 });
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [activeTab, setActiveTab] = useState("filters"); // "filters" or "adjustments"
@@ -100,6 +101,76 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
     imageDimensions.height || 1000,
     aspectRatio
   );
+
+  // Calculate display aspect ratio value
+  const displayAspectRatio = useMemo(() => {
+    if (aspectRatio === "original") {
+      if (imageDimensions.width && imageDimensions.height) {
+        return `${imageDimensions.width} / ${imageDimensions.height}`;
+      }
+      return "1 / 1";
+    }
+    return aspectRatio.replace(':', ' / ');
+  }, [aspectRatio, imageDimensions.width, imageDimensions.height]);
+
+  // Calculate image display size to cover container while maintaining aspect ratio
+  const imageDisplaySize = useMemo(() => {
+    if (!imageDimensions.width || !imageDimensions.height) {
+      return { width: '100%', height: '100%' };
+    }
+    
+    const imageAspectRatio = imageDimensions.width / imageDimensions.height;
+    const containerAspectRatio = containerDimensions.width / containerDimensions.height;
+    
+    // Size image to cover container (be at least as large in both dimensions)
+    // Base size without zoom - zoom is applied via transform
+    if (imageAspectRatio > containerAspectRatio) {
+      // Image is wider - height determines size
+      return {
+        width: `${containerDimensions.height * imageAspectRatio}px`,
+        height: `${containerDimensions.height}px`
+      };
+    } else {
+      // Image is taller - width determines size
+      return {
+        width: `${containerDimensions.width}px`,
+        height: `${containerDimensions.width / imageAspectRatio}px`
+      };
+    }
+  }, [imageDimensions.width, imageDimensions.height, containerDimensions.width, containerDimensions.height]);
+
+  // Update container dimensions when it resizes
+  useEffect(() => {
+    if (step !== "crop" || !cropContainerRef.current) return;
+    
+    const updateContainerSize = () => {
+      if (cropContainerRef.current) {
+        const rect = cropContainerRef.current.getBoundingClientRect();
+        setContainerDimensions({
+          width: rect.width,
+          height: rect.height
+        });
+      }
+    };
+    
+    updateContainerSize();
+    
+    // Use ResizeObserver if available, otherwise use window resize
+    let resizeObserver;
+    if (window.ResizeObserver && cropContainerRef.current) {
+      resizeObserver = new ResizeObserver(updateContainerSize);
+      resizeObserver.observe(cropContainerRef.current);
+    }
+    
+    window.addEventListener('resize', updateContainerSize);
+    
+    return () => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      window.removeEventListener('resize', updateContainerSize);
+    };
+  }, [step, aspectRatio]);
 
   // Get filter style for thumbnails
   const getFilterStyle = (filterName) => {
@@ -994,7 +1065,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                       alt="Upload"
                       className="w-20 h-20 invert"
                     />
-                  </div>
+        </div>
 
                   <p className="text-gray-300 text-lg">Drag photos and videos here</p>
                   <button
@@ -1056,12 +1127,13 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                   {/* Image with crop overlay - draggable */}
                   <div
                     ref={cropContainerRef}
-                    className="relative max-w-full max-h-full"
+                    className="relative"
                     style={{
-                      width: `${cropBoxDims.width}px`,
-                      height: `${cropBoxDims.height}px`,
-                      maxWidth: "90vw",
-                      maxHeight: "80vh"
+                      width: 'min(600px, calc(100vw - 400px))',
+                      maxHeight: 'calc(100vh - 200px)',
+                      aspectRatio: displayAspectRatio,
+                      minWidth: '300px',
+                      minHeight: '300px'
                     }}
                   >
                     {/* Grid lines - constrained to crop area */}
@@ -1082,17 +1154,30 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                         alt="Crop preview"
                         className="absolute top-1/2 left-1/2 select-none"
                         style={{
-                          transform: `translate(-50%, -50%) scale(${cropData.zoom}) translate(${cropData.x / cropData.zoom}px, ${cropData.y / cropData.zoom}px)`,
+                          transform: `translate(-50%, -50%) translate(${cropData.x}px, ${cropData.y}px) scale(${cropData.zoom})`,
                           cursor: isDraggingImage ? 'grabbing' : 'grab',
                           maxWidth: 'none',
-                          height: '100%',
-                          width: 'auto'
+                          maxHeight: 'none',
+                          width: imageDisplaySize.width,
+                          height: imageDisplaySize.height,
+                          objectFit: 'none'
                         }}
                         onMouseDown={handleImageMouseDown}
-                        onLoad={(e) => setImageDimensions({
-                          width: e.target.naturalWidth || imageDimensions.width,
-                          height: e.target.naturalHeight || imageDimensions.height
-                        })}
+                        onLoad={(e) => {
+                          const img = e.target;
+                          setImageDimensions({
+                            width: img.naturalWidth || imageDimensions.width,
+                            height: img.naturalHeight || imageDimensions.height
+                          });
+                          // Update container size after image loads
+                          if (cropContainerRef.current) {
+                            const rect = cropContainerRef.current.getBoundingClientRect();
+                            setContainerDimensions({
+                              width: rect.width,
+                              height: rect.height
+                            });
+                          }
+                        }}
                         draggable={false}
                       />
                     </div>
@@ -1519,8 +1604,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                     </button>
                   </div>
                   <div className="flex-1 overflow-y-auto p-4">
-                    <input
-                      type="text"
+        <input
+          type="text"
                       placeholder="Search for people..."
                       value={tagSearch}
                       onChange={(e) => setTagSearch(e.target.value)}
@@ -2126,8 +2211,8 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                             }`}
                         >
                           {filter.label}
-                        </span>
-                      </button>
+          </span>
+        </button>
                     ))}
                   </div>
                 </div>
@@ -2160,7 +2245,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                 >
                   Done
                 </button>
-              </div>
+        </div>
 
               {/* Crop Area */}
               <div className="flex-1 relative bg-black overflow-hidden flex items-center justify-center p-4">
@@ -2563,9 +2648,9 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                               className="sr-only peer"
                             />
                             <div className="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-                          </label>
-                        </div>
-                      </div>
+        </label>
+      </div>
+    </div>
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm text-white">Turn off commenting</span>
