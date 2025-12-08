@@ -133,15 +133,15 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
 
       // Fetch user posts
       const userPosts = await postService.getUserPosts(username);
-      setPosts(userPosts.posts || []);
+      setPosts(userPosts?.posts || userPosts || []);
 
       // Fetch followers
-      const followers = await userService.getUserFollowers(username);
-      setFollowersList(followers || []);
+      const followersData = await userService.getUserFollowers(username);
+      setFollowersList(followersData?.followers || followersData || []);
 
       // Fetch following
-      const following = await userService.getUserFollowing(username);
-      setFollowingList(following || []);
+      const followingData = await userService.getUserFollowing(username);
+      setFollowingList(followingData?.following || followingData || []);
     } catch (err) {
       console.error("Error fetching profile data:", err);
       setError(err.message || "Failed to load profile");

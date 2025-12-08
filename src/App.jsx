@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
@@ -27,6 +28,13 @@ export default function App() {
   const [selectedChatUsername, setSelectedChatUsername] = useState(null);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [authView, setAuthView] = useState("login"); // "login" or "signup"
+  
+  // Swipe gesture detection for mobile
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const touchStartY = useRef(0);
+  const touchEndY = useRef(0);
+  const [swipeDirection, setSwipeDirection] = useState(0); // -1 for left, 1 for right
 
   // Handle login success
   const handleLogin = () => {
@@ -104,6 +112,61 @@ export default function App() {
     setSelectedChatUsername(username);
   };
 
+  // Swipe gesture handlers for mobile navigation
+  const handleTouchStart = (e) => {
+    // Only enable on mobile devices (screen width < 768px)
+    if (window.innerWidth >= 768) return;
+    
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e) => {
+    // Only enable on mobile devices
+    if (window.innerWidth >= 768) return;
+    
+    touchEndX.current = e.changedTouches[0].clientX;
+    touchEndY.current = e.changedTouches[0].clientY;
+    
+    handleSwipeGesture();
+  };
+
+  const handleSwipeGesture = () => {
+    const swipeThreshold = 75; // Minimum swipe distance in pixels
+    const verticalThreshold = 50; // Maximum vertical movement allowed
+    
+    const horizontalDistance = touchStartX.current - touchEndX.current;
+    const verticalDistance = Math.abs(touchStartY.current - touchEndY.current);
+    
+    // Ignore if vertical movement is too large (likely scrolling)
+    if (verticalDistance > verticalThreshold) return;
+    
+    // Define swipeable pages in order
+    const swipeablePages = ["home", "explore", "messages", "communities"];
+    const currentIndex = swipeablePages.indexOf(activeView);
+    
+    // Only allow swiping on main pages, not on profile or other pages
+    if (currentIndex === -1) return;
+    
+    // Swipe left (next page)
+    if (horizontalDistance > swipeThreshold) {
+      const nextIndex = Math.min(currentIndex + 1, swipeablePages.length - 1);
+      if (nextIndex !== currentIndex) {
+        setSwipeDirection(-1);
+        setActiveView(swipeablePages[nextIndex]);
+      }
+    }
+    
+    // Swipe right (previous page)
+    if (horizontalDistance < -swipeThreshold) {
+      const prevIndex = Math.max(currentIndex - 1, 0);
+      if (prevIndex !== currentIndex) {
+        setSwipeDirection(1);
+        setActiveView(swipeablePages[prevIndex]);
+      }
+    }
+  };
+
   // ✅ include createPost view
   const renderView = () => {
     switch (activeView) {
@@ -148,7 +211,11 @@ export default function App() {
   const isStoryPage = activeView === "addStory";
 
   return (
-    <div className="bg-[#fffcfa] dark:bg-black text-black dark:text-white min-h-screen flex flex-col">
+    <div 
+      className="bg-[#fffcfa] dark:bg-black text-black dark:text-white min-h-screen flex flex-col"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Hide Navbar/Sidebar for Story Page */}
       {!isStoryPage && (
         <>
@@ -160,7 +227,32 @@ export default function App() {
             <Sidebar activeView={activeView} setActiveView={handleViewChange} onLogout={handleLogout} />
 
         <div className="flex-1 md:ml-80 overflow-hidden">
-          {renderView()}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={activeView}
+              initial={{ 
+                x: swipeDirection === 0 ? 0 : swipeDirection > 0 ? -50 : 50,
+                opacity: 0 
+              }}
+              animate={{ 
+                x: 0, 
+                opacity: 1 
+              }}
+              exit={{ 
+                x: swipeDirection === 0 ? 0 : swipeDirection > 0 ? 50 : -50,
+                opacity: 0 
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 30,
+                mass: 0.8
+              }}
+              className="h-full"
+            >
+              {renderView()}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
 
