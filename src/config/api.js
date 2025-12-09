@@ -49,8 +49,11 @@ export const API_ENDPOINTS = {
     DELETE: (postId) => `/api/posts/${postId}`,
     LIKE: (postId) => `/api/posts/${postId}/like`,
     UNLIKE: (postId) => `/api/posts/${postId}/like`,
+    COMMENT_LIKE: (postId, commentId) => `/api/posts/${postId}/comments/${commentId}/like`,
+    COMMENT_UNLIKE: (postId, commentId) => `/api/posts/${postId}/comments/${commentId}/like`,
     ADD_COMMENT: (postId) => `/api/posts/${postId}/comments`,
     BOOKMARK: (postId) => `/api/posts/${postId}/bookmark`,
+    UNBOOKMARK: (postId) => `/api/posts/${postId}/bookmark`,
     SHARE: (postId) => `/api/posts/${postId}/share`,
   },
   
@@ -144,4 +147,11 @@ export const API_ENDPOINTS = {
   // Health
   HEALTH: '/health',
   ROOT: '/',
+
+  // Stories
+  STORIES: {
+    LIST: '/api/stories',
+    CREATE: '/api/stories',
+    VIEW: (storyId) => `/api/stories/${storyId}/view`,
+  },
 };

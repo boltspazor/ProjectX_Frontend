@@ -166,6 +166,45 @@ export const postService = {
   },
 
   /**
+   * Remove bookmark from post
+   */
+  async unbookmarkPost(postId) {
+    try {
+      const response = await api.delete(API_ENDPOINTS.POSTS.UNBOOKMARK(postId));
+      return response;
+    } catch (error) {
+      console.error('Unbookmark post error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Like comment
+   */
+  async likeComment(postId, commentId) {
+    try {
+      const response = await api.post(API_ENDPOINTS.POSTS.COMMENT_LIKE(postId, commentId));
+      return response;
+    } catch (error) {
+      console.error('Like comment error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Unlike comment
+   */
+  async unlikeComment(postId, commentId) {
+    try {
+      const response = await api.delete(API_ENDPOINTS.POSTS.COMMENT_UNLIKE(postId, commentId));
+      return response;
+    } catch (error) {
+      console.error('Unlike comment error:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Share post
    */
   async sharePost(postId) {
