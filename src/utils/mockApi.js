@@ -159,7 +159,7 @@ export const mockApi = {
       success: true,
       data: {
         user: mockUser,
-        token: 'mock-jwt-token-' + Date.now(),
+        accessToken: 'mock-jwt-token-' + Date.now(),
         refreshToken: 'mock-refresh-token-' + Date.now(),
       },
     };

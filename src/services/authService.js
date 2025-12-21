@@ -45,7 +45,7 @@ export const authService = {
     try {
       const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, credentials, false);
       
-      if (response.success && response.data) {
+      if (response.data) {
         const { user, accessToken, refreshToken } = response.data;
         
         // Store tokens
