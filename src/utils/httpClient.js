@@ -2,7 +2,7 @@ import { API_CONFIG } from '../config/api';
 import { mockApi } from './mockApi';
 
 // Enable mock mode when backend is not available
-const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === 'true' || false;
+const USE_MOCK_API = true; // Force Mock API on
 
 /**
  * Custom API Error class
