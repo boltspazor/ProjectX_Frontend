@@ -8,10 +8,11 @@ export const notificationService = {
   /**
    * Get notifications
    */
-  async getNotifications(page = 1, limit = 20) {
+  async getNotifications(limit = 20, skip = 0, unreadOnly = false) {
     try {
-      const response = await api.get(API_ENDPOINTS.NOTIFICATIONS.LIST, { page, limit });
-      return response.success ? response.data : { notifications: [], pagination: {} };
+      // Backend expects skip-based pagination and unreadOnly as query param
+      const response = await api.get(API_ENDPOINTS.NOTIFICATIONS.LIST, { limit, skip, unreadOnly });
+      return response.success ? response.data.notifications : [];
     } catch (error) {
       console.error('Get notifications error:', error);
       throw error;

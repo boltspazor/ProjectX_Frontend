@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
-  // Backend runs on port 5001 per requested setup
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001',
+  // Backend runs on port 5000
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000',
   TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,
@@ -15,6 +15,8 @@ export const API_ENDPOINTS = {
     LOGIN: '/api/auth/login',
     REFRESH: '/api/auth/refresh',
     FORGOT_PASSWORD: '/api/auth/forgot-password',
+    VERIFY_OTP: '/api/auth/verify-otp',
+    RESET_PASSWORD: '/api/auth/reset-password',
     GOOGLE: '/api/auth/google',
     GOOGLE_CALLBACK: '/api/auth/google/callback',
     ME: '/api/auth/me',
@@ -98,6 +100,7 @@ export const API_ENDPOINTS = {
   MESSAGES: {
     CREATE_CONVERSATION: '/api/messages/conversations',
     LIST_CONVERSATIONS: '/api/messages/conversations',
+    UPLOAD_MEDIA: '/api/messages/upload',
     SEND: '/api/messages',
     BY_CONVERSATION: (conversationId) => `/api/messages/${conversationId}`,
     MARK_READ: (conversationId) => `/api/messages/${conversationId}/read`,

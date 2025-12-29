@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import PostCard from "../components/PostCard";
-import Filters from "../components/Filters";
-import Accounts from "../components/Accounts";
-import Comments from "../components/Comments";
-import { searchService, postService } from "../services";
+import PostCard from "../../components/PostCard";
+import Filters from "../../components/Filters";
+import Accounts from "../../components/Accounts";
+import Comments from "../../components/Comments";
+import { searchService, postService } from "../../services";
 
 export default function ExplorePage({ onViewUserProfile }) {
   const [activeTab, setActiveTab] = useState("Posts");

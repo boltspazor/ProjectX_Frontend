@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useAuth } from "../context/AuthContext";
-import { authService } from "../services/authService";
+import { useAuth } from "../../context/AuthContext";
 
-export default function LoginPage({ onLogin, onSwitchToSignup }) {
-  const { login } = useAuth();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+export default function SignupPage({ onSignup, onSwitchToLogin }) {
+  const { register } = useAuth();
+  const [formData, setFormData] = useState({
+    name: "",
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
-  const [forgotPasswordError, setForgotPasswordError] = useState("");
-  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
-  const [isSendingReset, setIsSendingReset] = useState(false);
   const particlesRef = useRef(null);
   const backgroundElementsRef = useRef(null);
   const gridBackgroundRef = useRef(null);
@@ -52,7 +51,33 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
   // Create background elements
   useEffect(() => {
-    // Removed floating elements that appear at top - keeping only bottom-to-top particles
+    const createBackgroundElements = () => {
+      if (!backgroundElementsRef.current) return;
+      backgroundElementsRef.current.innerHTML = "";
+      const elementCount = 8;
+
+      for (let i = 0; i < elementCount; i++) {
+        const element = document.createElement("div");
+        element.className = "floating-element";
+
+        const size = Math.random() * 200 + 100;
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        const animationDuration = Math.random() * 30 + 20;
+        const animationDelay = Math.random() * 10;
+
+        element.style.width = `${size}px`;
+        element.style.height = `${size}px`;
+        element.style.left = `${left}%`;
+        element.style.top = `${top}%`;
+        element.style.animationDuration = `${animationDuration}s`;
+        element.style.animationDelay = `${animationDelay}s`;
+
+        backgroundElementsRef.current.appendChild(element);
+      }
+    };
+
+    createBackgroundElements();
   }, []);
 
   // Create grid background
@@ -79,7 +104,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         gridBackgroundRef.current.appendChild(line);
       }
 
-      // Create pulse circles (match signup background style)
+      // Create pulse circles
       for (let i = 0; i < 5; i++) {
         const circle = document.createElement("div");
         circle.className = "pulse-circle";
@@ -100,7 +125,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         gridBackgroundRef.current.appendChild(circle);
       }
 
-      // Soft translucent circles (match signup look)
+      // Soft translucent circles (ensure parity with login)
       for (let i = 0; i < 10; i++) {
         const soft = document.createElement("div");
         soft.className = "soft-circle";
@@ -251,24 +276,58 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     };
   }, []);
 
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    if (error) setError("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!username.trim()) {
-      setError("Please enter your username or email");
+    if (!formData.name.trim()) {
+      setError("Please enter your name");
       triggerErrorAnimation();
       return;
     }
 
-    if (!password.trim()) {
-      setError("Please enter your password");
+    if (!formData.username.trim()) {
+      setError("Please enter a username");
       triggerErrorAnimation();
       return;
     }
 
-    if (password.length < 6) {
+    if (!formData.email.trim()) {
+      setError("Please enter your email");
+      triggerErrorAnimation();
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
+      triggerErrorAnimation();
+      return;
+    }
+
+    if (!formData.password.trim()) {
+      setError("Please enter a password");
+      triggerErrorAnimation();
+      return;
+    }
+
+    if (formData.password.length < 6) {
       setError("Password must be at least 6 characters");
+      triggerErrorAnimation();
+      return;
+    }
+
+    if (!agreedToTerms) {
+      setError("Please agree to the Terms of Service and Privacy Policy");
       triggerErrorAnimation();
       return;
     }
@@ -277,37 +336,38 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     setIsLoading(true);
     const controller = document.querySelector(".controller");
     if (controller) {
-      controller.style.transition = "opacity 0.5s ease, transform 0.5s ease";
-      controller.style.opacity = "0.8";
-      controller.style.transform = "scale(0.98)";
+      controller.style.animation = "none";
+      controller.style.transform = "scale(1.05) rotateY(10deg)";
     }
 
     try {
-      // Call API login - backend expects 'email' field
-      const response = await login({
-        email: username, // Using username as email
-        password: password,
+      // Call API register
+      const response = await register({
+        name: formData.name,
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
       });
 
       if (response.success) {
         createSuccessParticles();
-        // Wait a moment for animation before redirecting
+        // Wait for animation before redirecting
         setTimeout(() => {
-          onLogin();
-        }, 500);
+          onSignup();
+        }, 800);
       } else {
-        setError(response.message || "Login failed. Please try again.");
+        setError(response.message || "Registration failed. Please try again.");
         triggerErrorAnimation();
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setError(err.message || "Invalid credentials. Please try again.");
+      console.error('Signup error:', err);
+      setError(err.message || "Registration failed. Please try again.");
       triggerErrorAnimation();
     } finally {
       setIsLoading(false);
       if (controller) {
-        controller.style.opacity = "1";
         controller.style.transform = "scale(1)";
+        controller.style.animation = "controllerFloat 8s ease-in-out infinite";
       }
     }
   };
@@ -322,80 +382,20 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     }
   };
 
-  const handleForgotPassword = (e) => {
-    e.preventDefault();
-    setShowForgotPassword(true);
-    setForgotPasswordError("");
-    setForgotPasswordSuccess(false);
-    setForgotPasswordEmail("");
-  };
-
-  const handleForgotPasswordSubmit = async (e) => {
-    e.preventDefault();
-    setForgotPasswordError("");
-    setForgotPasswordSuccess(false);
-
-    if (!forgotPasswordEmail.trim()) {
-      setForgotPasswordError("Please enter your email address");
-      return;
-    }
-
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(forgotPasswordEmail)) {
-      setForgotPasswordError("Please enter a valid email address");
-      return;
-    }
-
-    setIsSendingReset(true);
-
-    try {
-      // Call API for password reset
-      await authService.forgotPassword(forgotPasswordEmail);
-      setForgotPasswordSuccess(true);
-      setForgotPasswordError("");
-      // Reset form after showing success message
-      setTimeout(() => {
-        setForgotPasswordEmail("");
-      }, 100);
-    } catch (err) {
-      console.error('Forgot password error:', err);
-      setForgotPasswordError(err.message || "Failed to send reset email. Please try again.");
-      setForgotPasswordSuccess(false);
-    } finally {
-      setIsSendingReset(false);
-    }
-  };
-
-  const closeForgotPasswordModal = () => {
-    setShowForgotPassword(false);
-    setForgotPasswordEmail("");
-    setForgotPasswordError("");
-    setForgotPasswordSuccess(false);
-  };
-
-  // Handle Enter key press and Escape key for modal
+  // Handle Enter key press
   useEffect(() => {
     const handleKeyPress = (e) => {
-      if (e.key === "Enter" && (e.target.tagName === "INPUT") && !showForgotPassword) {
-        const form = document.getElementById("loginForm");
+      if (e.key === "Enter" && (e.target.tagName === "INPUT")) {
+        const form = document.getElementById("signupForm");
         if (form) {
           form.requestSubmit();
         }
       }
-      // Close forgot password modal on Escape key
-      if (e.key === "Escape" && showForgotPassword) {
-        closeForgotPasswordModal();
-      }
     };
 
     document.addEventListener("keypress", handleKeyPress);
-    document.addEventListener("keydown", handleKeyPress);
-    return () => {
-      document.removeEventListener("keypress", handleKeyPress);
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [showForgotPassword]);
+    return () => document.removeEventListener("keypress", handleKeyPress);
+  }, []);
 
   const createSuccessParticles = () => {
     const controller = document.querySelector(".controller");
@@ -451,25 +451,25 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     }
   };
 
-  const handleSignupClick = () => {
+  const handleLoginClick = () => {
     const controller = document.querySelector(".controller");
     if (controller) {
       controller.style.transition = "opacity 0.4s ease, transform 0.4s ease";
       controller.style.opacity = "0";
       controller.style.transform = "scale(0.95)";
       setTimeout(() => {
-        onSwitchToSignup();
+        onSwitchToLogin();
       }, 400);
     }
   };
 
-  const handleGoogleLogin = () => {
-    // Google OAuth login logic here
-    // For now, just call onLogin after a short delay to simulate OAuth
+  const handleGoogleSignup = () => {
+    // Google OAuth signup logic here
+    // For now, just call onSignup after a short delay to simulate OAuth
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      onLogin();
+      onSignup();
     }, 1000);
   };
 
@@ -482,7 +482,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           box-sizing: border-box;
         }
 
-        .login-page-body {
+        .signup-page-body {
           background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
           display: flex;
           justify-content: center;
@@ -503,14 +503,24 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         }
 
         @media (max-width: 480px) {
-          .login-page-body {
-            padding: 60px 25px;
+          .signup-page-body {
+            height: 100vh;
+            min-height: 100vh;
+            max-height: 100vh;
+            padding: 10px 15px;
+            overflow: hidden;
+            box-sizing: border-box;
           }
 
           .controller-container {
             max-width: 320px;
-            transform: scale(0.75);
+            transform: scale(0.8);
             transform-origin: center;
+            margin: auto;
+            max-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
         }
 
@@ -630,7 +640,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         }
 
         .input-group:last-of-type {
-          margin-bottom: 5px;
+          margin-bottom: 15px;
         }
 
         .input-group label {
@@ -672,21 +682,9 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           background: rgba(255, 255, 255, 0.12);
         }
 
-        .input-field:focus + .input-focus-line {
+        .input-field:focus{
           width: 100%;
           opacity: 1;
-        }
-
-        .input-focus-line {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: linear-gradient(90deg, #ff5722, #ff9800);
-          transition: all 0.4s ease;
-          opacity: 0;
-          box-shadow: 0 0 10px rgba(255, 87, 34, 0.7);
         }
 
         .password-input-wrapper {
@@ -749,44 +747,15 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           }
         }
 
-        .login-btn:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-          transform: none !important;
+        .input-group.has-error .input-field {
+          border-color: rgba(255, 87, 34, 0.7);
+          animation: inputError 0.3s ease;
         }
 
-        .login-btn.loading {
-          position: relative;
-        }
-
-        .login-btn.loading span {
-          opacity: 0;
-        }
-
-        .login-btn.loading::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 20px;
-          height: 20px;
-          border: 3px solid rgba(255, 255, 255, 0.3);
-          border-top-color: white;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-          to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .login-btn:disabled:not(.loading) {
-          opacity: 0.5;
-        }
-
-        .input-field:invalid:not(:placeholder-shown) {
-          border-color: rgba(255, 87, 34, 0.5);
+        @keyframes inputError {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-3px); }
+          75% { transform: translateX(3px); }
         }
 
         .input-field::placeholder {
@@ -802,21 +771,52 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           border-color: rgba(255, 87, 34, 0.6);
         }
 
-        .input-group.has-error .input-field {
-          border-color: rgba(255, 87, 34, 0.7);
-          animation: inputError 0.3s ease;
+        .terms-checkbox {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          margin-bottom: 25px;
+          padding: 10px;
+          border-radius: 8px;
+          transition: background 0.3s;
         }
 
-        @keyframes inputError {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-3px); }
-          75% { transform: translateX(3px); }
+        .terms-checkbox:hover {
+          background: rgba(255, 255, 255, 0.03);
+        }
+
+        .terms-checkbox input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+          margin-top: 2px;
+          cursor: pointer;
+          accent-color: #ff5722;
+          flex-shrink: 0;
+        }
+
+        .terms-checkbox label {
+          color: #ccc;
+          font-size: 13px;
+          cursor: pointer;
+          line-height: 1.5;
+          margin: 0;
+        }
+
+        .terms-checkbox label a {
+          color: #ff9800;
+          text-decoration: none;
+          transition: color 0.3s;
+        }
+
+        .terms-checkbox label a:hover {
+          color: #ff5722;
+          text-decoration: underline;
         }
 
         .button-group {
           display: flex;
           justify-content: space-between;
-          margin-top: 35px;
+          margin-top: 25px;
           gap: 15px;
         }
 
@@ -859,7 +859,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           z-index: -1;
         }
 
-        .btn:hover::before {
+        .btn:hover:not(:disabled)::before {
           transform: scaleX(1);
           transform-origin: left;
         }
@@ -878,32 +878,62 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           z-index: -1;
         }
 
-        .btn:active::after {
+        .btn:active:not(:disabled)::after {
           width: 300px;
           height: 300px;
         }
 
-        .login-btn {
+        .signup-btn {
           background: linear-gradient(45deg, #ff5722, #ff9800);
           color: white;
           flex: 1;
           box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
         }
 
-        .login-btn:hover {
+        .signup-btn:hover:not(:disabled) {
           background: linear-gradient(45deg, #e64a19, #f57c00);
           transform: translateY(-3px);
           box-shadow: 0 8px 25px rgba(255, 87, 34, 0.6);
         }
 
-        .signup-btn {
+        .signup-btn.loading {
+          position: relative;
+        }
+
+        .signup-btn.loading span {
+          opacity: 0;
+        }
+
+        .signup-btn.loading::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 20px;
+          height: 20px;
+          border: 3px solid rgba(255, 255, 255, 0.3);
+          border-top-color: white;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+          to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .signup-btn:disabled:not(.loading) {
+          opacity: 0.5;
+        }
+
+        .login-btn {
           background: transparent;
           color: #ff5722;
           border: 2px solid #ff5722;
           flex: 1;
         }
 
-        .signup-btn:hover {
+        .login-btn:hover:not(:disabled) {
           background: rgba(255, 87, 34, 0.1);
           transform: translateY(-3px);
           box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
@@ -1217,21 +1247,40 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           }
         }
 
-        @keyframes successParticle {
-          0% {
-            transform: translate(0, 0) scale(1);
-            opacity: 1;
-          }
-          100% {
-            transform: translate(50px, -50px) scale(0);
-            opacity: 0;
-          }
-        }
-
         @keyframes shake {
           0%, 100% { transform: translateX(0) rotate(0); }
           10%, 30%, 50%, 70%, 90% { transform: translateX(-5px) rotate(-1deg); }
           20%, 40%, 60%, 80% { transform: translateX(5px) rotate(1deg); }
+        }
+
+        .background-elements {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+
+        .floating-element {
+          position: absolute;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.03);
+          animation: floating 20s infinite linear;
+        }
+
+        @keyframes floating {
+          0% {
+            transform: translateY(0) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-20px) rotate(180deg);
+          }
+          100% {
+            transform: translateY(0) rotate(360deg);
+          }
         }
 
         .grid-background {
@@ -1241,7 +1290,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           width: 100%;
           height: 100%;
           z-index: -1;
-          opacity: 0.28;
+          opacity: 0.2;
           pointer-events: none;
         }
 
@@ -1327,60 +1376,87 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
         @media (max-width: 480px) {
           .controller {
-            padding: 18px;
-            border-radius: 16px;
+            padding: 12px;
+            border-radius: 14px;
+            width: 100%;
+            box-sizing: border-box;
           }
 
           .logo {
-            margin-bottom: 25px;
+            margin-bottom: 12px;
           }
 
           .logo h1 {
-            font-size: 24px;
-            letter-spacing: 2px;
+            font-size: 20px;
+            letter-spacing: 1px;
+            margin: 0;
           }
 
           .controller h2 {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 18px;
+            margin-bottom: 12px;
           }
 
           .input-group {
-            margin-bottom: 16px;
+            margin-bottom: 10px;
+          }
+
+          .input-group:last-of-type {
+            margin-bottom: 8px;
           }
 
           .input-field {
-            padding: 12px 14px;
-            font-size: 14px;
+            padding: 9px 11px;
+            font-size: 13px;
           }
 
           .input-group label {
-            font-size: 12px;
+            font-size: 10px;
+            margin-bottom: 5px;
+          }
+
+          .terms-checkbox {
+            margin-top: 8px;
+            margin-bottom: 0;
+            padding: 6px;
+            gap: 6px;
+          }
+
+          .terms-checkbox label {
+            font-size: 10px;
+            line-height: 1.3;
+          }
+
+          .terms-checkbox input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            margin-top: 1px;
+            flex-shrink: 0;
           }
 
           .button-group {
             flex-direction: column;
-            margin-top: 25px;
-            gap: 12px;
+            margin-top: 12px;
+            gap: 8px;
           }
 
-          .login-btn, .signup-btn {
+          .signup-btn, .login-btn {
             margin: 0;
             width: 100%;
-            padding: 12px 20px;
-            font-size: 14px;
+            padding: 9px 16px;
+            font-size: 12px;
           }
 
           .controller-buttons {
             flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 10px;
+            margin-top: 12px;
           }
 
           .d-pad {
-            width: 90px;
-            height: 90px;
-            gap: 5px;
+            width: 75px;
+            height: 75px;
+            gap: 3px;
             margin: 0 auto;
           }
 
@@ -1389,396 +1465,26 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
             height: auto;
             width: 100%;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
           }
 
           .action-btn {
-            width: 45px;
-            height: 45px;
-            font-size: 12px;
+            width: 38px;
+            height: 38px;
+            font-size: 10px;
           }
 
           .forgot-password {
-            margin-top: 18px;
+            margin-top: 10px;
           }
 
           .forgot-password a {
-            font-size: 12px;
-          }
-        }
-
-        /* Forgot Password Modal Styles */
-        .forgot-password-modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.7);
-          backdrop-filter: blur(4px);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 10000;
-          animation: fadeIn 0.2s ease;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        .forgot-password-modal {
-          background: #0f0f0f;
-          border: 1px solid #262626;
-          border-radius: 16px;
-          padding: 32px;
-          max-width: 420px;
-          width: 90%;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-          position: relative;
-          animation: modalSlideIn 0.3s ease-out;
-        }
-
-        @keyframes modalSlideIn {
-          from {
-            transform: translateY(20px) scale(0.96);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-          }
-        }
-
-        .modal-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 24px;
-        }
-
-        .modal-header h2 {
-          color: #ffffff;
-          font-size: 20px;
-          font-weight: 600;
-          margin: 0;
-        }
-
-        .modal-close-btn {
-          background: transparent;
-          border: none;
-          color: #9ca3af;
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          font-size: 24px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s ease;
-          line-height: 1;
-          padding: 0;
-          -webkit-tap-highlight-color: transparent;
-          touch-action: manipulation;
-        }
-
-        .modal-close-btn:hover {
-          background: rgba(255, 255, 255, 0.05);
-          color: #ffffff;
-        }
-
-        .modal-close-btn:active {
-          transform: scale(0.95);
-        }
-
-        .forgot-password-modal .input-group {
-          margin-bottom: 20px;
-        }
-
-        .forgot-password-modal .input-group label {
-          color: #d1d5db;
-          font-size: 13px;
-          font-weight: 500;
-          margin-bottom: 8px;
-          display: block;
-        }
-
-        .forgot-password-modal .input-field {
-          width: 100%;
-          padding: 12px 16px;
-          background: #1a1a1a;
-          border: 1px solid #262626;
-          border-radius: 8px;
-          color: #ffffff;
-          font-size: 15px;
-          transition: all 0.2s ease;
-          -webkit-appearance: none;
-          touch-action: manipulation;
-        }
-
-        .forgot-password-modal .input-field:focus {
-          outline: none;
-          border-color: #fb923c;
-          background: #1f1f1f;
-        }
-
-        .forgot-password-modal .input-field::placeholder {
-          color: #6b7280;
-        }
-
-        .forgot-password-modal .input-field:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .forgot-password-modal .error-message {
-          color: #ef4444;
-          font-size: 13px;
-          margin-top: 8px;
-          padding-left: 20px;
-          padding-right: 0;
-          position: relative;
-          display: block;
-          animation: errorFadeIn 0.3s ease;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
-        }
-
-        .forgot-password-modal .error-message::before {
-          content: '⚠';
-          position: absolute;
-          left: 0;
-          font-size: 14px;
-          top: 0;
-          line-height: 1.5;
-          width: 18px;
-          flex-shrink: 0;
-        }
-
-        @keyframes errorFadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-5px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .forgot-password-modal .success-message {
-          color: #10b981;
-          font-size: 13px;
-          margin-top: 8px;
-          padding-left: 20px;
-          padding-right: 0;
-          position: relative;
-          display: block;
-          animation: slideDown 0.3s ease;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
-        }
-
-        .forgot-password-modal .success-message::before {
-          content: "✓";
-          position: absolute;
-          left: 0;
-          top: 0;
-          color: #10b981;
-          font-weight: bold;
-          font-size: 14px;
-          line-height: 1.5;
-          width: 18px;
-          flex-shrink: 0;
-          display: inline-block;
-        }
-
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .forgot-password-modal .button-group {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          margin-top: 24px;
-        }
-
-        .forgot-password-modal .btn {
-          padding: 14px 25px;
-          border: none;
-          border-radius: 10px;
-          font-size: 16px;
-          font-weight: bold;
-          cursor: pointer;
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          position: relative;
-          overflow: hidden;
-          z-index: 1;
-          width: 100%;
-          -webkit-tap-highlight-color: transparent;
-          touch-action: manipulation;
-          min-height: 48px;
-        }
-
-        .forgot-password-modal .btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 0;
-          height: 100%;
-          background: rgba(255, 255, 255, 0.1);
-          transition: transform 0.4s ease;
-          z-index: -1;
-        }
-
-        .forgot-password-modal .btn:hover::before {
-          transform: scaleX(1);
-          transform-origin: left;
-        }
-
-        .forgot-password-modal .btn::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 0;
-          height: 0;
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 50%;
-          transform: translate(-50%, -50%);
-          transition: width 0.6s, height 0.6s;
-          z-index: -1;
-        }
-
-        .forgot-password-modal .btn:active::after {
-          width: 300px;
-          height: 300px;
-        }
-
-        .forgot-password-modal .btn.login-btn {
-          background: linear-gradient(45deg, #ff5722, #ff9800);
-          color: white;
-          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
-        }
-
-        .forgot-password-modal .btn.login-btn:hover {
-          background: linear-gradient(45deg, #e64a19, #f57c00);
-          transform: translateY(-3px);
-          box-shadow: 0 8px 25px rgba(255, 87, 34, 0.6);
-        }
-
-        .forgot-password-modal .btn.signup-btn {
-          background: transparent;
-          color: #ff5722;
-          border: 2px solid #ff5722;
-        }
-
-        .forgot-password-modal .btn.signup-btn:hover {
-          background: rgba(255, 87, 34, 0.1);
-          transform: translateY(-3px);
-          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
-        }
-
-        .forgot-password-modal .btn:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-          transform: none !important;
-        }
-
-        .forgot-password-modal .btn.login-btn:disabled:not(.loading) {
-          opacity: 0.5;
-        }
-
-        .forgot-password-modal .btn.login-btn.loading {
-          position: relative;
-        }
-
-        .forgot-password-modal .btn.login-btn.loading span {
-          opacity: 0;
-        }
-
-        .forgot-password-modal .btn.login-btn.loading::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 20px;
-          height: 20px;
-          border: 3px solid rgba(255, 255, 255, 0.3);
-          border-top-color: white;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-          background: transparent;
-        }
-
-        @keyframes spin {
-          to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-          .forgot-password-modal {
-            padding: 30px 25px;
-            max-width: 95%;
-          }
-
-          .modal-header h2 {
-            font-size: 20px;
-          }
-
-          .modal-close-btn {
-            width: 30px;
-            height: 30px;
-            font-size: 20px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .forgot-password-modal {
-            padding: 25px 20px;
-            border-radius: 15px;
-          }
-
-          .modal-header {
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-          }
-
-          .modal-header h2 {
-            font-size: 18px;
-            letter-spacing: 1px;
-          }
-
-          .forgot-password-modal .input-field {
-            padding: 12px 14px;
-            font-size: 16px;
-          }
-
-          .forgot-password-modal .button-group {
-            margin-top: 20px;
-            gap: 10px;
+            font-size: 10px;
           }
         }
       `}</style>
 
-      <div className="login-page-body">
+      <div className="signup-page-body">
         <div className="grid-background" ref={gridBackgroundRef}></div>
         <div className="background-elements" ref={backgroundElementsRef}></div>
         <div className="particles" ref={particlesRef}></div>
@@ -1790,44 +1496,68 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
               <h1>BaitHub</h1>
             </div>
 
-            <form id="loginForm" onSubmit={handleSubmit}>
-              <div className="input-group">
+            <form id="signupForm" onSubmit={handleSubmit}>
+              <div className={`input-group ${error && !formData.name.trim() ? "has-error" : ""}`}>
+                <label htmlFor="name">FULL NAME</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  className="input-field"
+                  placeholder="Enter your full name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  autoComplete="name"
+                  required
+                />
+              </div>
+
+              <div className={`input-group ${error && !formData.username.trim() ? "has-error" : ""}`}>
                 <label htmlFor="username">USERNAME</label>
                 <input
                   type="text"
                   id="username"
+                  name="username"
                   className="input-field"
-                  placeholder="Enter your username"
-                  value={username}
-                  onChange={(e) => {
-                    setUsername(e.target.value);
-                    setError("");
-                  }}
+                  placeholder="Choose a username"
+                  value={formData.username}
+                  onChange={handleChange}
                   autoComplete="username"
                   required
-                  aria-describedby={error ? "username-error" : undefined}
                 />
               </div>
 
-              <div className={`input-group ${error ? "has-error" : ""}`}>
+              <div className={`input-group ${error && !formData.email.trim() ? "has-error" : ""}`}>
+                <label htmlFor="email">EMAIL</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  className="input-field"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  autoComplete="email"
+                  required
+                />
+              </div>
+
+              <div className={`input-group ${error && (!formData.password.trim() || formData.password.length < 6) ? "has-error" : ""}`}>
                 <label htmlFor="password">PASSWORD</label>
                 <div className="password-input-wrapper">
                   <input
                     type={showPassword ? "text" : "password"}
                     id="password"
+                    name="password"
                     className="input-field"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (error) setError("");
-                    }}
-                    autoComplete="current-password"
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    autoComplete="new-password"
                     required
-                    aria-describedby={error ? "password-error" : undefined}
                     style={{ paddingRight: "60px" }}
                   />
-                  {password && (
+                  {formData.password && (
                     <button
                       type="button"
                       className="password-toggle"
@@ -1846,22 +1576,44 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                 )}
               </div>
 
+              <div className={`terms-checkbox ${error && !agreedToTerms ? "has-error" : ""}`}>
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={agreedToTerms}
+                  onChange={(e) => {
+                    setAgreedToTerms(e.target.checked);
+                    if (error) setError("");
+                  }}
+                />
+                <label htmlFor="terms">
+                  I agree with the{" "}
+                  <a href="#" onClick={(e) => e.preventDefault()}>
+                    Terms of Service
+                  </a>{" "}
+                  and{" "}
+                  <a href="#" onClick={(e) => e.preventDefault()}>
+                    Privacy Policy
+                  </a>
+                </label>
+              </div>
+
               <div className="button-group">
                 <button
                   type="submit"
-                  className={`btn login-btn ${isLoading ? "loading" : ""}`}
-                  disabled={isLoading || !username.trim() || !password.trim()}
+                  className={`btn signup-btn ${isLoading ? "loading" : ""}`}
+                  disabled={isLoading || !formData.name.trim() || !formData.username.trim() || !formData.email.trim() || !formData.password.trim() || !agreedToTerms}
                   aria-busy={isLoading}
                 >
-                  <span>{isLoading ? "LOGGING IN..." : "LOGIN"}</span>
+                  <span>{isLoading ? "CREATING..." : "SIGN UP"}</span>
                 </button>
                 <button
                   type="button"
-                  className="btn signup-btn"
-                  onClick={handleSignupClick}
+                  className="btn login-btn"
+                  onClick={handleLoginClick}
                   disabled={isLoading}
                 >
-                  SIGN UP
+                  LOGIN
                 </button>
               </div>
             </form>
@@ -1871,11 +1623,11 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
               <span>OR</span>
             </div>
 
-            {/* Google Login Button */}
+            {/* Google Signup Button */}
             <button
               type="button"
               className="btn google-btn"
-              onClick={handleGoogleLogin}
+              onClick={handleGoogleSignup}
               disabled={isLoading}
             >
               <svg className="google-icon" viewBox="0 0 24 24" width="20" height="20">
@@ -1884,7 +1636,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
-              <span>LOGIN WITH GOOGLE</span>
+              <span>SIGN UP WITH GOOGLE</span>
             </button>
 
             <div className="controller-buttons">
@@ -1900,80 +1652,8 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                 <button className="action-btn">B</button>
               </div>
             </div>
-
-            <div className="forgot-password">
-              <a
-                href="#"
-                onClick={handleForgotPassword}
-                tabIndex={0}
-              >
-                FORGOT PASSWORD?
-              </a>
-            </div>
           </div>
         </div>
-
-        {/* Forgot Password Modal */}
-        {showForgotPassword && (
-          <div className="forgot-password-modal-overlay" onClick={closeForgotPasswordModal}>
-            <div className="forgot-password-modal" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2>Reset Password</h2>
-                <button className="modal-close-btn" onClick={closeForgotPasswordModal} aria-label="Close">
-                  ×
-                </button>
-              </div>
-
-              <form onSubmit={handleForgotPasswordSubmit}>
-                <div className="input-group">
-                  <label htmlFor="reset-email">Email Address</label>
-                  <input
-                    id="reset-email"
-                    type="email"
-                    className="input-field"
-                    placeholder="Enter your email"
-                    value={forgotPasswordEmail}
-                    onChange={(e) => {
-                      setForgotPasswordEmail(e.target.value);
-                      setForgotPasswordError("");
-                    }}
-                    autoFocus
-                    disabled={isSendingReset || forgotPasswordSuccess}
-                  />
-                  {forgotPasswordError && (
-                    <div className="error-message" role="alert">
-                      {forgotPasswordError}
-                    </div>
-                  )}
-                  {forgotPasswordSuccess && (
-                    <div className="success-message" role="alert">
-                      Password reset link has been sent to your email!
-                    </div>
-                  )}
-                </div>
-
-                <div className="button-group">
-                  <button
-                    type="submit"
-                    className={`btn login-btn ${isSendingReset ? "loading" : ""}`}
-                    disabled={isSendingReset || forgotPasswordSuccess || !forgotPasswordEmail.trim()}
-                    aria-busy={isSendingReset}
-                  >
-                    <span>{isSendingReset ? "SENDING..." : forgotPasswordSuccess ? "SENT!" : "SEND RESET LINK"}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="btn signup-btn"
-                    onClick={closeForgotPasswordModal}
-                    disabled={isSendingReset}
-                  >
-                    CANCEL
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );

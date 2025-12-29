@@ -145,7 +145,7 @@ export const authService = {
   },
 
   /**
-   * Forgot password
+   * Forgot password - Step 1: Request OTP
    */
   async forgotPassword(email) {
     try {
@@ -153,6 +153,36 @@ export const authService = {
       return response;
     } catch (error) {
       console.error('Forgot password error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Verify OTP - Step 2: Verify OTP code
+   */
+  async verifyOTP(email, otp) {
+    try {
+      const response = await api.post(API_ENDPOINTS.AUTH.VERIFY_OTP, { email, otp }, false);
+      return response;
+    } catch (error) {
+      console.error('Verify OTP error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Reset password - Step 3: Set new password
+   */
+  async resetPassword(email, otp, newPassword) {
+    try {
+      const response = await api.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, { 
+        email, 
+        otp, 
+        newPassword 
+      }, false);
+      return response;
+    } catch (error) {
+      console.error('Reset password error:', error);
       throw error;
     }
   },

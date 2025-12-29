@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Send } from "lucide-react";
-import LiveProfilePhoto from "../components/LiveProfilePhoto";
-import { getProfileVideoUrl } from "../utils/profileVideos";
-import themeIcon from "../assets/theme.svg";
-import catTheme from "../assets/cat_theme.jpg";
-import xoxoTheme from "../assets/xoxo_theme.jpg";
-import { messageService } from "../services";
+import LiveProfilePhoto from "../../components/LiveProfilePhoto";
+import { getProfileVideoUrl } from "../../utils/profileVideos";
+import themeIcon from "../../assets/theme.svg";
+import catTheme from "../../assets/cat_theme.jpg";
+import xoxoTheme from "../../assets/xoxo_theme.jpg";
+import { messageService, userService } from "../../services";
+import { useAuth } from "../../context/AuthContext";
 
 export default function MessagesPage({ onViewUserProfile, selectedChatUsername }) {
+  const { user } = useAuth(); // Get current user to identify message sender
+  const currentUserId = user?.id || user?._id;
   const [activeChat, setActiveChat] = useState(null);
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([]);
@@ -79,7 +82,8 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
     try {
       setLoadingConversations(true);
       setError(null);
-      const convos = await messageService.getConversations();
+      // Use skip-based pagination instead of page-based
+      const convos = await messageService.getConversations(20, 0);
       setConversations(convos || []);
     } catch (err) {
       console.error("Error fetching conversations:", err);
@@ -92,19 +96,19 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
   const fetchMessages = async (conversationId) => {
     try {
       setLoadingMessages(true);
-      const msgs = await messageService.getMessagesByConversation(conversationId);
+      // Use skip-based pagination
+      const msgs = await messageService.getMessagesByConversation(conversationId, 50, 0);
       
       // Transform API messages to component format
       const transformedMsgs = msgs.map(msg => ({
         id: msg._id,
-        text: msg.content,
-        sender: msg.isCurrentUser ? 'sender' : 'receiver',
+        text: msg.text, // Backend uses 'text', not 'content'
+        sender: msg.senderId === currentUserId ? 'sender' : 'receiver', // Compare senderId with currentUserId
         time: new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
         // Read receipt status - check if message was delivered/seen
-        // Assuming API returns: delivered (when received), read (when seen)
-        status: msg.isCurrentUser ? (msg.read ? 'read' : (msg.delivered ? 'delivered' : 'sent')) : null,
-        delivered: msg.delivered || false,
-        read: msg.read || false,
+        status: msg.senderId === currentUserId ? (msg.isRead ? 'read' : (msg.isDelivered ? 'delivered' : 'sent')) : null,
+        isDelivered: msg.isDelivered || false,
+        isRead: msg.isRead || false,
       }));
       
       setMessages(transformedMsgs);
@@ -144,10 +148,19 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
 
   const createNewConversation = async (username) => {
     try {
-      const newConvo = await messageService.createConversation({ participantUsername: username });
-      setConversations([newConvo, ...conversations]);
-      setActiveChat(newConvo);
-      setMessages([]);
+      // First, fetch user ID by username
+      const user = await userService.getUserByUsername(username);
+      if (!user) {
+        alert("User not found");
+        return;
+      }
+      // Backend expects userId, not username
+      const newConvo = await messageService.createConversation(user._id);
+      if (newConvo) {
+        setConversations([newConvo, ...conversations]);
+        setActiveChat(newConvo);
+        setMessages([]);
+      }
     } catch (err) {
       console.error("Error creating conversation:", err);
       alert("Failed to start conversation. Please try again.");
@@ -170,7 +183,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
     if (!messageInput.trim() || !activeChat || sendingMessage) return;
 
     const messageText = messageInput.trim();
-      setMessageInput("");
+    setMessageInput("");
     setSendingMessage(true);
 
     // Optimistically add message to UI
@@ -180,13 +193,19 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
       sender: 'sender',
       time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
       status: 'sent',
-      delivered: false,
-      read: false,
+      isDelivered: false,
+      isRead: false,
     };
     setMessages([...messages, tempMessage]);
 
     try {
-      const sentMessage = await messageService.sendMessage(activeChat._id, { content: messageText });
+      // Backend expects: conversationId, recipientId, text, mediaUrl
+      const sentMessage = await messageService.sendMessage(
+        activeChat._id,
+        activeChat.otherUser._id,
+        messageText,
+        null
+      );
       
       // Update the optimistic message with actual message data and mark as delivered
       setMessages(prevMsgs =>
@@ -196,7 +215,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                 ...msg,
                 id: sentMessage._id || sentMessage.id || msg.id,
                 status: 'delivered', // Assume delivered after successful send
-                delivered: true,
+                isDelivered: true,
               }
             : msg
         )
@@ -206,7 +225,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
       setConversations(prevConvos =>
         prevConvos.map(convo =>
           convo._id === activeChat._id
-            ? { ...convo, lastMessage: { content: messageText, createdAt: new Date() } }
+            ? { ...convo, lastMessage: { text: messageText, createdAt: new Date() } }
             : convo
         )
       );
@@ -316,7 +335,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                       </span>
                     </div>
                     <p className={`text-xs md:text-sm truncate ${convo.unreadCount > 0 ? 'text-black dark:text-white font-medium' : 'text-gray-400'}`}>
-                      {lastMessage.content || "No messages yet"}
+                      {lastMessage.text || "No messages yet"}
                     </p>
                   </div>
                 </div>

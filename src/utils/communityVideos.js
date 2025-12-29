@@ -1,8 +1,6 @@
 // Utility to get video URLs for community banners and profile photos
 // Checks community object first, then falls back to API/database lookup
 
-import { getCommunityById } from "../data/communitiesData";
-
 // Generate banner video URL based on community ID or banner image URL
 export const getCommunityBannerVideoUrl = (communityId, bannerSrc = null, community = null) => {
   // First check if community object was passed and has a bannerVideo property

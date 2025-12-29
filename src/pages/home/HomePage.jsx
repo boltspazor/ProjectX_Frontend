@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import Stories from "../components/Stories";
-import PostCard from "../components/PostCard";
-import Comments from "../components/Comments";
-import { postService } from "../services";
+import Stories from "../../components/Stories";
+import PostCard from "../../components/PostCard";
+import Comments from "../../components/Comments";
+import { postService } from "../../services";
 
 export default function HomePage({ setActiveView, onViewUserProfile }) {
   const [activePostId, setActivePostId] = useState(null);

@@ -9,3 +9,8 @@ export { searchService } from './searchService';
 export { uploadService } from './uploadService';
 export { aiService } from './aiService';
 export { creditsService } from './creditsService';
+export { storyService } from './storyService';
+export { analyticsService } from './analyticsService';
+export { adminService } from './adminService';
+export { socketService } from './socketService';
+

@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/baithub.svg";
-import bell from "../assets/bell.svg";
-import shop from "../assets/shop.svg";
-import ThemeToggle from "./ThemeToggle";
+import logo from "../../assets/baithub.svg";
+import bell from "../../assets/bell.svg";
+import shop from "../../assets/shop.svg";
+import ThemeToggle from "../ThemeToggle";
 
 export default function Navbar({ onCreatePostClick }) {
   const navigate = useNavigate();
@@ -29,6 +29,7 @@ export default function Navbar({ onCreatePostClick }) {
           alt="Project Logo"
           className="h-12 md:h-16 w-auto select-none object-contain"
         />
+
       </div>
 
       <div className="flex items-center gap-4 md:gap-6">

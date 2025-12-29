@@ -1,15 +1,27 @@
 import { useState, useEffect } from 'react';
-import { getUserProfile, getProfilePhoto, getProfileVideo } from '../utils/userProfile';
 import profilePhotoDefault from '../assets/profile-photo.jpg';
+
+/**
+ * Get user profile from localStorage
+ */
+const getUserProfile = () => {
+  try {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  } catch (error) {
+    console.error('Error getting user profile:', error);
+    return null;
+  }
+};
 
 /**
  * Hook to get current user profile data with reactive updates
  * Automatically updates when profile changes
  */
 export const useUserProfile = () => {
-  const [profilePhoto, setProfilePhoto] = useState(() => getProfilePhoto(profilePhotoDefault));
-  const [profileVideo, setProfileVideo] = useState(() => getProfileVideo());
   const [profile, setProfile] = useState(() => getUserProfile());
+  const [profilePhoto, setProfilePhoto] = useState(() => profile?.profilePhoto || profilePhotoDefault);
+  const [profileVideo, setProfileVideo] = useState(() => profile?.profileVideo || null);
 
   useEffect(() => {
     const handleProfileUpdate = (e) => {
@@ -33,7 +45,7 @@ export const useUserProfile = () => {
     };
     
     checkProfile();
-    const interval = setInterval(checkProfile, 1000);
+    const interval = setInterval(checkProfile, 5000); // Check every 5 seconds
 
     return () => {
       window.removeEventListener('profileUpdated', handleProfileUpdate);
@@ -45,7 +57,7 @@ export const useUserProfile = () => {
     profile,
     profilePhoto,
     profileVideo,
-    username: profile?.username || "idkwhoisrahul_04"
+    username: profile?.username || "user"
   };
 };
 
