@@ -2,15 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import { ArrowLeft, Camera, Video, Upload, X } from "lucide-react";
 import profilePhotoDefault from "../assets/profile-photo.jpg";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
-import { getUserProfile, saveUserProfile } from "../utils/userProfile";
 import { useAuth } from "../context/AuthContext";
 import { userService, uploadService } from "../services";
 
 export default function ProfileSettings({ onBack, onProfileUpdate }) {
   const { user, updateUser } = useAuth();
   
-  // Load saved profile or use defaults
-  const savedProfile = getUserProfile();
+  // Load saved profile from user data
+  const savedProfile = user;
 
   const [formData, setFormData] = useState({
     username: savedProfile?.username || user?.username || "idkwhoisrahul_04",

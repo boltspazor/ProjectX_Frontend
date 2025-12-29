@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { LogOut, Settings } from "lucide-react";
-import profilePhotoDefault from "../assets/profile-photo.jpg";
-import PostDetailModal from "../components/PostDetailModal";
-import LogoutConfirmationModal from "../components/LogoutConfirmationModal";
-import ProfileSettings from "../components/ProfileSettings";
-import FollowersFollowingModal from "../components/FollowersFollowingModal";
-import LiveProfilePhoto from "../components/LiveProfilePhoto";
-import { useUserProfile } from "../hooks/useUserProfile";
-import { getProfileVideoUrl } from "../utils/profileVideos";
-import { useAuth } from "../context/AuthContext";
-import { userService, postService } from "../services";
+import profilePhotoDefault from "../../assets/profile-photo.jpg";
+import PostDetailModal from "../../components/PostDetailModal";
+import LogoutConfirmationModal from "../../components/LogoutConfirmationModal";
+import ProfileSettings from "../../components/ProfileSettings";
+import FollowersFollowingModal from "../../components/FollowersFollowingModal";
+import LiveProfilePhoto from "../../components/LiveProfilePhoto";
+import { useUserProfile } from "../../hooks/useUserProfile";
+import { getProfileVideoUrl } from "../../utils/profileVideos";
+import { useAuth } from "../../context/AuthContext";
+import { userService, postService } from "../../services";
 
 export default function ProfilePage({ onLogout, onViewUserProfile }) {
   const [selectedPost, setSelectedPost] = useState(null);

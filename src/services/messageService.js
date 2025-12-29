@@ -8,10 +8,11 @@ export const messageService = {
   /**
    * Create conversation
    */
-  async createConversation(participantIds) {
+  async createConversation(userId) {
     try {
-      const response = await api.post(API_ENDPOINTS.MESSAGES.CREATE_CONVERSATION, { participantIds });
-      return response.success ? response.data : null;
+      // Backend expects userId, not participantIds
+      const response = await api.post(API_ENDPOINTS.MESSAGES.CREATE_CONVERSATION, { userId });
+      return response.success ? response.data.conversation : null;
     } catch (error) {
       console.error('Create conversation error:', error);
       throw error;
@@ -21,10 +22,11 @@ export const messageService = {
   /**
    * Get conversations
    */
-  async getConversations(page = 1, limit = 20) {
+  async getConversations(limit = 20, skip = 0) {
     try {
-      const response = await api.get(API_ENDPOINTS.MESSAGES.LIST_CONVERSATIONS, { page, limit });
-      return response.success ? response.data : { conversations: [], pagination: {} };
+      // Backend expects skip, not page
+      const response = await api.get(API_ENDPOINTS.MESSAGES.LIST_CONVERSATIONS, { limit, skip });
+      return response.success ? response.data.conversations : [];
     } catch (error) {
       console.error('Get conversations error:', error);
       throw error;
@@ -34,14 +36,16 @@ export const messageService = {
   /**
    * Send message
    */
-  async sendMessage(conversationId, text, attachments = []) {
+  async sendMessage(conversationId, recipientId, text, mediaUrl = null) {
     try {
+      // Backend expects: conversationId, recipientId, text, mediaUrl
       const response = await api.post(API_ENDPOINTS.MESSAGES.SEND, {
         conversationId,
+        recipientId,
         text,
-        attachments,
+        mediaUrl,
       });
-      return response.success ? response.data : null;
+      return response.success ? response.data.message : null;
     } catch (error) {
       console.error('Send message error:', error);
       throw error;
@@ -51,10 +55,11 @@ export const messageService = {
   /**
    * Get messages by conversation
    */
-  async getMessagesByConversation(conversationId, page = 1, limit = 50) {
+  async getMessagesByConversation(conversationId, limit = 50, skip = 0) {
     try {
-      const response = await api.get(API_ENDPOINTS.MESSAGES.BY_CONVERSATION(conversationId), { page, limit });
-      return response.success ? response.data : { messages: [], pagination: {} };
+      // Backend expects skip, not page
+      const response = await api.get(API_ENDPOINTS.MESSAGES.BY_CONVERSATION(conversationId), { limit, skip });
+      return response.success ? response.data.messages : [];
     } catch (error) {
       console.error('Get messages error:', error);
       throw error;
@@ -71,6 +76,26 @@ export const messageService = {
       return response;
     } catch (error) {
       console.error('Mark conversation as read error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Upload message media (image, voice note, etc.)
+   */
+  async uploadMessageMedia(file) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await api.post(API_ENDPOINTS.MESSAGES.UPLOAD_MEDIA, formData, true, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.success ? response.data : null;
+    } catch (error) {
+      console.error('Upload message media error:', error);
       throw error;
     }
   },

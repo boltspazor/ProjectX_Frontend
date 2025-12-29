@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Settings, Upload, X, Plus, Trash2, Eye, EyeOff, Globe, Lock, Eye as EyeIcon, RefreshCw } from "lucide-react";
 import { useUserProfile } from "../hooks/useUserProfile";
-import { getCommunityById } from "../data/communitiesData";
 import { communityService } from "../services/communityService";
 import LiveBanner from "./LiveBanner";
 import LiveProfilePhoto from "./LiveProfilePhoto";
@@ -9,13 +8,11 @@ import { getCommunityBannerVideoUrl, getCommunityProfileVideoUrl } from "../util
 
 export default function CommunitySettings({ setActiveView, communityId, onViewUserProfile }) {
   const { username } = useUserProfile();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  // Get community data
-  const community = getCommunityById(communityId);
+  const [community, setCommunity] = useState(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -45,31 +42,45 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
   const [newModerator, setNewModerator] = useState("");
   const [passwordValidationError, setPasswordValidationError] = useState("");
 
-  // Initialize form data from community
+  // Fetch community data from API
   useEffect(() => {
-    if (community) {
-      setFormData({
-        name: community.name || "",
-        description: community.description || "",
-        rules: community.rules || [],
-        newRule: "",
-        password: "",
-        newPassword: "",
-        confirmPassword: "",
-        showPassword: false,
-        showNewPassword: false,
-        showConfirmPassword: false,
-        communityCode: community.code || community.id?.toString() || "",
-        communityType: community.type || "Public",
-        hasPassword: community.hasPassword || !!community.password,
-      });
-      setModerators(community.moderators || []);
-      setBannerPreview(community.banner);
-      setBannerVideoPreview(community.bannerVideo || null);
-      setProfilePreview(community.icon || community.avatar);
-      setProfileVideoPreview(community.profileVideo || null);
+    const fetchCommunity = async () => {
+      try {
+        setLoading(true);
+        const data = await communityService.getCommunityById(communityId);
+        setCommunity(data);
+        setFormData({
+          name: data.name || "",
+          description: data.description || "",
+          rules: data.rules || [],
+          newRule: "",
+          password: "",
+          newPassword: "",
+          confirmPassword: "",
+          showPassword: false,
+          showNewPassword: false,
+          showConfirmPassword: false,
+          communityCode: data.code || data.id?.toString() || "",
+          communityType: data.type || "Public",
+          hasPassword: data.hasPassword || !!data.password,
+        });
+        setModerators(data.moderators || []);
+        setBannerPreview(data.banner);
+        setBannerVideoPreview(data.bannerVideo || null);
+        setProfilePreview(data.icon || data.avatar);
+        setProfileVideoPreview(data.profileVideo || null);
+      } catch (err) {
+        setError("Failed to load community data");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (communityId) {
+      fetchCommunity();
     }
-  }, [community]);
+  }, [communityId]);
 
   // Check if user is admin/moderator
   const isAdmin = community?.creator === username || community?.creatorId === username;

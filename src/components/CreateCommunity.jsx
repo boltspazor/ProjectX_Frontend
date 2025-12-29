@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ArrowLeft, Globe, Eye, Lock, Upload } from "lucide-react";
-import { addCommunity } from "../data/communitiesData";
+import { communityService } from "../services/communityService";
 import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function CreateCommunity({ setActiveView }) {
@@ -13,6 +13,8 @@ export default function CreateCommunity({ setActiveView }) {
   const [iconPreview, setIconPreview] = useState(null);
   const [bannerVideoPreview, setBannerVideoPreview] = useState(null);
   const [profileVideoPreview, setProfileVideoPreview] = useState(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState("");
 
   const topics = ["Art", "Cooking", "Coding", "Law", "Business", "Design", "Finance", "Music", "Dance", "Technology", "Cars", "Food", "Places"];
 
@@ -66,7 +68,7 @@ export default function CreateCommunity({ setActiveView }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate that at least one topic is selected
@@ -75,34 +77,41 @@ export default function CreateCommunity({ setActiveView }) {
       return;
     }
 
-    // Create new community object
-    const newCommunity = {
-      name: communityName,
-      description: description,
-      banner: bannerPreview || "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
-      cover: bannerPreview || "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
-      icon: iconPreview || "https://i.pravatar.cc/100?img=60",
-      avatar: iconPreview || "https://i.pravatar.cc/100?img=60",
-      bannerVideo: bannerVideoPreview || null,
-      profileVideo: profileVideoPreview || null,
-      creator: username,
-      creatorId: username,
-      code: `COMM${Date.now().toString().slice(-6)}`, // Temporary code, will be replaced by addCommunity
-      type: communityType.charAt(0).toUpperCase() + communityType.slice(1),
-      topics: selectedTopics,
-      rules: [
-        "Be respectful to all members",
-        "No spam or self-promotion",
-        "Keep discussions relevant to the community",
-        "Share your knowledge and experiences",
-      ],
-    };
+    try {
+      setIsCreating(true);
+      setError("");
 
-    // Add community to data store
-    const createdCommunity = addCommunity(newCommunity);
+      // Create new community object
+      const newCommunity = {
+        name: communityName,
+        description: description,
+        type: communityType.charAt(0).toUpperCase() + communityType.slice(1),
+        topics: selectedTopics,
+        rules: [
+          "Be respectful to all members",
+          "No spam or self-promotion",
+          "Keep discussions relevant to the community",
+          "Share your knowledge and experiences",
+        ],
+      };
 
-    // Navigate to the newly created community detail page
-    setActiveView("communityDetail", createdCommunity.id);
+      // Add banner and icon if provided
+      if (bannerPreview) newCommunity.banner = bannerPreview;
+      if (iconPreview) newCommunity.icon = iconPreview;
+      if (bannerVideoPreview) newCommunity.bannerVideo = bannerVideoPreview;
+      if (profileVideoPreview) newCommunity.profileVideo = profileVideoPreview;
+
+      // Create community via API
+      const createdCommunity = await communityService.createCommunity(newCommunity);
+
+      // Navigate to the newly created community detail page
+      setActiveView("communityDetail", createdCommunity.id);
+    } catch (err) {
+      console.error("Error creating community:", err);
+      setError(err.response?.data?.message || "Failed to create community");
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (

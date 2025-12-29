@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import JoinedCommunities from "../components/JoinedCommunities";
-import DiscoverCommunities from "../components/DiscoverCommunities";
+import JoinedCommunities from "../../components/JoinedCommunities";
+import DiscoverCommunities from "../../components/DiscoverCommunities";
 
 export default function CommunitiesPage({ setActiveView }) {
   const [showDiscover, setShowDiscover] = useState(false);
