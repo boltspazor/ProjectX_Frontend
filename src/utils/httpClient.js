@@ -128,7 +128,7 @@ class HTTPClient {
         return await fn();
       } catch (error) {
         const isLastAttempt = i === attempts - 1;
-        const shouldRetry = error.status >= 500 || error.status === 429;
+        const shouldRetry = error.status >= 500;
 
         if (isLastAttempt || !shouldRetry) {
           throw error;
