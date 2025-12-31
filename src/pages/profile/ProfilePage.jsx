@@ -103,10 +103,17 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
   const followersCount = profileData?.stats?.followers || followersList.length;
   const followingCount = profileData?.stats?.following || followingList.length;
 
+  const hasFetchedProfile = React.useRef(false);
+
   // Fetch profile data on mount
-  useEffect(() => {
-    fetchProfileData();
-  }, [username]);
+useEffect(() => {
+  if (!user || !user.username) return;
+  if (hasFetchedProfile.current) return;
+
+  hasFetchedProfile.current = true;
+  fetchProfileData();
+}, [user]);
+
 
   // Listen for new posts created from CreatePost component
   useEffect(() => {
@@ -122,33 +129,36 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
     };
   }, []);
 
-  const fetchProfileData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+const fetchProfileData = async () => {
+  try {
+    setLoading(true);
+    setError(null);
 
-      // Fetch user profile data
-      const userData = await userService.getUserByUsername(username);
-      setProfileData(userData);
+    const actualUsername = user.username;
 
-      // Fetch user posts
-      const userPosts = await postService.getUserPosts(username);
-      setPosts(userPosts?.posts || userPosts || []);
+    // Fetch user profile data
+    const userData = await userService.getUserByUsername(actualUsername);
+    setProfileData(userData);
 
-      // Fetch followers
-      const followersData = await userService.getUserFollowers(username);
-      setFollowersList(followersData?.followers || followersData || []);
+    // Fetch user posts
+    const userPosts = await postService.getUserPosts(actualUsername);
+    setPosts(userPosts?.posts || userPosts || []);
 
-      // Fetch following
-      const followingData = await userService.getUserFollowing(username);
-      setFollowingList(followingData?.following || followingData || []);
-    } catch (err) {
-      console.error("Error fetching profile data:", err);
-      setError(err.message || "Failed to load profile");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Fetch followers
+    const followersData = await userService.getUserFollowers(actualUsername);
+    setFollowersList(followersData?.followers || followersData || []);
+
+    // Fetch following
+    const followingData = await userService.getUserFollowing(actualUsername);
+    setFollowingList(followingData?.following || followingData || []);
+  } catch (err) {
+    console.error("Error fetching profile data:", err);
+    setError(err.message || "Failed to load profile");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handlePostClick = (post) => {
     setSelectedPost(post);
@@ -376,23 +386,24 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
           className="grid grid-cols-3 gap-1 md:gap-2"
         >
           {posts.map((post, index) => (
-            <motion.div
-              key={post.id}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.35 + index * 0.03, duration: 0.4 }}
-              onClick={() => handlePostClick(post)}
-              className="aspect-square overflow-hidden bg-gray-900 cursor-pointer group"
-            >
-              <img
-                src={post.image}
-                alt={`Post ${post.id + 1}`}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-                decoding="async"
-              />
-            </motion.div>
-          ))}
+  <motion.div
+    key={`${post.id || post._id}-${index}`}
+    initial={{ scale: 0.9, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    transition={{ delay: 0.35 + index * 0.03, duration: 0.4 }}
+    onClick={() => handlePostClick(post)}
+    className="aspect-square overflow-hidden bg-gray-900 cursor-pointer group"
+  >
+    <img
+      src={post.image}
+      alt={`Post ${index + 1}`}
+      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+      loading="lazy"
+      decoding="async"
+    />
+  </motion.div>
+))}
+
         </motion.div>
       </div>
 

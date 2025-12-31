@@ -149,17 +149,18 @@ export default function HomePage({ setActiveView, onViewUserProfile }) {
         <div className={`max-w-2xl mx-auto transition-all duration-300 ${activePostId !== null ? 'md:max-w-none md:grid md:grid-cols-2 md:gap-6' : ''}`}>
           {/* Posts Container */}
           <div className="space-y-6">
-            {posts.map((post) => (
-              <PostCard
-                key={post.id || post._id}
-                post={post}
-                postId={post.id || post._id}
-                variant="feed"
-                onCommentClick={handleCommentClick}
-                isActive={activePostId === (post.id || post._id)}
-                onViewUserProfile={onViewUserProfile}
-              />
-            ))}
+            {posts.map((post, index) => (
+  <PostCard
+    key={`${post.id || post._id}-${index}`}
+    post={post}
+    postId={post.id || post._id}
+    variant="feed"
+    onCommentClick={handleCommentClick}
+    isActive={activePostId === (post.id || post._id)}
+    onViewUserProfile={onViewUserProfile}
+  />
+))}
+
 
             {/* Loading Indicator */}
             {loading && (
