@@ -1,5 +1,6 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
+import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * User Service
@@ -10,6 +11,8 @@ export const userService = {
    */
   async searchUsers(query, limit = 10) {
     try {
+      if (USE_MOCK_API) return await mockApi.users.searchUsers(query, limit);
+      
       const response = await api.get(API_ENDPOINTS.USERS.SEARCH, { q: query, limit });
       return response.success ? response.data : [];
     } catch (error) {
@@ -23,6 +26,8 @@ export const userService = {
    */
   async updateProfile(profileData) {
     try {
+      if (USE_MOCK_API) return await mockApi.users.updateProfile(profileData);
+      
       const response = await api.put(API_ENDPOINTS.USERS.PROFILE, profileData);
       
       if (response.success && response.data) {
@@ -43,6 +48,11 @@ export const userService = {
    */
   async getCreditsBalance() {
     try {
+      if (USE_MOCK_API) {
+        const response = await mockApi.users.getCreditsBalance();
+        return response.success ? response.data : { credits: 0 };
+      }
+      
       const response = await api.get(API_ENDPOINTS.USERS.CREDITS_BALANCE);
       return response.success ? response.data : { credits: 0 };
     } catch (error) {
@@ -56,6 +66,11 @@ export const userService = {
    */
   async getCreditTransactions(page = 1, limit = 20) {
     try {
+      if (USE_MOCK_API) {
+        const response = await mockApi.users.getCreditTransactions(page, limit);
+        return response.success ? response.data : { transactions: [], pagination: {} };
+      }
+      
       const response = await api.get(API_ENDPOINTS.USERS.CREDITS_TRANSACTIONS, { page, limit });
       return response.success ? response.data : { transactions: [], pagination: {} };
     } catch (error) {
@@ -69,6 +84,11 @@ export const userService = {
    */
   async getUserByUsername(username) {
     try {
+      if (USE_MOCK_API) {
+        const response = await mockApi.users.getUserByUsername(username);
+        return response.success ? response.data : null;
+      }
+      
       const response = await api.get(API_ENDPOINTS.USERS.BY_USERNAME(username));
       return response.success ? response.data : null;
     } catch (error) {
@@ -82,6 +102,11 @@ export const userService = {
    */
   async getUserFollowers(username, page = 1, limit = 20) {
     try {
+      if (USE_MOCK_API) {
+        const response = await mockApi.users.getUserFollowers(username, page, limit);
+        return response.success ? response.data : { followers: [], pagination: {} };
+      }
+      
       const response = await api.get(API_ENDPOINTS.USERS.FOLLOWERS(username), { page, limit });
       return response.success ? response.data : { followers: [], pagination: {} };
     } catch (error) {
@@ -95,6 +120,11 @@ export const userService = {
    */
   async getUserFollowing(username, page = 1, limit = 20) {
     try {
+      if (USE_MOCK_API) {
+        const response = await mockApi.users.getUserFollowing(username, page, limit);
+        return response.success ? response.data : { following: [], pagination: {} };
+      }
+      
       const response = await api.get(API_ENDPOINTS.USERS.FOLLOWING(username), { page, limit });
       return response.success ? response.data : { following: [], pagination: {} };
     } catch (error) {

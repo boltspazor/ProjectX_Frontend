@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 import { notificationService, userService } from "../services";
 
 export default function Notifications({ setActiveView, onViewUserProfile, previousView = "home" }) {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState({
     today: [],
     yesterday: [],
@@ -362,7 +364,7 @@ export default function Notifications({ setActiveView, onViewUserProfile, previo
       <div className="sticky top-0 z-10 bg-[#fffcfa] dark:bg-black border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-4 px-4 py-3">
           <button
-            onClick={() => setActiveView(previousView)}
+            onClick={() => navigate(-1)}
             className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

@@ -1,5 +1,6 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
+import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * Search Service
@@ -10,6 +11,8 @@ export const searchService = {
    */
   async search(query, type = 'all', page = 1, limit = 20) {
     try {
+      if (USE_MOCK_API) return await mockApi.search.globalSearch(query, type, limit);
+      
       const response = await api.get(API_ENDPOINTS.SEARCH.UNIVERSAL, { q: query, type, page, limit });
       return response.success ? response.data : {};
     } catch (error) {

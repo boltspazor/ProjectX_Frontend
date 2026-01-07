@@ -30,9 +30,16 @@ export const AuthProvider = ({ children }) => {
           // Try to get current user from API
           try {
             const userData = await authService.getCurrentUser();
-            setUser(userData);
-            setIsAuthenticated(true);
+            if (userData) {
+              setUser(userData);
+              setIsAuthenticated(true);
+            } else {
+              // Clear invalid session
+              await authService.logout();
+              setIsAuthenticated(false);
+            }
           } catch (error) {
+            console.error('Get current user error:', error);
             // If API call fails, use stored user data
             const storedUser = authService.getStoredUser();
             if (storedUser) {
@@ -49,7 +56,7 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        setError(error.message);
+        setError(error?.message || 'Authentication error');
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);

@@ -1,6 +1,7 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
 import { tokenManager } from '../utils/httpClient';
+import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * Authentication Service
@@ -11,6 +12,31 @@ export const authService = {
    */
   async register(userData) {
     try {
+      // Use mock API if enabled
+      if (USE_MOCK_API) {
+        const response = await mockApi.auth.register(userData);
+        
+        if (response.success && response.data) {
+          const { user, accessToken, refreshToken } = response.data;
+          
+          // Store tokens
+          tokenManager.setAccessToken(accessToken);
+          tokenManager.setRefreshToken(refreshToken);
+          
+          // Store user data
+          localStorage.setItem('user', JSON.stringify(user));
+          
+          // Set token expiry (2 hours from now)
+          const expiryTime = Date.now() + (2 * 60 * 60 * 1000);
+          localStorage.setItem('tokenExpiry', expiryTime.toString());
+          localStorage.setItem('authToken', accessToken);
+          
+          return { success: true, user, accessToken };
+        }
+        
+        return response;
+      }
+      
       const response = await api.post(API_ENDPOINTS.AUTH.REGISTER, userData, false);
       
       if (response.success && response.data) {
@@ -43,6 +69,31 @@ export const authService = {
    */
   async login(credentials) {
     try {
+      // Use mock API if enabled
+      if (USE_MOCK_API) {
+        const response = await mockApi.auth.login(credentials);
+        
+        if (response.success && response.data) {
+          const { user, accessToken, refreshToken } = response.data;
+          
+          // Store tokens
+          tokenManager.setAccessToken(accessToken);
+          tokenManager.setRefreshToken(refreshToken);
+          
+          // Store user data
+          localStorage.setItem('user', JSON.stringify(user));
+          
+          // Set token expiry (2 hours from now)
+          const expiryTime = Date.now() + (2 * 60 * 60 * 1000);
+          localStorage.setItem('tokenExpiry', expiryTime.toString());
+          localStorage.setItem('authToken', accessToken);
+          
+          return { success: true, user, accessToken };
+        }
+        
+        return response;
+      }
+      
       const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, credentials, false);
       
       if (response.data) {
@@ -93,6 +144,18 @@ export const authService = {
    */
   async getCurrentUser() {
     try {
+      // Use mock API if enabled
+      if (USE_MOCK_API) {
+        const response = await mockApi.auth.getCurrentUser();
+        
+        if (response.success && response.data) {
+          localStorage.setItem('user', JSON.stringify(response.data));
+          return response.data;
+        }
+        
+        return null;
+      }
+      
       const response = await api.get(API_ENDPOINTS.AUTH.ME);
       
       if (response.success && response.data) {
@@ -149,6 +212,11 @@ export const authService = {
    */
   async forgotPassword(email) {
     try {
+      // Use mock API if enabled
+      if (USE_MOCK_API) {
+        return await mockApi.auth.forgotPassword(email);
+      }
+      
       const response = await api.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, { email }, false);
       return response;
     } catch (error) {
@@ -162,6 +230,11 @@ export const authService = {
    */
   async verifyOTP(email, otp) {
     try {
+      // Use mock API if enabled
+      if (USE_MOCK_API) {
+        return await mockApi.auth.verifyOTP({ email, otp });
+      }
+      
       const response = await api.post(API_ENDPOINTS.AUTH.VERIFY_OTP, { email, otp }, false);
       return response;
     } catch (error) {
@@ -175,6 +248,11 @@ export const authService = {
    */
   async resetPassword(email, otp, newPassword) {
     try {
+      // Use mock API if enabled
+      if (USE_MOCK_API) {
+        return await mockApi.auth.resetPassword({ email, otp, newPassword });
+      }
+      
       const response = await api.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, { 
         email, 
         otp, 
