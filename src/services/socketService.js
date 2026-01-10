@@ -1,16 +1,25 @@
 import { io } from 'socket.io-client';
 import { API_CONFIG } from '../config/api';
+import { USE_MOCK_API } from '../mocks/mockApi';
 
 class SocketService {
   constructor() {
     this.socket = null;
     this.connected = false;
+    this.mockMode = USE_MOCK_API;
   }
 
   /**
    * Connect to Socket.io server
    */
   connect(token) {
+    // Skip socket connection in mock mode
+    if (this.mockMode) {
+      console.log('📦 Socket.io: Running in mock mode, skipping connection');
+      this.connected = false;
+      return null;
+    }
+    
     if (this.socket?.connected) {
       return this.socket;
     }

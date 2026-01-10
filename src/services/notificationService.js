@@ -1,5 +1,6 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
+import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * Notification Service
@@ -10,6 +11,11 @@ export const notificationService = {
    */
   async getNotifications(limit = 20, skip = 0, unreadOnly = false) {
     try {
+      if (USE_MOCK_API) {
+        const response = await mockApi.notifications.getNotifications(limit, Math.floor(skip / limit) + 1);
+        return response.success ? response.data : [];
+      }
+      
       // Backend expects skip-based pagination and unreadOnly as query param
       const response = await api.get(API_ENDPOINTS.NOTIFICATIONS.LIST, { limit, skip, unreadOnly });
       return response.success ? response.data.notifications : [];
@@ -24,6 +30,11 @@ export const notificationService = {
    */
   async getUnreadCount() {
     try {
+      if (USE_MOCK_API) {
+        const response = await mockApi.notifications.getUnreadCount();
+        return response.success ? response.data : { count: 0 };
+      }
+      
       const response = await api.get(API_ENDPOINTS.NOTIFICATIONS.UNREAD_COUNT);
       return response.success ? response.data : { count: 0 };
     } catch (error) {
@@ -37,6 +48,10 @@ export const notificationService = {
    */
   async markAsRead(notificationId) {
     try {
+      if (USE_MOCK_API) {
+        return await mockApi.notifications.markAsRead(notificationId);
+      }
+      
       const response = await api.put(API_ENDPOINTS.NOTIFICATIONS.MARK_READ(notificationId));
       return response;
     } catch (error) {
@@ -50,6 +65,10 @@ export const notificationService = {
    */
   async markAllAsRead() {
     try {
+      if (USE_MOCK_API) {
+        return await mockApi.notifications.markAllAsRead();
+      }
+      
       const response = await api.put(API_ENDPOINTS.NOTIFICATIONS.MARK_ALL_READ);
       return response;
     } catch (error) {

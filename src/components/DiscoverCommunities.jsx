@@ -188,7 +188,7 @@ export default function DiscoverCommunities({ onBack }) {
   );
 
   return (
-    <div className="min-h-screen bg-[#fffcfa] dark:bg-black text-black dark:text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#fffcfa] dark:bg-[#0b0b0b] text-black dark:text-white pb-20 md:pb-0">
       {/* Header */}
       <div className="border-b border-black dark:border-gray-800 px-4 md:px-6 py-4">
         <div className="flex items-center gap-4 max-w-6xl mx-auto">
