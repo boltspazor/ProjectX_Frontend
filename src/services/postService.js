@@ -118,10 +118,7 @@ export const postService = {
    */
   async likePost(postId) {
     try {
-      console.log('postService.likePost called with:', postId);
-      console.log('API endpoint:', API_ENDPOINTS.POSTS.LIKE(postId));
       const response = await api.post(API_ENDPOINTS.POSTS.LIKE(postId));
-      console.log('Like post response:', response);
       return response;
     } catch (error) {
       console.error('Like post error:', error);
@@ -134,10 +131,7 @@ export const postService = {
    */
   async unlikePost(postId) {
     try {
-      console.log('postService.unlikePost called with:', postId);
-      console.log('API endpoint:', API_ENDPOINTS.POSTS.UNLIKE(postId));
       const response = await api.delete(API_ENDPOINTS.POSTS.UNLIKE(postId));
-      console.log('Unlike post response:', response);
       return response;
     } catch (error) {
       console.error('Unlike post error:', error);

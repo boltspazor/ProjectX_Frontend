@@ -23,13 +23,8 @@ export const communityService = {
    */
   async getUserCommunities(limit = 20) {
     try {
-      console.log('communityService.getUserCommunities called');
-      console.log('API endpoint:', API_ENDPOINTS.COMMUNITIES.USER_COMMUNITIES);
       const response = await api.get(API_ENDPOINTS.COMMUNITIES.USER_COMMUNITIES, { limit });
-      console.log('User communities response:', response);
-      const communities = response.success ? (response.data?.communities || response.data || []) : [];
-      console.log('Processed communities:', communities);
-      return communities;
+      return response.success ? (response.data?.communities || response.data || []) : [];
     } catch (error) {
       console.error('Get user communities error:', error);
       throw error;

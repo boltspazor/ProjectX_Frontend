@@ -1,6 +1,7 @@
 // Normal icons
 import { NavLink } from "react-router-dom";
 import { FiBarChart2 } from "react-icons/fi";
+import React, { useState, useEffect } from "react";
 import homeIcon from "../../assets/home.svg";
 import exploreIcon from "../../assets/explore.svg";
 import communitiesIcon from "../../assets/communities.svg";
@@ -18,40 +19,42 @@ import logoutIconActive from "../../assets/logout-active.svg";
 import LogoutConfirmationModal from "../LogoutConfirmationModal";
 import LiveProfilePhoto from "../LiveProfilePhoto";
 import { useUserProfile } from "../../hooks/useUserProfile";
-import React, { useState } from "react";
+import { userService } from "../../services";
 
 export default function Sidebar({ onLogout }) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLogoutHovered, setIsLogoutHovered] = useState(false);
   const { profilePhoto, profileVideo, username } = useUserProfile();
+  
+  // Fetch stats from backend
+  const [stats, setStats] = useState({
+    posts: 0,
+    followers: 0,
+    following: 0,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
 
-  // Same initial data as ProfilePage to keep counts in sync
-  // These match exactly what ProfilePage has
-  const posts = [
-    { id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 },
-    { id: 5 }, { id: 6 }, { id: 7 }, { id: 8 },
-  ];
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      if (!username) return;
+      try {
+        const response = await userService.getUserStats(username);
+        if (response) {
+          setStats({
+            posts: response.posts || response.postsCount || 0,
+            followers: response.followers || response.followersCount || 0,
+            following: response.following || response.followingCount || 0,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch user stats:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
 
-  const followersList = [
-    { username: "sheryanne_xoxo" },
-    { username: "john_doe" },
-    { username: "jane_smith" },
-    { username: "mike_ross" },
-    { username: "sarah_jones" },
-    { username: "david_wilson" },
-  ];
-
-  const followingList = [
-    { username: "sheryanne_xoxo" },
-    { username: "pxhf_12" },
-    { username: "xsd_hgf" },
-    { username: "shane_xd" },
-    { username: "garvv_pvt" },
-  ];
-
-  // Dynamic counts based on array lengths - same calculation as ProfilePage
-  const postsCount = posts.length;
-  const followersCount = followersList.length;
-  const followingCount = followingList.length;
+    fetchUserStats();
+  }, [username]);
   const items = [
     { label: "Home", value: "/home", icon: homeIcon, iconActive: homeIconActive },
     { label: "Explore", value: "/explore", icon: exploreIcon, iconActive: exploreIconActive },
@@ -95,21 +98,21 @@ export default function Sidebar({ onLogout }) {
       {/* Stats */}
       <div className="flex justify-center text-center mb-10 text-sm">
         <div className="px-3">
-          <p className="font-bold">{postsCount}</p>
+          <p className="font-bold">{statsLoading ? "..." : stats.posts}</p>
           <p className="dark:text-gray-400 text-gray-600 text-xs">Posts</p>
         </div>
 
         <div className="border-l dark:border-gray-700 border-black mx-2 h-5"></div>
 
         <div className="px-3">
-          <p className="font-bold">{followersCount}</p>
+          <p className="font-bold">{statsLoading ? "..." : stats.followers}</p>
           <p className="dark:text-gray-400 text-gray-600 text-xs">Followers</p>
         </div>
 
         <div className="border-l dark:border-gray-700 border-black mx-2 h-5"></div>
 
         <div className="px-3">
-          <p className="font-bold">{followingCount}</p>
+          <p className="font-bold">{statsLoading ? "..." : stats.following}</p>
           <p className="dark:text-gray-400 text-gray-600 text-xs">Following</p>
         </div>
       </div>
@@ -145,9 +148,11 @@ export default function Sidebar({ onLogout }) {
         <button
           className="group relative w-full rounded-2xl p-[3px] border dark:border-gray-600 border-black hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600 transition-all duration-300 mt-6"
           onClick={handleLogoutClick}
+          onMouseEnter={() => setIsLogoutHovered(true)}
+          onMouseLeave={() => setIsLogoutHovered(false)}
         >
           <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-white dark:bg-[#0f0f0f]">
-            <img src={logoutIcon} className="h-5 w-5 invert dark:invert-0" alt="Logout" />
+            <img src={isLogoutHovered ? logoutIconActive : logoutIcon} className="h-5 w-5 invert dark:invert-0" alt="Logout" />
             <span className="text-black dark:text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-400 group-hover:via-orange-500 group-hover:to-orange-600 transition-all duration-300">
               Logout
             </span>

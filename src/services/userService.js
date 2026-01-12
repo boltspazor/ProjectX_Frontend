@@ -121,10 +121,7 @@ export const userService = {
    */
   async followUser(userId) {
     try {
-      console.log('userService.followUser called with:', userId);
-      console.log('API endpoint:', API_ENDPOINTS.USERS.FOLLOW(userId));
       const response = await api.post(API_ENDPOINTS.USERS.FOLLOW(userId));
-      console.log('Follow user response:', response);
       return response;
     } catch (error) {
       console.error('Follow user error:', error);
@@ -137,13 +134,23 @@ export const userService = {
    */
   async unfollowUser(userId) {
     try {
-      console.log('userService.unfollowUser called with:', userId);
-      console.log('API endpoint:', API_ENDPOINTS.USERS.UNFOLLOW(userId));
       const response = await api.delete(API_ENDPOINTS.USERS.UNFOLLOW(userId));
-      console.log('Unfollow user response:', response);
       return response;
     } catch (error) {
       console.error('Unfollow user error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update user profile
+   */
+  async updateProfile(profileData) {
+    try {
+      const response = await api.put('/api/users/me', profileData);
+      return response;
+    } catch (error) {
+      console.error('Update profile error:', error);
       throw error;
     }
   },

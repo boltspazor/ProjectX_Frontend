@@ -158,47 +158,62 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
     setSaveError(null);
     
     try {
-      // Prepare update data
-      const updateData = {
-        username: formData.username,
-        bio: formData.bio,
-        email: formData.email,
-        phone: formData.phone,
-        gender: formData.gender,
-        profilePicture: profilePhotoPreview,
-        profileVideo: profileVideoPreview,
-        // Add notification settings if your backend supports them
-        notificationSettings: notifications
-      };
+      // Use FormData for file uploads
+      const formDataToSend = new FormData();
+      formDataToSend.append('username', formData.username);
+      formDataToSend.append('bio', formData.bio);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phone', formData.phone || '');
+      formDataToSend.append('gender', formData.gender || '');
+      formDataToSend.append('accountType', accountType);
+      formDataToSend.append('notificationSettings', JSON.stringify(notifications));
+      formDataToSend.append('readReceiptsEnabled', readReceiptsEnabled);
+
+      // Add photo file if it was uploaded (not just preview)
+      if (photoInputRef.current?.files?.[0]) {
+        formDataToSend.append('profilePhoto', photoInputRef.current.files[0]);
+      }
+      
+      // Add video file if it was uploaded
+      if (videoInputRef.current?.files?.[0]) {
+        formDataToSend.append('profileVideo', videoInputRef.current.files[0]);
+      }
 
       // Call API to update profile
-      const updatedProfile = await userService.updateProfile(updateData);
+      const response = await userService.updateProfile(formDataToSend);
       
-      // Save to localStorage as well for offline access
-      const profileData = {
-        profilePhoto: profilePhotoPreview,
-        profileVideo: profileVideoPreview,
-        username: formData.username,
-        bio: formData.bio,
-        fullName: user?.displayName || "Rahul Chauhan"
-      };
-      saveUserProfile(profileData);
-      
-      // Update auth context with new user data
-      if (updateUser) {
-        updateUser(updatedProfile);
-      }
-      
-      // Call parent callback to refresh profile page
-      if (onProfileUpdate) {
-        onProfileUpdate();
-      }
-      
-      alert("Profile updated successfully!");
-      
-      // Go back to profile page
-      if (onBack) {
-        onBack();
+      if (response && response.user) {
+        // Save to localStorage
+        const profileData = {
+          profilePhoto: response.user.profilePhoto || profilePhotoPreview,
+          profileVideo: response.user.profileVideo || profileVideoPreview,
+          username: response.user.username || formData.username,
+          bio: response.user.bio || formData.bio,
+          fullName: response.user.fullName || response.user.displayName || "Rahul Chauhan"
+        };
+        saveUserProfile(profileData);
+        
+        // Update auth context
+        if (updateUser) {
+          updateUser(response.user);
+        }
+        
+        // Trigger global profile update event
+        window.dispatchEvent(new CustomEvent('profileUpdated', {
+          detail: response.user
+        }));
+        
+        // Call parent callback
+        if (onProfileUpdate) {
+          onProfileUpdate(response.user);
+        }
+        
+        alert("Profile updated successfully!");
+        
+        // Go back to profile page
+        if (onBack) {
+          onBack();
+        }
       }
     } catch (err) {
       console.error("Error updating profile:", err);

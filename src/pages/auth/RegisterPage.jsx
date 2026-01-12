@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 
-export default function SignupPage({ onSignup, onSwitchToLogin }) {
+export default function RegisterPage() {
   const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: "",

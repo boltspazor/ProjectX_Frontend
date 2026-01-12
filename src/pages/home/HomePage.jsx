@@ -54,7 +54,7 @@ export default function HomePage({ setActiveView, onViewUserProfile }) {
       }
 
       const response = await postService.getFeed(params);
-      
+
       if (response.posts && response.posts.length > 0) {
         setPosts((prev) => [...prev, ...response.posts]);
         setLastDocId(response.lastDocId);
@@ -99,7 +99,7 @@ export default function HomePage({ setActiveView, onViewUserProfile }) {
 
     try {
       const newComment = await postService.addComment(activePostId, { text: commentText });
-      
+
       // Update local state with the new comment
       setPostsComments((prev) => ({
         ...prev,
@@ -150,16 +150,16 @@ export default function HomePage({ setActiveView, onViewUserProfile }) {
           {/* Posts Container */}
           <div className="space-y-6">
             {posts.map((post, index) => (
-  <PostCard
-    key={`${post.id || post._id}-${index}`}
-    post={post}
-    postId={post.id || post._id}
-    variant="feed"
-    onCommentClick={handleCommentClick}
-    isActive={activePostId === (post.id || post._id)}
-    onViewUserProfile={onViewUserProfile}
-  />
-))}
+              <PostCard
+                key={`${post.id || post._id}-${index}`}
+                post={post}
+                postId={post.id || post._id}
+                variant="feed"
+                onCommentClick={handleCommentClick}
+                isActive={activePostId === (post.id || post._id)}
+                onViewUserProfile={onViewUserProfile}
+              />
+            ))}
 
 
             {/* Loading Indicator */}

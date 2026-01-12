@@ -24,7 +24,7 @@ export default function PostCard({
   const [likes, setLikes] = useState(postData.likesCount || postData.likes || 0);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
-  const postImage = postData.imageUrl || postData.image || postData.images?.[0] || postSampleImage;
+  const postImage = postData.imageUrl || postData.image || postData.images?.[0] || 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=800';
   const profileImage = author.profilePhoto || author.profilePicture || postData.profileImage || "https://i.pravatar.cc/100";
   const username = author.username || postData.username || "sheryanne_xoxo";
   const caption = postData.caption || postData.content || "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.";
@@ -39,23 +39,14 @@ export default function PostCard({
 
     try {
       const id = postData._id || postId;
-      console.log('Attempting to like/unlike post:', { id, liked, postData, postId });
       
       if (liked) {
-        const result = await postService.unlikePost(id);
-        console.log('Unlike result:', result);
+        await postService.unlikePost(id);
       } else {
-        const result = await postService.likePost(id);
-        console.log('Like result:', result);
+        await postService.likePost(id);
       }
     } catch (err) {
       console.error("Error toggling like:", err);
-      console.error("Error details:", {
-        message: err.message,
-        status: err.status,
-        data: err.data,
-        stack: err.stack
-      });
       // Revert on error
       setLiked(previousLiked);
       setLikes(previousLikes);

@@ -21,7 +21,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
   const [error, setError] = useState(null);
 
   // Sample post data if not provided
-  const postImage = post?.imageUrl || post?.image || "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=800&h=800&fit=crop";
+  const postImage = post?.imageUrl || post?.image || post?.images?.[0] || "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=800";
   const profileImage = post?.user?.profilePhoto || post?.profileImage || profilePhoto;
   const username = post?.user?.username || post?.username || "idkwhoisrahul_04";
   const caption = post?.caption || "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.";
@@ -94,46 +94,60 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
     }
   };
 
-  const handleLikeComment = (commentId) => {
-    setComments(comments.map(comment =>
-      comment.id === commentId
-        ? { ...comment, liked: !comment.liked, likes: comment.liked ? comment.likes - 1 : comment.likes + 1 }
-        : comment
-    ));
+  const handleLikeComment = async (commentId) => {
+    if (!post?.id) return;
+    
+    try {
+      const comment = comments.find(c => c.id === commentId || c._id === commentId);
+      if (!comment) return;
+      
+      const isLiked = comment.isLiked || comment.liked;
+      
+      // Optimistic update
+      setComments(comments.map(c =>
+        (c.id === commentId || c._id === commentId)
+          ? { ...c, isLiked: !isLiked, liked: !isLiked, likesCount: isLiked ? (c.likesCount || 0) - 1 : (c.likesCount || 0) + 1, likes: isLiked ? (c.likes || 0) - 1 : (c.likes || 0) + 1 }
+          : c
+      ));
+      
+      // Call API
+      if (isLiked) {
+        await postService.unlikeComment(post.id, commentId);
+      } else {
+        await postService.likeComment(post.id, commentId);
+      }
+    } catch (error) {
+      console.error('Error liking comment:', error);
+      // Revert on error
+      fetchComments();
+    }
   };
 
   const handleSendComment = async () => {
     if (!newComment.trim() || !post?.id) return;
     
+    const commentText = newComment.trim();
+    setNewComment("");
+    
     try {
-      const optimisticComment = {
-        id: `temp-${Date.now()}`,
-        text: newComment,
-        user: {
-          username: "idkwhoisrahul_04",
-          profilePhoto: profilePhoto
-        },
-        likesCount: 0,
-        isLiked: false,
-        createdAt: new Date().toISOString()
-      };
+      // Call API to save comment
+      const response = await postService.addComment(post.id, { 
+        content: commentText,
+        text: commentText 
+      });
       
-      // Optimistic update
-      setComments([...comments, optimisticComment]);
-      setNewComment("");
-
-      // API call
-      const response = await postService.addComment(post.id, { text: newComment });
-      
-      // Replace optimistic comment with real one
-      setComments(prev => prev.map(c => 
-        c.id === optimisticComment.id ? response.comment : c
-      ));
+      // Add the new comment from backend response
+      if (response && (response.comment || response.data)) {
+        const newCommentObj = response.comment || response.data;
+        setComments(prev => [...prev, newCommentObj]);
+      } else {
+        // Fallback: refetch all comments
+        fetchComments();
+      }
     } catch (error) {
       console.error('Error adding comment:', error);
-      // Remove optimistic comment on error
-      setComments(prev => prev.filter(c => !c.id.toString().startsWith('temp-')));
-      setNewComment(newComment); // Restore comment text
+      setNewComment(commentText); // Restore comment text on error
+      alert('Failed to add comment. Please try again.');
     }
   };
 

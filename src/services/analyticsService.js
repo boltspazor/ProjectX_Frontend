@@ -6,6 +6,19 @@ import { API_ENDPOINTS } from '../config/api';
  */
 export const analyticsService = {
   /**
+   * Get analytics overview
+   */
+  async getOverview() {
+    try {
+      const response = await api.get(API_ENDPOINTS.ANALYTICS.USER);
+      return response.success ? response.data : null;
+    } catch (error) {
+      console.error('Get analytics overview error:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Get user analytics
    */
   async getUserAnalytics() {

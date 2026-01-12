@@ -1,7 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiBarChart2, FiTrendingUp, FiEye, FiHeart } from 'react-icons/fi';
+import { analyticsService } from '../../services';
 
 const AnalyticsPage = () => {
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
+
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await analyticsService.getOverview();
+      setAnalytics(data);
+    } catch (err) {
+      console.error('Failed to fetch analytics:', err);
+      setError(err.message || 'Failed to load analytics');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="page-container">
+        <div className="content-wrapper max-w-6xl flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="content-wrapper max-w-6xl">
+          <div className="card p-6 text-center">
+            <p className="text-red-500 mb-4">Error: {error}</p>
+            <button onClick={fetchAnalytics} className="btn-primary px-6 py-2">
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-container">
       <div className="content-wrapper max-w-6xl">
@@ -23,8 +71,10 @@ const AnalyticsPage = () => {
               <span className="text-gray-600 dark:text-gray-400">Total Views</span>
               <FiEye className="text-primary" />
             </div>
-            <p className="text-3xl font-bold">12,543</p>
-            <p className="text-sm text-green-500 mt-1">+12.5% from last week</p>
+            <p className="text-3xl font-bold">{analytics?.totalViews?.toLocaleString() || 0}</p>
+            <p className="text-sm text-green-500 mt-1">
+              {analytics?.viewsChange || '+0%'} from last week
+            </p>
           </div>
 
           <div className="card p-6">
@@ -32,8 +82,10 @@ const AnalyticsPage = () => {
               <span className="text-gray-600 dark:text-gray-400">Engagement</span>
               <FiHeart className="text-red-500" />
             </div>
-            <p className="text-3xl font-bold">8,432</p>
-            <p className="text-sm text-green-500 mt-1">+8.3% from last week</p>
+            <p className="text-3xl font-bold">{analytics?.totalEngagement?.toLocaleString() || 0}</p>
+            <p className="text-sm text-green-500 mt-1">
+              {analytics?.engagementChange || '+0%'} from last week
+            </p>
           </div>
 
           <div className="card p-6">
@@ -41,17 +93,19 @@ const AnalyticsPage = () => {
               <span className="text-gray-600 dark:text-gray-400">Reach</span>
               <FiTrendingUp className="text-secondary" />
             </div>
-            <p className="text-3xl font-bold">24,128</p>
-            <p className="text-sm text-green-500 mt-1">+15.2% from last week</p>
+            <p className="text-3xl font-bold">{analytics?.totalReach?.toLocaleString() || 0}</p>
+            <p className="text-sm text-green-500 mt-1">
+              {analytics?.reachChange || '+0%'} from last week
+            </p>
           </div>
 
           <div className="card p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 dark:text-gray-400">Credits</span>
+              <span className="text-gray-600 dark:text-gray-400">Posts</span>
               <FiBarChart2 className="text-blue-500" />
             </div>
-            <p className="text-3xl font-bold">1,250</p>
-            <p className="text-sm text-gray-500 mt-1">Available credits</p>
+            <p className="text-3xl font-bold">{analytics?.totalPosts?.toLocaleString() || 0}</p>
+            <p className="text-sm text-gray-500 mt-1">Total posts created</p>
           </div>
         </div>
 
