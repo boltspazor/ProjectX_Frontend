@@ -15,7 +15,7 @@ class SocketService {
   connect(token) {
     // Skip socket connection in mock mode
     if (this.mockMode) {
-      console.log('📦 Socket.io: Running in mock mode, skipping connection');
+      // Running in mock mode, skipping connection
       this.connected = false;
       return null;
     }
@@ -36,12 +36,10 @@ class SocketService {
 
     // Connection events
     this.socket.on('connect', () => {
-      console.log('✅ Socket.io connected');
       this.connected = true;
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('❌ Socket.io disconnected:', reason);
       this.connected = false;
     });
 
