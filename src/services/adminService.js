@@ -1,7 +1,5 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
-import { USE_MOCK_API } from '../mocks/mockApi';
-import { allUsers } from '../mocks/mockData';
 
 /**
  * Admin Service
@@ -12,20 +10,6 @@ export const adminService = {
    */
   async listUsers(page = 1, limit = 20) {
     try {
-      if (USE_MOCK_API) {
-        const startIndex = (page - 1) * limit;
-        const users = allUsers.slice(startIndex, startIndex + limit);
-        return {
-          users,
-          pagination: {
-            page,
-            limit,
-            total: allUsers.length,
-            pages: Math.ceil(allUsers.length / limit),
-          },
-        };
-      }
-      
       const response = await api.get(API_ENDPOINTS.ADMIN.USERS, { page, limit });
       return response.success ? response.data : { users: [], pagination: {} };
     } catch (error) {

@@ -10,6 +10,7 @@ import ExplorePage from "./pages/explore/ExplorePage";
 import MessagesPage from "./pages/messages/MessagesPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import ShopPage from "./pages/shop/ShopPage";
+import AnalyticsPage from "./pages/analytics/AnalyticsPage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import AuthCallback from "./pages/auth/AuthCallback";
@@ -202,6 +203,7 @@ export default function App() {
                     <Route path="/communities/:id/settings" element={<CommunitySettingsWrapper />} />
                     <Route path="/notifications" element={<NotificationsWrapper />} />
                     <Route path="/shop" element={<ShopPage />} />
+                    <Route path="/analytics" element={<AnalyticsPage />} />
                     <Route path="/" element={<Navigate to="/home" replace />} />
                     <Route path="*" element={<Navigate to="/home" replace />} />
                   </Routes>

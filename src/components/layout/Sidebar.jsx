@@ -1,5 +1,6 @@
 // Normal icons
 import { NavLink } from "react-router-dom";
+import { FiBarChart2 } from "react-icons/fi";
 import homeIcon from "../../assets/home.svg";
 import exploreIcon from "../../assets/explore.svg";
 import communitiesIcon from "../../assets/communities.svg";
@@ -56,6 +57,7 @@ export default function Sidebar({ onLogout }) {
     { label: "Explore", value: "/explore", icon: exploreIcon, iconActive: exploreIconActive },
     { label: "Communities", value: "/communities", icon: communitiesIcon, iconActive: communitiesIcon },
     { label: "Messages", value: "/messages", icon: messageIcon, iconActive: messageIconActive },
+    { label: "Analytics", value: "/analytics", icon: null, iconActive: null, isReactIcon: true },
     { label: "Profile", value: "/profile", icon: profileIcon, iconActive: profileIconActive },
   ];
 
@@ -125,7 +127,11 @@ export default function Sidebar({ onLogout }) {
             >
               {({ isActive }) => (
                 <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-white dark:bg-[#0f0f0f]">
-                  <img src={isActive ? item.icon : item.icon} className="h-5 w-5 invert dark:invert-0" alt={item.label} />
+                  {item.isReactIcon ? (
+                    <FiBarChart2 className={`h-5 w-5 ${isActive ? 'text-orange-500' : 'text-black dark:text-white'}`} />
+                  ) : (
+                    <img src={isActive ? item.icon : item.icon} className="h-5 w-5 invert dark:invert-0" alt={item.label} />
+                  )}
                   <span className={`${isActive ? "text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" : ""}`}>
                     {item.label}
                   </span>

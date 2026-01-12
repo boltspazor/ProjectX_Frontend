@@ -1,6 +1,5 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
-import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * Message Service
@@ -11,8 +10,6 @@ export const messageService = {
    */
   async createConversation(userId) {
     try {
-      if (USE_MOCK_API) return await mockApi.messages.createConversation(userId);
-      
       // Backend expects userId, not participantIds
       const response = await api.post(API_ENDPOINTS.MESSAGES.CREATE_CONVERSATION, { userId });
       return response.success ? response.data.conversation : null;
@@ -27,11 +24,6 @@ export const messageService = {
    */
   async getConversations(limit = 20, skip = 0) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.messages.getConversations(limit);
-        return response.success ? response.data : [];
-      }
-      
       // Backend expects skip, not page
       const response = await api.get(API_ENDPOINTS.MESSAGES.LIST_CONVERSATIONS, { limit, skip });
       return response.success ? response.data.conversations : [];
@@ -46,10 +38,6 @@ export const messageService = {
    */
   async sendMessage(conversationId, recipientId, text, mediaUrl = null) {
     try {
-      if (USE_MOCK_API) {
-        return await mockApi.messages.sendMessage(conversationId, { content: text, mediaUrl });
-      }
-      
       // Backend expects: conversationId, recipientId, text, mediaUrl
       const response = await api.post(API_ENDPOINTS.MESSAGES.SEND, {
         conversationId,
@@ -69,11 +57,6 @@ export const messageService = {
    */
   async getMessagesByConversation(conversationId, limit = 50, skip = 0) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.messages.getMessages(conversationId, limit, Math.floor(skip / limit) + 1);
-        return response.success ? response.data.messages : [];
-      }
-      
       // Backend expects skip, not page
       const response = await api.get(API_ENDPOINTS.MESSAGES.BY_CONVERSATION(conversationId), { limit, skip });
       return response.success ? response.data.messages : [];
@@ -88,10 +71,6 @@ export const messageService = {
    */
   async markConversationAsRead(conversationId, lastReadMessageId = null) {
     try {
-      if (USE_MOCK_API) {
-        return await mockApi.messages.markAsRead(conversationId);
-      }
-      
       const data = lastReadMessageId ? { lastReadMessageId } : {};
       const response = await api.post(API_ENDPOINTS.MESSAGES.MARK_READ(conversationId), data);
       return response;

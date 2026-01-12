@@ -38,13 +38,24 @@ export default function PostCard({
     setLikes(liked ? likes - 1 : likes + 1);
 
     try {
+      const id = postData._id || postId;
+      console.log('Attempting to like/unlike post:', { id, liked, postData, postId });
+      
       if (liked) {
-        await postService.unlikePost(postData._id || postId);
+        const result = await postService.unlikePost(id);
+        console.log('Unlike result:', result);
       } else {
-        await postService.likePost(postData._id || postId);
+        const result = await postService.likePost(id);
+        console.log('Like result:', result);
       }
     } catch (err) {
       console.error("Error toggling like:", err);
+      console.error("Error details:", {
+        message: err.message,
+        status: err.status,
+        data: err.data,
+        stack: err.stack
+      });
       // Revert on error
       setLiked(previousLiked);
       setLikes(previousLikes);

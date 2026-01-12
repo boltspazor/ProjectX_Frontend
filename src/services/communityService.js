@@ -1,6 +1,5 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
-import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * Community Service
@@ -11,13 +10,8 @@ export const communityService = {
    */
   async getPublicCommunities(limit = 20) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.communities.getPublicCommunities(limit);
-        return response.success ? response.data : [];
-      }
-      
       const response = await api.get(API_ENDPOINTS.COMMUNITIES.PUBLIC, { limit });
-      return response.success ? response.data : [];
+      return response.success ? (response.data?.communities || response.data || []) : [];
     } catch (error) {
       console.error('Get public communities error:', error);
       throw error;
@@ -29,13 +23,13 @@ export const communityService = {
    */
   async getUserCommunities(limit = 20) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.communities.getUserCommunities(limit);
-        return response.success ? response.data : [];
-      }
-      
+      console.log('communityService.getUserCommunities called');
+      console.log('API endpoint:', API_ENDPOINTS.COMMUNITIES.USER_COMMUNITIES);
       const response = await api.get(API_ENDPOINTS.COMMUNITIES.USER_COMMUNITIES, { limit });
-      return response.success ? response.data : [];
+      console.log('User communities response:', response);
+      const communities = response.success ? (response.data?.communities || response.data || []) : [];
+      console.log('Processed communities:', communities);
+      return communities;
     } catch (error) {
       console.error('Get user communities error:', error);
       throw error;
@@ -47,8 +41,6 @@ export const communityService = {
    */
   async createCommunity(communityData) {
     try {
-      if (USE_MOCK_API) return await mockApi.communities.createCommunity(communityData);
-      
       const response = await api.post(API_ENDPOINTS.COMMUNITIES.CREATE, communityData);
       return response.success ? response.data : null;
     } catch (error) {
@@ -62,11 +54,6 @@ export const communityService = {
    */
   async getCommunityBySlug(slug) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.communities.getCommunityBySlug(slug);
-        return response.success ? response.data : null;
-      }
-      
       const response = await api.get(API_ENDPOINTS.COMMUNITIES.BY_SLUG(slug));
       return response.success ? response.data : null;
     } catch (error) {
@@ -80,11 +67,6 @@ export const communityService = {
    */
   async getCommunityPosts(communityId, limit = 10, page = 1) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.communities.getCommunityPosts(communityId, limit, page);
-        return response.success ? response.data : { posts: [], pagination: {} };
-      }
-      
       const response = await api.get(API_ENDPOINTS.COMMUNITIES.POSTS(communityId), { limit, page });
       return response.success ? response.data : { posts: [], pagination: {} };
     } catch (error) {

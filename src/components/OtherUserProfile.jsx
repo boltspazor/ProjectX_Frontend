@@ -85,12 +85,27 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
     const newFollowingState = !isFollowing;
     const previousFollowingState = isFollowing;
     
+    console.log('handleFollow called:', { 
+      viewedUser, 
+      userData, 
+      newFollowingState, 
+      uid: userData?.uid, 
+      _id: userData?._id 
+    });
+    
     // Optimistic update
     setIsFollowing(newFollowingState);
 
     try {
       if (newFollowingState) {
-        await userService.followUser(viewedUser);
+        // Use userId from userData instead of username
+        const userIdToFollow = userData?.uid || userData?._id;
+        console.log('Following user with ID:', userIdToFollow);
+        if (!userIdToFollow) {
+          throw new Error('User ID not found');
+        }
+        const result = await userService.followUser(userIdToFollow);
+        console.log('Follow result:', result);
         
         // Update follower count
         if (userData?.stats) {
@@ -100,7 +115,14 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
           });
         }
       } else {
-        await userService.unfollowUser(viewedUser);
+        // Use userId from userData instead of username
+        const userIdToUnfollow = userData?.uid || userData?._id;
+        console.log('Unfollowing user with ID:', userIdToUnfollow);
+        if (!userIdToUnfollow) {
+          throw new Error('User ID not found');
+        }
+        const result = await userService.unfollowUser(userIdToUnfollow);
+        console.log('Unfollow result:', result);
         
         // Update follower count
         if (userData?.stats) {
@@ -112,6 +134,12 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
       }
     } catch (err) {
       console.error("Error toggling follow:", err);
+      console.error('Error details:', {
+        message: err.message,
+        status: err.status,
+        data: err.data,
+        stack: err.stack
+      });
       // Revert on error
       setIsFollowing(previousFollowingState);
       alert("Failed to update follow status. Please try again.");
