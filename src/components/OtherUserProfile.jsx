@@ -90,7 +90,12 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
 
     try {
       if (newFollowingState) {
-        await userService.followUser(viewedUser);
+        // Use userId from userData instead of username
+        const userIdToFollow = userData?.uid || userData?._id;
+        if (!userIdToFollow) {
+          throw new Error('User ID not found');
+        }
+        await userService.followUser(userIdToFollow);
         
         // Update follower count
         if (userData?.stats) {
@@ -100,7 +105,12 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
           });
         }
       } else {
-        await userService.unfollowUser(viewedUser);
+        // Use userId from userData instead of username
+        const userIdToUnfollow = userData?.uid || userData?._id;
+        if (!userIdToUnfollow) {
+          throw new Error('User ID not found');
+        }
+        await userService.unfollowUser(userIdToUnfollow);
         
         // Update follower count
         if (userData?.stats) {

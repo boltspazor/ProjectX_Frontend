@@ -1,6 +1,5 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
-import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * AI Service
@@ -11,8 +10,6 @@ export const aiService = {
    */
   async getCreditCosts() {
     try {
-      if (USE_MOCK_API) return { generateImage: 20, generateCaption: 5, generateBio: 10 };
-      
       const response = await api.get(API_ENDPOINTS.AI.CREDIT_COSTS);
       return response.success ? response.data : {};
     } catch (error) {
@@ -26,8 +23,6 @@ export const aiService = {
    */
   async generateImage(prompt, options = {}) {
     try {
-      if (USE_MOCK_API) return await mockApi.ai.generateImage(prompt);
-      
       const response = await api.post(API_ENDPOINTS.AI.GENERATE_IMAGE, { prompt, ...options });
       return response.success ? response.data : null;
     } catch (error) {
@@ -41,8 +36,6 @@ export const aiService = {
    */
   async generateCaption(imageUrl, context = '') {
     try {
-      if (USE_MOCK_API) return await mockApi.ai.generateContent(`Generate caption for image: ${context}`);
-      
       const response = await api.post(API_ENDPOINTS.AI.GENERATE_CAPTION, { imageUrl, context });
       return response.success ? response.data : null;
     } catch (error) {

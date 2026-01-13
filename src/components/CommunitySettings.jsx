@@ -776,4 +776,3 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
     </div>
   );
 }
-

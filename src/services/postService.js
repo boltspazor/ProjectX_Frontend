@@ -1,6 +1,5 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
-import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * Post Service
@@ -11,12 +10,6 @@ export const postService = {
    */
   async getFeed(params = {}) {
     try {
-      // Use mock API if enabled
-      if (USE_MOCK_API) {
-        const response = await mockApi.posts.getFeed(params);
-        return response.success ? response.data : { posts: [], lastDocId: null, hasMore: false };
-      }
-      
       const { limit = 10, lastDocId = null } = params;
       const queryParams = { limit };
       if (lastDocId) queryParams.lastDocId = lastDocId;
@@ -34,11 +27,6 @@ export const postService = {
    */
   async getTrending(limit = 10, page = 1) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.posts.getTrending(limit, page);
-        return response.success ? response.data : { posts: [], pagination: {} };
-      }
-      
       const response = await api.get(API_ENDPOINTS.POSTS.TRENDING, { limit, page });
       return response.success ? response.data : { posts: [], pagination: {} };
     } catch (error) {
@@ -52,11 +40,6 @@ export const postService = {
    */
   async getUserPosts(username, limit = 10, page = 1) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.posts.getUserPosts(username, limit, page);
-        return response.success ? response.data : { posts: [], pagination: {} };
-      }
-      
       const response = await api.get(API_ENDPOINTS.POSTS.BY_USER(username), { limit, page });
       return response.success ? response.data : { posts: [], pagination: {} };
     } catch (error) {
@@ -70,11 +53,6 @@ export const postService = {
    */
   async getPostById(postId) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.posts.getPostById(postId);
-        return response.success ? response.data : null;
-      }
-      
       const response = await api.get(API_ENDPOINTS.POSTS.BY_ID(postId));
       return response.success ? response.data : null;
     } catch (error) {
@@ -88,11 +66,6 @@ export const postService = {
    */
   async getPostComments(postId, limit = 20, page = 1) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.posts.getPostComments(postId, limit, page);
-        return response.success ? response.data : { comments: [], pagination: {} };
-      }
-      
       const response = await api.get(API_ENDPOINTS.POSTS.COMMENTS(postId), { limit, page });
       return response.success ? response.data : { comments: [], pagination: {} };
     } catch (error) {
@@ -106,11 +79,6 @@ export const postService = {
    */
   async createPost(postData) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.posts.createPost(postData);
-        return response.success ? response.data : null;
-      }
-      
       const response = await api.post(API_ENDPOINTS.POSTS.CREATE, postData);
       return response.success ? response.data : null;
     } catch (error) {
@@ -124,8 +92,6 @@ export const postService = {
    */
   async updatePost(postId, postData) {
     try {
-      if (USE_MOCK_API) return await mockApi.posts.updatePost(postId, postData);
-      
       const response = await api.put(API_ENDPOINTS.POSTS.UPDATE(postId), postData);
       return response.success ? response.data : null;
     } catch (error) {
@@ -139,8 +105,6 @@ export const postService = {
    */
   async deletePost(postId) {
     try {
-      if (USE_MOCK_API) return await mockApi.posts.deletePost(postId);
-      
       const response = await api.delete(API_ENDPOINTS.POSTS.DELETE(postId));
       return response;
     } catch (error) {
@@ -154,11 +118,6 @@ export const postService = {
    */
   async likePost(postId) {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.posts.likePost(postId);
-        return response;
-      }
-      
       const response = await api.post(API_ENDPOINTS.POSTS.LIKE(postId));
       return response;
     } catch (error) {
@@ -185,8 +144,6 @@ export const postService = {
    */
   async addComment(postId, commentData) {
     try {
-      if (USE_MOCK_API) return await mockApi.posts.createComment(postId, commentData);
-      
       const response = await api.post(API_ENDPOINTS.POSTS.ADD_COMMENT(postId), commentData);
       return response.success ? response.data : null;
     } catch (error) {
@@ -200,8 +157,6 @@ export const postService = {
    */
   async bookmarkPost(postId) {
     try {
-      if (USE_MOCK_API) return await mockApi.posts.savePost(postId);
-      
       const response = await api.post(API_ENDPOINTS.POSTS.BOOKMARK(postId));
       return response;
     } catch (error) {

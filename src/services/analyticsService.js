@@ -1,18 +1,28 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
-import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * Analytics Service
  */
 export const analyticsService = {
   /**
+   * Get analytics overview
+   */
+  async getOverview() {
+    try {
+      const response = await api.get(API_ENDPOINTS.ANALYTICS.USER);
+      return response.success ? response.data : null;
+    } catch (error) {
+      console.error('Get analytics overview error:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Get user analytics
    */
   async getUserAnalytics() {
     try {
-      if (USE_MOCK_API) return await mockApi.analytics.getAnalytics();
-      
       const response = await api.get(API_ENDPOINTS.ANALYTICS.USER);
       return response.success ? response.data : null;
     } catch (error) {

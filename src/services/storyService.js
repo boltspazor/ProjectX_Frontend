@@ -1,6 +1,5 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
-import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * Story Service
@@ -11,11 +10,6 @@ export const storyService = {
    */
   async getStories() {
     try {
-      if (USE_MOCK_API) {
-        const response = await mockApi.stories.getStories();
-        return response.success ? response.data : [];
-      }
-      
       const response = await api.get(API_ENDPOINTS.STORIES.LIST, {}, false);
       return response.success ? response.data?.stories || [] : [];
     } catch (error) {
@@ -29,8 +23,6 @@ export const storyService = {
    */
   async createStory(story) {
     try {
-      if (USE_MOCK_API) return await mockApi.stories.createStory(story);
-      
       const response = await api.post(API_ENDPOINTS.STORIES.CREATE, story);
       return response.success ? response.data?.story || null : null;
     } catch (error) {

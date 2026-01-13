@@ -1,6 +1,5 @@
 import { api } from '../utils/httpClient';
 import { API_ENDPOINTS } from '../config/api';
-import { USE_MOCK_API, mockApi } from '../mocks/mockApi';
 
 /**
  * Upload Service
@@ -11,8 +10,6 @@ export const uploadService = {
    */
   async uploadFromURL(imageUrl, folder = 'posts') {
     try {
-      if (USE_MOCK_API) return await mockApi.upload.uploadImage({ url: imageUrl, folder });
-      
       const response = await api.post(API_ENDPOINTS.UPLOAD.URL, { imageUrl, folder });
       return response.success ? response.data : null;
     } catch (error) {
@@ -26,8 +23,6 @@ export const uploadService = {
    */
   async uploadFromBase64(base64, folder = 'posts') {
     try {
-      if (USE_MOCK_API) return await mockApi.upload.uploadImage({ base64, folder });
-      
       const response = await api.post(API_ENDPOINTS.UPLOAD.BASE64, { base64, folder });
       return response.success ? response.data : null;
     } catch (error) {
