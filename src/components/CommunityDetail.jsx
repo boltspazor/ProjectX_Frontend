@@ -83,7 +83,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
   if (loading) {
     return (
       <div className="min-h-screen w-full bg-[#0b0b0b] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -96,7 +96,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
           <h1 className="text-2xl font-bold text-white mb-4">Community not found</h1>
           <button
             onClick={() => setActiveView("communities", null)}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition"
           >
             Back to Communities
           </button>
@@ -301,21 +301,21 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                       onClick={handleJoin}
                       className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition flex-shrink-0 ${isJoined
                         ? "bg-gray-700 text-white border border-gray-600"
-                        : "bg-orange-500 text-white hover:bg-orange-600"
+                        : "bg-primary text-white hover:bg-primary-700"
                         }`}
                     >
                       {isJoined ? "Joined" : "Join"}
                     </button>
                     <button
                       onClick={handleAddPost}
-                      className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg bg-transparent text-white border border-orange-500 text-xs sm:text-sm font-medium hover:bg-orange-500/10 transition flex-shrink-0"
+                      className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg bg-transparent text-white border border-primary text-xs sm:text-sm font-medium hover:bg-primary/10 transition flex-shrink-0"
                     >
                       Add Post
                     </button>
                     {canManageSettings && (
                       <button
                         onClick={() => setActiveView("communitySettings", communityId)}
-                        className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg bg-transparent text-white border border-orange-500 text-xs sm:text-sm font-medium hover:bg-orange-500/10 transition flex items-center gap-1 sm:gap-2 flex-shrink-0"
+                        className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg bg-transparent text-white border border-primary text-xs sm:text-sm font-medium hover:bg-primary/10 transition flex items-center gap-1 sm:gap-2 flex-shrink-0"
                       >
                         <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
                         <span className="hidden sm:inline">Settings</span>
@@ -344,11 +344,11 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
             {/* Community Information */}
             <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-3 sm:p-4 space-y-3 sm:space-y-4">
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <Pencil className="w-4 h-4 text-orange-500" />
+                <Pencil className="w-4 h-4 text-primary" />
                 <span>Created {community.createdDate}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <Globe className="w-4 h-4 text-orange-500" />
+                <Globe className="w-4 h-4 text-primary" />
                 <span>{community.type}</span>
               </div>
 
@@ -391,7 +391,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                       setCopiedCode(true);
                       setTimeout(() => setCopiedCode(false), 2000);
                     }}
-                    className="px-3 sm:px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2 text-xs sm:text-sm whitespace-nowrap"
+                    className="px-3 sm:px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm whitespace-nowrap"
                   >
                     {copiedCode ? (
                       <>
@@ -413,7 +413,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     setCopiedLink(true);
                     setTimeout(() => setCopiedLink(false), 2000);
                   }}
-                  className="w-full px-3 sm:px-4 py-2 bg-transparent border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500/10 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+                  className="w-full px-3 sm:px-4 py-2 bg-transparent border border-primary text-primary rounded-lg hover:bg-primary/10 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
                 >
                   {copiedLink ? (
                     <>
@@ -440,8 +440,8 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     key={index}
                     onClick={() => handleTopicClick(topic)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${index < 3
-                      ? "bg-orange-500 text-white"
-                      : "bg-orange-500 text-white"
+                      ? "bg-primary text-white"
+                      : "bg-primary text-white"
                       }`}
                   >
                     {topic}
@@ -505,7 +505,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     </div>
                     {/* Category Badge (Reddit-style) */}
                     {post.category && (
-                      <span className="px-2 sm:px-3 py-1 text-xs font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full flex-shrink-0">
+                      <span className="px-2 sm:px-3 py-1 text-xs font-semibold bg-primary/20 text-primary-400 border border-primary/30 rounded-full flex-shrink-0">
                         {post.category}
                       </span>
                     )}
@@ -608,7 +608,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     setCodeError("");
                   }}
                   placeholder="Enter community code"
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
                   autoFocus
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
@@ -633,7 +633,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                 </button>
                 <button
                   onClick={handleCodeSubmit}
-                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition"
                 >
                   Submit
                 </button>
@@ -661,7 +661,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                     setPasswordError("");
                   }}
                   placeholder="Enter password"
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
                   autoFocus
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
@@ -686,7 +686,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
                 </button>
                 <button
                   onClick={handlePasswordSubmit}
-                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition"
                 >
                   Join
                 </button>
@@ -846,9 +846,9 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
               className="p-2 hover:bg-gray-800 rounded-full transition relative"
               title="Drafts"
             >
-              <Bookmark className="w-5 h-5 text-gray-400 hover:text-orange-500" />
+              <Bookmark className="w-5 h-5 text-gray-400 hover:text-primary" />
               {drafts.length > 0 && (
-                <span className="absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full"></span>
+                <span className="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
               )}
             </button>
 
@@ -882,7 +882,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                     <div key={draft.id} className="flex items-start gap-2">
                       <button
                         onClick={() => handleLoadDraft(draft)}
-                        className="flex-1 text-left p-3 rounded-lg bg-[#0f0f0f] hover:bg-[#121212] border border-gray-800 hover:border-orange-500/50 transition"
+                        className="flex-1 text-left p-3 rounded-lg bg-[#0f0f0f] hover:bg-[#121212] border border-gray-800 hover:border-primary/50 transition"
                       >
                         <div className="flex items-start gap-3">
                           {draft.imagePreview && (
@@ -948,7 +948,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full py-12 border-2 border-dashed border-gray-700 rounded-lg hover:border-orange-500 transition text-gray-400 hover:text-white"
+                  className="w-full py-12 border-2 border-dashed border-gray-700 rounded-lg hover:border-primary transition text-gray-400 hover:text-white"
                 >
                   <div className="flex flex-col items-center gap-2">
                     <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -968,7 +968,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep("caption")}
-                  className="flex-1 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition"
+                  className="flex-1 px-6 py-3 bg-primary hover:bg-primary-700 text-white rounded-lg font-medium transition"
                 >
                   {imagePreview ? "Continue to Post Details" : "Skip Image & Continue"}
                 </button>
@@ -991,7 +991,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter post title..."
-                  className="w-full px-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
               </div>
 
@@ -1001,7 +1001,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="What's on your mind? (Optional)"
-                  className="w-full min-h-[150px] px-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                  className="w-full min-h-[150px] px-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                 />
               </div>
 
@@ -1015,8 +1015,8 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                         selectedCategory === category ? null : category
                       )}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition ${selectedCategory === category
-                        ? "bg-orange-500 text-white"
-                        : "bg-[#1a1a1a] text-gray-300 border border-gray-700 hover:border-orange-500/50"
+                        ? "bg-primary text-white"
+                        : "bg-[#1a1a1a] text-gray-300 border border-gray-700 hover:border-primary/50"
                         }`}
                     >
                       {category}
@@ -1036,7 +1036,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                   <button
                     onClick={handlePost}
                     disabled={!title.trim()}
-                    className="flex-1 px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg font-medium transition"
+                    className="flex-1 px-6 py-3 bg-primary hover:bg-primary-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg font-medium transition"
                   >
                     Post
                   </button>
@@ -1046,7 +1046,7 @@ function CreateCommunityPost({ isOpen, onClose, onPostCreated, community }) {
                 {(title.trim() || imagePreview) && (
                   <button
                     onClick={handleSaveDraft}
-                    className="w-full flex items-center justify-center gap-2 border-2 border-gray-700 hover:border-orange-500 text-gray-300 hover:text-orange-500 font-medium py-3 px-6 rounded-lg transition"
+                    className="w-full flex items-center justify-center gap-2 border-2 border-gray-700 hover:border-primary text-gray-300 hover:text-primary font-medium py-3 px-6 rounded-lg transition"
                   >
                     <Bookmark className="w-4 h-4" />
                     {currentDraftId ? "Update Draft" : "Save as Draft"}

@@ -245,7 +245,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
           <div className="space-y-6">
             {/* Profile Picture */}
             <div>
-              <label className="block text-sm font-medium text-orange-500 mb-3">
+              <label className="block text-sm font-medium text-primary mb-3">
                 Profile Picture
               </label>
               <div className="relative w-32 h-32 mx-auto md:mx-0">
@@ -267,7 +267,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                 <button
                   onClick={() => photoInputRef.current?.click()}
                   disabled={uploadingPhoto}
-                  className="absolute bottom-0 right-0 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors border-2 border-white dark:border-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="absolute bottom-0 right-0 w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary-700 transition-colors border-2 border-white dark:border-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Upload profile photo"
                 >
                   {uploadingPhoto ? (
@@ -301,7 +301,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
 
             {/* Live Profile Video */}
             <div>
-              <label className="block text-sm font-medium text-orange-500 mb-3">
+              <label className="block text-sm font-medium text-primary mb-3">
                 Live Profile Video
               </label>
               <div className="space-y-3">
@@ -336,7 +336,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                     />
                     <button
                       onClick={() => videoInputRef.current?.click()}
-                      className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
+                      className="px-4 py-2 bg-primary hover:bg-primary-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
                     >
                       <Upload className="h-4 w-4" />
                       Upload Video (Max 10MB)
@@ -349,7 +349,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
 
             {/* Username */}
             <div>
-              <label className="block text-sm font-medium text-orange-500 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Username
               </label>
               <input
@@ -357,13 +357,13 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-primary transition-colors"
               />
             </div>
 
             {/* Bio */}
             <div>
-              <label className="block text-sm font-medium text-orange-500 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Bio
               </label>
               <textarea
@@ -371,13 +371,13 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                 value={formData.bio}
                 onChange={handleInputChange}
                 rows="3"
-                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-orange-500 transition-colors resize-none"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-primary transition-colors resize-none"
               />
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-orange-500 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Email Address
               </label>
               <input
@@ -385,13 +385,13 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-primary transition-colors"
               />
             </div>
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium text-orange-500 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Phone Number
               </label>
               <input
@@ -400,13 +400,13 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                 value={formData.phone}
                 onChange={handleInputChange}
                 placeholder="Enter phone number"
-                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-primary transition-colors"
               />
             </div>
 
             {/* Gender */}
             <div>
-              <label className="block text-sm font-medium text-orange-500 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Gender
               </label>
               <input
@@ -415,7 +415,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                 value={formData.gender}
                 onChange={handleInputChange}
                 placeholder="Enter gender"
-                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-primary transition-colors"
               />
             </div>
           </div>
@@ -424,7 +424,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
           <div className="space-y-6">
             {/* Account Type */}
             <div>
-              <label className="block text-sm font-medium text-orange-500 mb-3">
+              <label className="block text-sm font-medium text-primary mb-3">
                 Account Type
               </label>
               <div className="flex gap-4">
@@ -435,7 +435,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                     value="public"
                     checked={accountType === "public"}
                     onChange={(e) => setAccountType(e.target.value)}
-                    className="w-4 h-4 text-orange-500 focus:ring-orange-500"
+                    className="w-4 h-4 text-primary focus:ring-primary"
                   />
                   <span className="text-black dark:text-white">Public</span>
                 </label>
@@ -446,7 +446,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                     value="private"
                     checked={accountType === "private"}
                     onChange={(e) => setAccountType(e.target.value)}
-                    className="w-4 h-4 text-orange-500 focus:ring-orange-500"
+                    className="w-4 h-4 text-primary focus:ring-primary"
                   />
                   <span className="text-black dark:text-white">Private</span>
                 </label>
@@ -455,7 +455,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
 
             {/* Notifications */}
             <div>
-              <label className="block text-sm font-medium text-orange-500 mb-3">
+              <label className="block text-sm font-medium text-primary mb-3">
                 Notifications
               </label>
               <div className="space-y-3">
@@ -463,7 +463,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                   <span className="text-black dark:text-white">Likes</span>
                   <button
                     onClick={() => handleNotificationToggle("likes")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.likes ? "bg-orange-500" : "bg-gray-600"
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.likes ? "bg-primary" : "bg-gray-600"
                       }`}
                   >
                     <span
@@ -477,7 +477,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                   <span className="text-black dark:text-white">Comments</span>
                   <button
                     onClick={() => handleNotificationToggle("comments")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.comments ? "bg-orange-500" : "bg-gray-600"
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.comments ? "bg-primary" : "bg-gray-600"
                       }`}
                   >
                     <span
@@ -491,7 +491,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                   <span className="text-black dark:text-white">Messages</span>
                   <button
                     onClick={() => handleNotificationToggle("messages")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.messages ? "bg-orange-500" : "bg-gray-600"
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.messages ? "bg-primary" : "bg-gray-600"
                       }`}
                   >
                     <span
@@ -505,7 +505,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                   <span className="text-black dark:text-white">Follow Requests</span>
                   <button
                     onClick={() => handleNotificationToggle("followRequests")}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.followRequests ? "bg-orange-500" : "bg-gray-600"
+                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications.followRequests ? "bg-primary" : "bg-gray-600"
                       }`}
                   >
                     <span
@@ -519,7 +519,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
 
             {/* Read Receipts */}
             <div>
-              <label className="block text-sm font-medium text-orange-500 mb-3">
+              <label className="block text-sm font-medium text-primary mb-3">
                 Read Receipts
               </label>
               <div className="bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3">
@@ -536,7 +536,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                       setReadReceiptsEnabled(newValue);
                       localStorage.setItem('readReceiptsEnabled', newValue.toString());
                     }}
-                    className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${readReceiptsEnabled ? "bg-orange-500" : "bg-gray-600"
+                    className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${readReceiptsEnabled ? "bg-primary" : "bg-gray-600"
                       }`}
                   >
                     <span
@@ -559,7 +559,7 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                 <button
                   onClick={handleSaveChanges}
                   disabled={isSaving}
-                  className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-6 py-3 bg-primary hover:bg-primary-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {isSaving ? (
                     <>

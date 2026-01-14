@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-export default function RegisterPage() {
+export default function RegisterPage({ onSwitchToLogin }) {
+  const navigate = useNavigate();
   const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
@@ -343,7 +345,7 @@ export default function RegisterPage() {
     try {
       // Call API register
       const response = await register({
-        name: formData.name,
+        displayName: formData.name,
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -351,9 +353,9 @@ export default function RegisterPage() {
 
       if (response.success) {
         createSuccessParticles();
-        // Wait for animation before redirecting
+        // Wait for animation before redirecting - user is already authenticated via AuthContext
         setTimeout(() => {
-          onSignup();
+          navigate('/home');
         }, 800);
       } else {
         setError(response.message || "Registration failed. Please try again.");
@@ -458,14 +460,29 @@ export default function RegisterPage() {
       controller.style.opacity = "0";
       controller.style.transform = "scale(0.95)";
       setTimeout(() => {
-        onSwitchToLogin();
+        if (onSwitchToLogin) {
+          onSwitchToLogin();
+        } else {
+          navigate('/login');
+        }
       }, 400);
+    } else {
+      if (onSwitchToLogin) {
+        onSwitchToLogin();
+      } else {
+        navigate('/login');
+      }
     }
   };
 
   const handleGoogleSignup = () => {
-    // Google OAuth signup logic here
-    // For now, just call onSignup after a short delay to simulate OAuth
+    // Redirect to Google OAuth endpoint
+    const googleAuthURL = authService.getGoogleLoginURL();
+    window.location.href = googleAuthURL;
+  };
+
+  const handleGoogleSignupOld = () => {
+    // Old simulation code - keeping for reference
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
@@ -583,7 +600,7 @@ export default function RegisterPage() {
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, rgba(255,87,34,0.05) 0%, transparent 50%);
+          background: linear-gradient(135deg, rgba(119, 5, 36,0.05) 0%, transparent 50%);
           border-radius: 20px;
           z-index: -1;
         }
@@ -598,8 +615,8 @@ export default function RegisterPage() {
           font-size: 32px;
           color: #ff5722;
           text-shadow:
-            0 0 10px rgba(255, 87, 34, 0.5),
-            0 0 20px rgba(255, 87, 34, 0.3);
+            0 0 10px rgba(119, 5, 36, 0.5),
+            0 0 20px rgba(119, 5, 36, 0.3);
           letter-spacing: 3px;
           animation: logoGlow 3s ease-in-out infinite alternate;
           position: relative;
@@ -619,13 +636,13 @@ export default function RegisterPage() {
 
         @keyframes logoGlow {
           0% {
-            text-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+            text-shadow: 0 0 10px rgba(119, 5, 36, 0.5);
           }
           100% {
             text-shadow:
-              0 0 20px rgba(255, 87, 34, 0.8),
-              0 0 30px rgba(255, 87, 34, 0.6),
-              0 0 40px rgba(255, 87, 34, 0.4);
+              0 0 20px rgba(119, 5, 36, 0.8),
+              0 0 30px rgba(119, 5, 36, 0.6),
+              0 0 40px rgba(119, 5, 36, 0.4);
           }
         }
 
@@ -676,8 +693,8 @@ export default function RegisterPage() {
           outline: none;
           border-color: #ff5722;
           box-shadow:
-            0 0 15px rgba(255, 87, 34, 0.4),
-            inset 0 0 10px rgba(255, 87, 34, 0.1);
+            0 0 15px rgba(119, 5, 36, 0.4),
+            inset 0 0 10px rgba(119, 5, 36, 0.1);
           transform: translateY(-3px);
           background: rgba(255, 255, 255, 0.12);
         }
@@ -711,7 +728,7 @@ export default function RegisterPage() {
 
         .password-toggle:hover {
           color: #ff5722;
-          background: rgba(255, 87, 34, 0.1);
+          background: rgba(119, 5, 36, 0.1);
         }
 
         .password-toggle:active {
@@ -724,7 +741,7 @@ export default function RegisterPage() {
           margin-top: 8px;
           display: block;
           animation: errorFadeIn 0.3s ease;
-          text-shadow: 0 0 8px rgba(255, 87, 34, 0.5);
+          text-shadow: 0 0 8px rgba(119, 5, 36, 0.5);
           position: relative;
           padding-left: 20px;
         }
@@ -748,7 +765,7 @@ export default function RegisterPage() {
         }
 
         .input-group.has-error .input-field {
-          border-color: rgba(255, 87, 34, 0.7);
+          border-color: rgba(119, 5, 36, 0.7);
           animation: inputError 0.3s ease;
         }
 
@@ -768,7 +785,7 @@ export default function RegisterPage() {
         }
 
         .input-field:invalid:not(:placeholder-shown):not(:focus) {
-          border-color: rgba(255, 87, 34, 0.6);
+          border-color: rgba(119, 5, 36, 0.6);
         }
 
         .terms-checkbox {
@@ -887,13 +904,13 @@ export default function RegisterPage() {
           background: linear-gradient(45deg, #ff5722, #ff9800);
           color: white;
           flex: 1;
-          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+          box-shadow: 0 5px 15px rgba(119, 5, 36, 0.4);
         }
 
         .signup-btn:hover:not(:disabled) {
           background: linear-gradient(45deg, #e64a19, #f57c00);
           transform: translateY(-3px);
-          box-shadow: 0 8px 25px rgba(255, 87, 34, 0.6);
+          box-shadow: 0 8px 25px rgba(119, 5, 36, 0.6);
         }
 
         .signup-btn.loading {
@@ -934,9 +951,9 @@ export default function RegisterPage() {
         }
 
         .login-btn:hover:not(:disabled) {
-          background: rgba(255, 87, 34, 0.1);
+          background: rgba(119, 5, 36, 0.1);
           transform: translateY(-3px);
-          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+          box-shadow: 0 5px 15px rgba(119, 5, 36, 0.3);
         }
 
         /* Divider */
@@ -952,7 +969,7 @@ export default function RegisterPage() {
           content: '';
           flex: 1;
           height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(255, 87, 34, 0.3), transparent);
+          background: linear-gradient(90deg, transparent, rgba(119, 5, 36, 0.3), transparent);
         }
 
         .divider span {
@@ -960,7 +977,7 @@ export default function RegisterPage() {
           font-size: 12px;
           font-weight: 600;
           letter-spacing: 2px;
-          text-shadow: 0 0 10px rgba(255, 87, 34, 0.3);
+          text-shadow: 0 0 10px rgba(119, 5, 36, 0.3);
         }
 
         /* Google Button */
@@ -1072,7 +1089,7 @@ export default function RegisterPage() {
           left: 0;
           width: 100%;
           height: 100%;
-          background: linear-gradient(135deg, rgba(255, 87, 34, 0.7), rgba(255, 152, 0, 0.7));
+          background: linear-gradient(135deg, rgba(119, 5, 36, 0.7), rgba(255, 152, 0, 0.7));
           transform: scale(0);
           transition: transform 0.3s;
           border-radius: 8px;
@@ -1141,7 +1158,7 @@ export default function RegisterPage() {
           cursor: pointer;
           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           box-shadow:
-            0 5px 15px rgba(255, 87, 34, 0.4),
+            0 5px 15px rgba(119, 5, 36, 0.4),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
           position: relative;
           overflow: hidden;
@@ -1170,7 +1187,7 @@ export default function RegisterPage() {
         .action-btn:hover {
           transform: scale(1.15);
           box-shadow:
-            0 8px 20px rgba(255, 87, 34, 0.6),
+            0 8px 20px rgba(119, 5, 36, 0.6),
             inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
@@ -1220,10 +1237,10 @@ export default function RegisterPage() {
 
         .particle {
           position: absolute;
-          background: rgba(255, 87, 34, 0.6);
+          background: rgba(119, 5, 36, 0.6);
           border-radius: 50%;
           animation: float 15s infinite linear;
-          box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+          box-shadow: 0 0 10px rgba(119, 5, 36, 0.5);
           transform: translateY(100vh);
           opacity: 0;
           animation-fill-mode: both;
@@ -1354,7 +1371,7 @@ export default function RegisterPage() {
           position: absolute;
           width: 100%;
           height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(255, 87, 34, 0.5), transparent);
+          background: linear-gradient(90deg, transparent, rgba(119, 5, 36, 0.5), transparent);
           animation: scan 4s linear infinite;
           z-index: 2;
           pointer-events: none;
@@ -1493,7 +1510,7 @@ export default function RegisterPage() {
         <div className="controller-container">
           <div className="controller">
             <div className="logo">
-              <h1>BaitHub</h1>
+              <h1>Radian</h1>
             </div>
 
             <form id="signupForm" onSubmit={handleSubmit}>

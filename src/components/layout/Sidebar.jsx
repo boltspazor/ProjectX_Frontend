@@ -81,7 +81,7 @@ export default function Sidebar({ onLogout }) {
 
       {/* Profile Image */}
       <div className="relative w-28 h-28 mx-auto mb-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 rounded-full blur-lg opacity-90"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-400 via-primary to-primary-700 rounded-full blur-lg opacity-90"></div>
         <div className="relative w-28 h-28 rounded-full border-2 dark:border-gray-900 border-black overflow-hidden">
           <LiveProfilePhoto
             imageSrc={profilePhoto}
@@ -125,17 +125,17 @@ export default function Sidebar({ onLogout }) {
               key={i}
               to={item.value}
               className={({ isActive }) =>
-                `relative w-full rounded-2xl p-[3px] border ${isActive ? "border-transparent" : "dark:border-gray-600 border-black"} ${isActive ? "bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" : "hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600"} transition-all duration-300 block`
+                `relative w-full rounded-2xl p-[3px] border ${isActive ? "border-transparent" : "dark:border-gray-600 border-black"} ${isActive ? "bg-gradient-to-r from-primary-400 via-primary to-primary-700" : "hover:border-transparent hover:bg-gradient-to-r hover:from-primary-400 hover:via-primary hover:to-primary-700"} transition-all duration-300 block`
               }
             >
               {({ isActive }) => (
                 <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-white dark:bg-[#0f0f0f]">
                   {item.isReactIcon ? (
-                    <FiBarChart2 className={`h-5 w-5 ${isActive ? 'text-orange-500' : 'text-black dark:text-white'}`} />
+                    <FiBarChart2 className={`h-5 w-5 ${isActive ? 'text-primary' : 'text-black dark:text-white'}`} />
                   ) : (
                     <img src={isActive ? item.icon : item.icon} className="h-5 w-5 invert dark:invert-0" alt={item.label} />
                   )}
-                  <span className={`${isActive ? "text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" : ""}`}>
+                  <span className={`${isActive ? "text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-primary to-primary-700" : ""}`}>
                     {item.label}
                   </span>
                 </span>
@@ -146,14 +146,14 @@ export default function Sidebar({ onLogout }) {
 
         {/* Logout */}
         <button
-          className="group relative w-full rounded-2xl p-[3px] border dark:border-gray-600 border-black hover:border-transparent hover:bg-gradient-to-r hover:from-orange-400 hover:via-orange-500 hover:to-orange-600 transition-all duration-300 mt-6"
+          className="group relative w-full rounded-2xl p-[3px] border dark:border-gray-600 border-black hover:border-transparent hover:bg-gradient-to-r hover:from-primary-400 hover:via-primary hover:to-primary-700 transition-all duration-300 mt-6"
           onClick={handleLogoutClick}
           onMouseEnter={() => setIsLogoutHovered(true)}
           onMouseLeave={() => setIsLogoutHovered(false)}
         >
           <span className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-white dark:bg-[#0f0f0f]">
             <img src={isLogoutHovered ? logoutIconActive : logoutIcon} className="h-5 w-5 invert dark:invert-0" alt="Logout" />
-            <span className="text-black dark:text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-400 group-hover:via-orange-500 group-hover:to-orange-600 transition-all duration-300">
+            <span className="text-black dark:text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary-400 group-hover:via-primary group-hover:to-primary-700 transition-all duration-300">
               Logout
             </span>
           </span>

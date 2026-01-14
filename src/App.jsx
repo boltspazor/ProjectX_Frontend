@@ -45,17 +45,17 @@ export default function App() {
   // Show loading state while checking authentication
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#fdecdf] dark:bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-secondary-50 dark:bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>
     );
   }
 
-  // If not authenticated, show login/signup
-  if (!isAuthenticated && location.pathname !== '/auth/callback' && location.pathname !== '/register' && location.pathname !== '/forgot-password') {
+  // If not authenticated, show login/signup/forgot-password pages
+  if (!isAuthenticated && location.pathname !== '/auth/callback') {
     return (
       <Routes>
         <Route path="/login" element={<LoginPage />} />
@@ -156,7 +156,7 @@ export default function App() {
 
   return (
     <div 
-      className="bg-[#fffcfa] dark:bg-black text-black dark:text-white min-h-screen flex flex-col"
+      className="bg-secondary-50 dark:bg-black text-black dark:text-white min-h-screen flex flex-col"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >

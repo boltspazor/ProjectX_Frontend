@@ -92,7 +92,7 @@ export default function FollowersFollowingModal({
                 <button
                   onClick={() => setActiveTab("followers")}
                   className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${activeTab === "followers"
-                    ? "text-black dark:text-white border-b-2 border-orange-500"
+                    ? "text-black dark:text-white border-b-2 border-primary"
                     : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-gray-300"
                     }`}
                 >
@@ -101,7 +101,7 @@ export default function FollowersFollowingModal({
                 <button
                   onClick={() => setActiveTab("following")}
                   className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${activeTab === "following"
-                    ? "text-black dark:text-white border-b-2 border-orange-500"
+                    ? "text-black dark:text-white border-b-2 border-primary"
                     : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-gray-300"
                     }`}
                 >
@@ -135,7 +135,7 @@ export default function FollowersFollowingModal({
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.03, duration: 0.3 }}
-                          className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl hover:bg-orange-50 dark:hover:bg-[#1a1a1a] transition-colors"
+                          className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl hover:bg-secondary-50 dark:hover:bg-[#1a1a1a] transition-colors"
                         >
                           {/* Profile Picture */}
                           <button
@@ -191,7 +191,7 @@ export default function FollowersFollowingModal({
                               }}
                               className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${user.isFollowing
                                 ? "bg-gray-200 dark:bg-gray-800 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 border border-gray-400 dark:border-gray-700"
-                                : "bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
+                                : "bg-gradient-to-r from-primary-400 via-primary to-primary-700 text-white hover:from-primary hover:via-primary-700 hover:to-primary-800"
                                 }`}
                             >
                               {user.isFollowing ? "Following" : "Follow"}

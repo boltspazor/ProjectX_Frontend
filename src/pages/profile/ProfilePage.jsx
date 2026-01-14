@@ -247,7 +247,7 @@ const fetchProfileData = async () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#fffcfa] dark:bg-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -260,7 +260,7 @@ const fetchProfileData = async () => {
           <p className="text-red-500 mb-4">{error}</p>
           <button
             onClick={fetchProfileData}
-            className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
+            className="px-6 py-2 bg-primary hover:bg-primary-700 text-white rounded-lg"
           >
             Try Again
           </button>

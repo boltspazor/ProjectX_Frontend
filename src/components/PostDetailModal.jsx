@@ -274,7 +274,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                 >
                   {loading ? (
                     <div className="flex flex-col items-center justify-center h-full py-12">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
                       <p className="text-gray-400 text-sm mt-4">Loading comments...</p>
                     </div>
                   ) : error ? (
@@ -282,7 +282,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                       <p className="text-red-500 text-sm mb-4">{error}</p>
                       <button
                         onClick={fetchComments}
-                        className="px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+                        className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors"
                       >
                         Try again
                       </button>
@@ -372,14 +372,14 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                         onChange={(e) => setNewComment(e.target.value)}
                         onKeyPress={(e) => e.key === "Enter" && handleSendComment()}
                         placeholder="Add a comment..."
-                        className="flex-1 min-w-0 bg-gray-100 dark:bg-[#1a1a1a] border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-full px-3 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder-gray-500 transition-all"
+                        className="flex-1 min-w-0 bg-gray-100 dark:bg-[#1a1a1a] border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-full px-3 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-gray-500 transition-all"
                       />
                       <motion.button
                         onClick={handleSendComment}
                         disabled={!newComment.trim()}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-3 md:px-6 py-2 md:py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded-full text-xs md:text-base font-semibold transition-colors text-white flex-shrink-0"
+                        className="px-3 md:px-6 py-2 md:py-3 bg-primary hover:bg-primary-700 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded-full text-xs md:text-base font-semibold transition-colors text-white flex-shrink-0"
                       >
                         Send
                       </motion.button>

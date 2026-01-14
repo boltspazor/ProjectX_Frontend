@@ -8,7 +8,7 @@
   }
   
   body {
-    @apply bg-[#fdecdf] dark:bg-black text-black dark:text-white;
+    @apply bg-secondary-50 dark:bg-black text-black dark:text-white;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
   
@@ -66,10 +66,10 @@
 .animate-spin-slow-glow {
   background: conic-gradient(
     from 0deg,
-    #fb923c,
-    #f97316,
-    #ea580c,
-    #fb923c
+    #911c3f,
+    #770524,
+    #ae1e46,
+    #911c3f
   );
   background-size: 400% 400%;
   animation: rotateGradient 10s linear infinite, softGlow 10s ease-in-out infinite;

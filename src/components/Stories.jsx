@@ -19,7 +19,7 @@ export default function Stories({ onAddStory }) {
       // Default ring style for normal users
       return isViewed
         ? "bg-gray-600"
-        : "bg-gradient-to-tr from-orange-400 via-orange-500 to-orange-600";
+        : "bg-gradient-to-tr from-primary-400 via-primary to-primary-700";
     }
 
     // Special creator tier rings
@@ -110,7 +110,7 @@ export default function Stories({ onAddStory }) {
 
   return (
     <div className="w-full max-w-7xl mx-auto">
-      <div className="relative bg-white dark:bg-black border border-black dark:border-gray-800 hover:border-orange-500 transition-colors duration-300 rounded-xl py-3 md:py-4 px-3 sm:px-4 md:px-6">
+      <div className="relative bg-white dark:bg-black border border-black dark:border-gray-800 hover:border-primary transition-colors duration-300 rounded-xl py-3 md:py-4 px-3 sm:px-4 md:px-6">
         {/* Left Arrow - Show when scrolled */}
         {showLeftArrow && (
           <motion.button
@@ -118,7 +118,7 @@ export default function Stories({ onAddStory }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => scroll("left")}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-sm border border-black dark:border-gray-700 hover:border-orange-500 flex items-center justify-center hover:bg-white/90 dark:hover:bg-black/90 transition-all cursor-pointer"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-sm border border-black dark:border-gray-700 hover:border-primary flex items-center justify-center hover:bg-white/90 dark:hover:bg-black/90 transition-all cursor-pointer"
             aria-label="Scroll left"
           >
             <ChevronRight className="w-4 h-4 md:w-5 md:h-5 dark:text-white text-black rotate-180" />
@@ -154,7 +154,7 @@ export default function Stories({ onAddStory }) {
               </div>
 
               {/* Plus Icon Overlay */}
-              <div className="absolute bottom-0 right-0 w-5 h-5 md:w-6 md:h-6 bg-orange-500 rounded-full border-2 dark:border-black border-white flex items-center justify-center group-hover:bg-orange-600 transition-all duration-200 group-hover:scale-110">
+              <div className="absolute bottom-0 right-0 w-5 h-5 md:w-6 md:h-6 bg-primary rounded-full border-2 dark:border-black border-white flex items-center justify-center group-hover:bg-primary-700 transition-all duration-200 group-hover:scale-110">
                 <svg className="w-3 h-3 md:w-3.5 md:h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
                 </svg>
@@ -221,7 +221,7 @@ export default function Stories({ onAddStory }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => scroll("right")}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-sm border border-black dark:border-gray-700 hover:border-orange-500 flex items-center justify-center hover:bg-white/90 dark:hover:bg-black/90 transition-all cursor-pointer"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-sm border border-black dark:border-gray-700 hover:border-primary flex items-center justify-center hover:bg-white/90 dark:hover:bg-black/90 transition-all cursor-pointer"
             aria-label="Scroll right"
           >
             <ChevronRight className="w-4 h-4 md:w-5 md:h-5 dark:text-white text-black" />

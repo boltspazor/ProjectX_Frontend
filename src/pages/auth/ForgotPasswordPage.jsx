@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { authService } from "../../services/authService";
 
 export default function ResetPasswordPage({ onComplete, onCancel }) {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -165,7 +167,11 @@ export default function ResetPasswordPage({ onComplete, onCancel }) {
       await authService.resetPassword(email, otp, newPassword);
       setSuccess("Password reset successful!");
       setTimeout(() => {
-        if (onComplete) onComplete();
+        if (onComplete) {
+          onComplete();
+        } else {
+          navigate('/login');
+        }
       }, 1500);
     } catch (err) {
       console.error("Reset password error:", err);
@@ -199,7 +205,7 @@ export default function ResetPasswordPage({ onComplete, onCancel }) {
           border-radius: 20px;
           box-shadow: 0 15px 60px rgba(0, 0, 0, 0.5);
           backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 87, 34, 0.2);
+          border: 1px solid rgba(119, 5, 36, 0.2);
           position: relative;
           z-index: 10;
         }
@@ -214,7 +220,7 @@ export default function ResetPasswordPage({ onComplete, onCancel }) {
           font-size: 28px;
           font-weight: 700;
           margin-bottom: 10px;
-          text-shadow: 0 0 20px rgba(255, 87, 34, 0.5);
+          text-shadow: 0 0 20px rgba(119, 5, 36, 0.5);
         }
 
         .reset-header p {
@@ -248,7 +254,7 @@ export default function ResetPasswordPage({ onComplete, onCancel }) {
           background: linear-gradient(45deg, #ff5722, #ff9800);
           color: white;
           border-color: #ff5722;
-          box-shadow: 0 0 20px rgba(255, 87, 34, 0.6);
+          box-shadow: 0 0 20px rgba(119, 5, 36, 0.6);
         }
 
         .step.completed {
@@ -284,7 +290,7 @@ export default function ResetPasswordPage({ onComplete, onCancel }) {
         .input-field:focus {
           outline: none;
           border-color: #ff5722;
-          box-shadow: 0 0 15px rgba(255, 87, 34, 0.4);
+          box-shadow: 0 0 15px rgba(119, 5, 36, 0.4);
           background: rgba(255, 255, 255, 0.12);
         }
 
@@ -314,7 +320,7 @@ export default function ResetPasswordPage({ onComplete, onCancel }) {
 
         .password-toggle:hover {
           color: #ff5722;
-          background: rgba(255, 87, 34, 0.1);
+          background: rgba(119, 5, 36, 0.1);
         }
 
         .error-message {
@@ -372,13 +378,13 @@ export default function ResetPasswordPage({ onComplete, onCancel }) {
         .btn-primary {
           background: linear-gradient(45deg, #ff5722, #ff9800);
           color: white;
-          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+          box-shadow: 0 5px 15px rgba(119, 5, 36, 0.4);
         }
 
         .btn-primary:hover:not(:disabled) {
           background: linear-gradient(45deg, #e64a19, #f57c00);
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(255, 87, 34, 0.6);
+          box-shadow: 0 8px 25px rgba(119, 5, 36, 0.6);
         }
 
         .btn-secondary {
@@ -388,7 +394,7 @@ export default function ResetPasswordPage({ onComplete, onCancel }) {
         }
 
         .btn-secondary:hover:not(:disabled) {
-          background: rgba(255, 87, 34, 0.1);
+          background: rgba(119, 5, 36, 0.1);
           transform: translateY(-2px);
         }
 
@@ -435,10 +441,10 @@ export default function ResetPasswordPage({ onComplete, onCancel }) {
 
         .particle {
           position: absolute;
-          background: rgba(255, 87, 34, 0.6);
+          background: rgba(119, 5, 36, 0.6);
           border-radius: 50%;
           animation: float 15s infinite linear;
-          box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+          box-shadow: 0 0 10px rgba(119, 5, 36, 0.5);
         }
 
         @keyframes float {

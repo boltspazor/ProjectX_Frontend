@@ -72,7 +72,7 @@ export default function PostCard({
           w-full rounded-xl overflow-hidden bg-white dark:bg-[#111] border shadow-sm
           transition-all duration-300
           md:max-h-[700px] md:flex md:flex-col
-            ${isActive ? 'border-orange-400' : 'border-black dark:border-gray-800 hover:border-orange-500'}
+            ${isActive ? 'border-primary-400' : 'border-black dark:border-gray-800 hover:border-primary'}
         `}
         >
           {/* User Info Header */}
@@ -156,7 +156,7 @@ export default function PostCard({
   // Grid variant (for Explore page)
   return (
     <>
-      <div className="w-full rounded-xl overflow-hidden bg-white dark:bg-[#111] border border-black dark:border-gray-800 hover:border-orange-500 transition shadow-sm">
+      <div className="w-full rounded-xl overflow-hidden bg-white dark:bg-[#111] border border-black dark:border-gray-800 hover:border-primary transition shadow-sm">
         {/* Post Image - 4:3 aspect ratio (Instagram standard) */}
         <div className="w-full aspect-[4/3] dark:bg-black bg-gray-100 overflow-hidden flex items-center justify-center">
           <img

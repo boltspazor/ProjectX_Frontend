@@ -59,13 +59,13 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
         <div className="flex items-center gap-3">
           <button
             onClick={onDiscoverClick}
-            className="px-4 py-2 rounded-lg border border-black dark:border-gray-700 bg-white dark:bg-[#161616] text-sm text-gray-700 dark:text-gray-300 hover:border-orange-500 hover:text-black dark:hover:text-white transition-all duration-300"
+            className="px-4 py-2 rounded-lg border border-black dark:border-gray-700 bg-white dark:bg-[#161616] text-sm text-gray-700 dark:text-gray-300 hover:border-primary hover:text-black dark:hover:text-white transition-all duration-300"
           >
             Discover more
           </button>
           <button
             onClick={() => setActiveView("createCommunity")}
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-orange-500 via-orange-500 to-orange-600 text-sm font-medium text-white hover:shadow-[0_0_24px_rgba(249,115,22,0.35)] transition-all duration-300"
+            className="px-4 py-2 rounded-lg bg-gradient-to-r from-primary via-primary to-primary-700 text-sm font-medium text-white hover:shadow-[0_0_24px_rgba(119,5,36,0.35)] transition-all duration-300"
           >
             Create community
           </button>
@@ -74,7 +74,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
 
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
       )}
 
@@ -83,7 +83,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
           <p className="text-red-500 mb-4">{error}</p>
           <button
             onClick={fetchJoinedCommunities}
-            className="px-6 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+            className="px-6 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors"
           >
             Try again
           </button>
@@ -97,7 +97,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
           </p>
           <button
             onClick={onDiscoverClick}
-            className="px-6 py-2 rounded-lg bg-gradient-to-r from-orange-500 via-orange-500 to-orange-600 text-white hover:shadow-[0_0_24px_rgba(249,115,22,0.35)] transition-all duration-300"
+            className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary via-primary to-primary-700 text-white hover:shadow-[0_0_24px_rgba(119,5,36,0.35)] transition-all duration-300"
           >
             Discover communities
           </button>
@@ -110,7 +110,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
           <article
             key={community.id}
             onClick={() => handleCommunityClick(community.id)}
-            className="group relative rounded-3xl border border-black dark:border-gray-800 bg-white dark:bg-[#121212] transition-all duration-500 hover:border-orange-500 hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] cursor-pointer"
+            className="group relative rounded-3xl border border-black dark:border-gray-800 bg-white dark:bg-[#121212] transition-all duration-500 hover:border-primary hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] cursor-pointer"
           >
             <div className="relative h-40 overflow-hidden rounded-t-3xl">
               <LiveBanner
@@ -142,7 +142,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
                     {community.description}
                   </p>
                 </div>
-                <span className="text-xs font-medium uppercase tracking-wide text-orange-400 bg-orange-500/10 border border-orange-500/40 px-3 py-1 rounded-full">
+                <span className="text-xs font-medium uppercase tracking-wide text-primary-400 bg-primary/10 border border-primary/40 px-3 py-1 rounded-full">
                   Active
                 </span>
               </div>
@@ -154,7 +154,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
                   {community.badges.map((badge) => (
                     <span
                       key={badge}
-                      className="px-3 py-1 rounded-full text-xs font-medium text-orange-600 dark:text-orange-300 bg-orange-100 dark:bg-orange-500/10 border border-orange-300 dark:border-orange-500/30"
+                      className="px-3 py-1 rounded-full text-xs font-medium text-primary-700 dark:text-secondary-300 bg-secondary-100 dark:bg-primary/10 border border-secondary-300 dark:border-primary/30"
                     >
                       {badge}
                     </span>
@@ -168,7 +168,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
                     e.stopPropagation();
                     handleCommunityClick(community.id);
                   }}
-                  className="flex-1 rounded-xl border border-black dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 transition-all duration-300 hover:border-orange-500 hover:text-black dark:hover:text-white"
+                  className="flex-1 rounded-xl border border-black dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 transition-all duration-300 hover:border-primary hover:text-black dark:hover:text-white"
                 >
                   View latest posts
                 </button>

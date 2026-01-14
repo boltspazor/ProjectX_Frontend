@@ -646,7 +646,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, rgba(255,87,34,0.05) 0%, transparent 50%);
+          background: linear-gradient(135deg, rgba(119, 5, 36,0.05) 0%, transparent 50%);
           border-radius: 20px;
           z-index: -1;
         }
@@ -661,8 +661,8 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           font-size: 32px;
           color: #ff5722;
           text-shadow:
-            0 0 10px rgba(255, 87, 34, 0.5),
-            0 0 20px rgba(255, 87, 34, 0.3);
+            0 0 10px rgba(119, 5, 36, 0.5),
+            0 0 20px rgba(119, 5, 36, 0.3);
           letter-spacing: 3px;
           animation: logoGlow 3s ease-in-out infinite alternate;
           position: relative;
@@ -682,13 +682,13 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
         @keyframes logoGlow {
           0% {
-            text-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+            text-shadow: 0 0 10px rgba(119, 5, 36, 0.5);
           }
           100% {
             text-shadow:
-              0 0 20px rgba(255, 87, 34, 0.8),
-              0 0 30px rgba(255, 87, 34, 0.6),
-              0 0 40px rgba(255, 87, 34, 0.4);
+              0 0 20px rgba(119, 5, 36, 0.8),
+              0 0 30px rgba(119, 5, 36, 0.6),
+              0 0 40px rgba(119, 5, 36, 0.4);
           }
         }
 
@@ -739,8 +739,8 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           outline: none;
           border-color: #ff5722;
           box-shadow:
-            0 0 15px rgba(255, 87, 34, 0.4),
-            inset 0 0 10px rgba(255, 87, 34, 0.1);
+            0 0 15px rgba(119, 5, 36, 0.4),
+            inset 0 0 10px rgba(119, 5, 36, 0.1);
           transform: translateY(-3px);
           background: rgba(255, 255, 255, 0.12);
         }
@@ -759,7 +759,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           background: linear-gradient(90deg, #ff5722, #ff9800);
           transition: all 0.4s ease;
           opacity: 0;
-          box-shadow: 0 0 10px rgba(255, 87, 34, 0.7);
+          box-shadow: 0 0 10px rgba(119, 5, 36, 0.7);
         }
 
         .password-input-wrapper {
@@ -786,7 +786,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
         .password-toggle:hover {
           color: #ff5722;
-          background: rgba(255, 87, 34, 0.1);
+          background: rgba(119, 5, 36, 0.1);
         }
 
         .password-toggle:active {
@@ -799,7 +799,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           margin-top: 8px;
           display: block;
           animation: errorFadeIn 0.3s ease;
-          text-shadow: 0 0 8px rgba(255, 87, 34, 0.5);
+          text-shadow: 0 0 8px rgba(119, 5, 36, 0.5);
           position: relative;
           padding-left: 20px;
         }
@@ -859,7 +859,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         }
 
         .input-field:invalid:not(:placeholder-shown) {
-          border-color: rgba(255, 87, 34, 0.5);
+          border-color: rgba(119, 5, 36, 0.5);
         }
 
         .input-field::placeholder {
@@ -872,11 +872,11 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         }
 
         .input-field:invalid:not(:placeholder-shown):not(:focus) {
-          border-color: rgba(255, 87, 34, 0.6);
+          border-color: rgba(119, 5, 36, 0.6);
         }
 
         .input-group.has-error .input-field {
-          border-color: rgba(255, 87, 34, 0.7);
+          border-color: rgba(119, 5, 36, 0.7);
           animation: inputError 0.3s ease;
         }
 
@@ -960,13 +960,13 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           background: linear-gradient(45deg, #ff5722, #ff9800);
           color: white;
           flex: 1;
-          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+          box-shadow: 0 5px 15px rgba(119, 5, 36, 0.4);
         }
 
         .login-btn:hover {
           background: linear-gradient(45deg, #e64a19, #f57c00);
           transform: translateY(-3px);
-          box-shadow: 0 8px 25px rgba(255, 87, 34, 0.6);
+          box-shadow: 0 8px 25px rgba(119, 5, 36, 0.6);
         }
 
         .signup-btn {
@@ -977,9 +977,9 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         }
 
         .signup-btn:hover {
-          background: rgba(255, 87, 34, 0.1);
+          background: rgba(119, 5, 36, 0.1);
           transform: translateY(-3px);
-          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+          box-shadow: 0 5px 15px rgba(119, 5, 36, 0.3);
         }
 
         /* Divider */
@@ -995,7 +995,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           content: '';
           flex: 1;
           height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(255, 87, 34, 0.3), transparent);
+          background: linear-gradient(90deg, transparent, rgba(119, 5, 36, 0.3), transparent);
         }
 
         .divider span {
@@ -1003,7 +1003,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           font-size: 12px;
           font-weight: 600;
           letter-spacing: 2px;
-          text-shadow: 0 0 10px rgba(255, 87, 34, 0.3);
+          text-shadow: 0 0 10px rgba(119, 5, 36, 0.3);
         }
 
         /* Google Button */
@@ -1115,7 +1115,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           left: 0;
           width: 100%;
           height: 100%;
-          background: linear-gradient(135deg, rgba(255, 87, 34, 0.7), rgba(255, 152, 0, 0.7));
+          background: linear-gradient(135deg, rgba(119, 5, 36, 0.7), rgba(255, 152, 0, 0.7));
           transform: scale(0);
           transition: transform 0.3s;
           border-radius: 8px;
@@ -1184,7 +1184,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           cursor: pointer;
           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           box-shadow:
-            0 5px 15px rgba(255, 87, 34, 0.4),
+            0 5px 15px rgba(119, 5, 36, 0.4),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
           position: relative;
           overflow: hidden;
@@ -1213,7 +1213,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         .action-btn:hover {
           transform: scale(1.15);
           box-shadow:
-            0 8px 20px rgba(255, 87, 34, 0.6),
+            0 8px 20px rgba(119, 5, 36, 0.6),
             inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
@@ -1263,10 +1263,10 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
         .particle {
           position: absolute;
-          background: rgba(255, 87, 34, 0.6);
+          background: rgba(119, 5, 36, 0.6);
           border-radius: 50%;
           animation: float 15s infinite linear;
-          box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+          box-shadow: 0 0 10px rgba(119, 5, 36, 0.5);
           transform: translateY(100vh);
           opacity: 0;
           animation-fill-mode: both;
@@ -1378,7 +1378,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
           position: absolute;
           width: 100%;
           height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(255, 87, 34, 0.5), transparent);
+          background: linear-gradient(90deg, transparent, rgba(119, 5, 36, 0.5), transparent);
           animation: scan 4s linear infinite;
           z-index: 2;
           pointer-events: none;
@@ -1597,7 +1597,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
 
         .forgot-password-modal .input-field:focus {
           outline: none;
-          border-color: #fb923c;
+          border-color: #ae1e46;
           background: #1f1f1f;
         }
 
@@ -1759,13 +1759,13 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         .forgot-password-modal .btn.login-btn {
           background: linear-gradient(45deg, #ff5722, #ff9800);
           color: white;
-          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+          box-shadow: 0 5px 15px rgba(119, 5, 36, 0.4);
         }
 
         .forgot-password-modal .btn.login-btn:hover {
           background: linear-gradient(45deg, #e64a19, #f57c00);
           transform: translateY(-3px);
-          box-shadow: 0 8px 25px rgba(255, 87, 34, 0.6);
+          box-shadow: 0 8px 25px rgba(119, 5, 36, 0.6);
         }
 
         .forgot-password-modal .btn.signup-btn {
@@ -1775,9 +1775,9 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         }
 
         .forgot-password-modal .btn.signup-btn:hover {
-          background: rgba(255, 87, 34, 0.1);
+          background: rgba(119, 5, 36, 0.1);
           transform: translateY(-3px);
-          box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+          box-shadow: 0 5px 15px rgba(119, 5, 36, 0.3);
         }
 
         .forgot-password-modal .btn:disabled {
@@ -1871,7 +1871,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
         <div className="controller-container">
           <div className="controller">
             <div className="logo">
-              <h1>BaitHub</h1>
+              <h1>Radian</h1>
             </div>
 
             <form id="loginForm" onSubmit={handleSubmit}>

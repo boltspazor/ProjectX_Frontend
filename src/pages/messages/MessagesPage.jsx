@@ -50,8 +50,8 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
   const themes = {
     default: {
       backgroundStyle: { backgroundColor: "" }, // Will use the container's background
-      senderBubble: "bg-orange-500/90 text-white dark:bg-orange-600/40 dark:text-white",
-      receiverBubble: "bg-orange-400/80 text-white dark:bg-orange-500/30 dark:text-white",
+      senderBubble: "bg-primary/90 text-white dark:bg-primary-700/40 dark:text-white",
+      receiverBubble: "bg-primary-400/80 text-white dark:bg-primary/30 dark:text-white",
     },
     cat: {
       backgroundStyle: {
@@ -270,7 +270,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
             {/* Loading State */}
             {loadingConversations && (
               <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
             )}
 
@@ -301,7 +301,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                 <div
                     key={convo._id}
                     onClick={() => handleChatClick(convo)}
-                    className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 hover:border-orange-500 cursor-pointer transition"
+                    className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 hover:border-primary cursor-pointer transition"
                 >
                   {/* Profile Picture */}
                   <div className="relative flex-shrink-0">
@@ -314,7 +314,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                     />
                     </div>
                     {convo.unreadCount > 0 && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-orange-500 rounded-full border-2 border-black dark:border-gray-800"></div>
+                      <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-primary rounded-full border-2 border-black dark:border-gray-800"></div>
                     )}
                   </div>
 
@@ -374,7 +374,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                   </button>
                   {/* Online Status Indicator */}
                   {activeChat.otherUser?.isOnline && (
-                    <span className="text-xs text-orange-500 font-medium">online</span>
+                    <span className="text-xs text-primary font-medium">online</span>
                   )}
                 </div>
               </div>
@@ -392,13 +392,13 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => handleSelectTheme("cat")}
-                        className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "cat" ? "border-orange-500" : "border-gray-300 dark:border-gray-700"}`}
+                        className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "cat" ? "border-primary" : "border-gray-300 dark:border-gray-700"}`}
                         style={{ backgroundImage: `url(${catTheme})`, backgroundSize: "cover", backgroundPosition: "center" }}
                         aria-label="Cat theme"
               />
                       <button
                         onClick={() => handleSelectTheme("xoxo")}
-                        className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "xoxo" ? "border-orange-500" : "border-gray-300 dark:border-gray-700"}`}
+                        className={`w-14 h-14 rounded-full border-2 overflow-hidden flex-shrink-0 ${currentTheme === "xoxo" ? "border-primary" : "border-gray-300 dark:border-gray-700"}`}
                         style={{ backgroundImage: `url(${xoxoTheme})`, backgroundSize: "cover", backgroundPosition: "center" }}
                         aria-label="XOXO theme"
                       />
@@ -415,7 +415,7 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
             >
               {loadingMessages ? (
                 <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : (
                 <>
@@ -467,12 +467,12 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                   onChange={(e) => setMessageInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Type a message..."
-                  className="flex-1 bg-gray-100 dark:bg-[#2f2f2f] border border-black dark:border-gray-500 rounded-full px-4 py-2 md:py-3 text-sm text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  className="flex-1 bg-gray-100 dark:bg-[#2f2f2f] border border-black dark:border-gray-500 rounded-full px-4 py-2 md:py-3 text-sm text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary transition"
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!messageInput.trim() || sendingMessage}
-                  className="p-2 md:p-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full transition flex items-center justify-center"
+                  className="p-2 md:p-3 bg-primary hover:bg-primary-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full transition flex items-center justify-center"
                 >
                   {sendingMessage ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

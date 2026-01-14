@@ -164,14 +164,14 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
               onChange={(e) => setNewComment(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
               placeholder="Add a comment..."
-              className="flex-1 min-w-0 bg-gray-100 dark:bg-[#1a1a1a] border dark:border-gray-700 border-gray-300 dark:text-white text-black rounded-full px-3 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:placeholder-gray-500 placeholder-gray-400 transition-all"
+              className="flex-1 min-w-0 bg-gray-100 dark:bg-[#1a1a1a] border dark:border-gray-700 border-gray-300 dark:text-white text-black rounded-full px-3 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:placeholder-gray-500 placeholder-gray-400 transition-all"
             />
             <motion.button
               onClick={handleSendComment}
               disabled={!newComment.trim() || isSubmitting}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-3 md:px-6 py-2 md:py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 disabled:opacity-50 rounded-full text-xs md:text-base font-semibold transition-colors text-white flex-shrink-0"
+              className="px-3 md:px-6 py-2 md:py-3 bg-primary hover:bg-primary-700 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:hover:bg-gray-700 disabled:opacity-50 rounded-full text-xs md:text-base font-semibold transition-colors text-white flex-shrink-0"
             >
               {isSubmitting ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

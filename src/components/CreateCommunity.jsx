@@ -140,14 +140,14 @@ export default function CreateCommunity({ setActiveView }) {
               {/* Community Name */}
               <div>
                 <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                  Community Name <span className="text-orange-500">*</span>
+                  Community Name <span className="text-primary">*</span>
                 </label>
                 <input
                   type="text"
                   value={communityName}
                   onChange={(e) => setCommunityName(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
                   placeholder="Enter community name"
                 />
               </div>
@@ -155,14 +155,14 @@ export default function CreateCommunity({ setActiveView }) {
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                  Description <span className="text-orange-500">*</span>
+                  Description <span className="text-primary">*</span>
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   required
                   rows={6}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition resize-none"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition resize-none"
                   placeholder="Describe your community"
                 />
               </div>
@@ -172,7 +172,7 @@ export default function CreateCommunity({ setActiveView }) {
                 <label className="block text-sm font-medium text-black dark:text-white mb-2">
                   Community Banner
                 </label>
-                <label className="block w-full h-32 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-orange-500 rounded-lg cursor-pointer hover:border-orange-400 transition flex items-center justify-center">
+                <label className="block w-full h-32 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center">
                   {bannerPreview ? (
                     <img
                       src={bannerPreview}
@@ -181,7 +181,7 @@ export default function CreateCommunity({ setActiveView }) {
                     />
                   ) : (
                     <div className="text-center">
-                      <Upload className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+                      <Upload className="w-6 h-6 text-primary mx-auto mb-2" />
                       <span className="text-sm text-gray-400">Upload Image</span>
                     </div>
                   )}
@@ -195,7 +195,7 @@ export default function CreateCommunity({ setActiveView }) {
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mt-2 mb-1">
                   Live Banner Video (Optional)
                 </label>
-                <label className="block w-full h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-orange-500/50 rounded-lg cursor-pointer hover:border-orange-400 transition flex items-center justify-center">
+                <label className="block w-full h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center">
                   {bannerVideoPreview ? (
                     <video
                       src={bannerVideoPreview}
@@ -205,7 +205,7 @@ export default function CreateCommunity({ setActiveView }) {
                     />
                   ) : (
                     <div className="text-center">
-                      <Upload className="w-5 h-5 text-orange-500/70 mx-auto mb-1" />
+                      <Upload className="w-5 h-5 text-primary/70 mx-auto mb-1" />
                       <span className="text-xs text-gray-500">Upload Video (10s max)</span>
                     </div>
                   )}
@@ -223,7 +223,7 @@ export default function CreateCommunity({ setActiveView }) {
                 <label className="block text-sm font-medium text-black dark:text-white mb-2">
                   Community Icon
                 </label>
-                <label className="block w-24 h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-orange-500 rounded-full cursor-pointer hover:border-orange-400 transition flex items-center justify-center overflow-hidden">
+                <label className="block w-24 h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
                   {iconPreview ? (
                     <img
                       src={iconPreview}
@@ -232,7 +232,7 @@ export default function CreateCommunity({ setActiveView }) {
                     />
                   ) : (
                     <div className="text-center">
-                      <Upload className="w-5 h-5 text-orange-500" />
+                      <Upload className="w-5 h-5 text-primary" />
                     </div>
                   )}
                   <input
@@ -245,7 +245,7 @@ export default function CreateCommunity({ setActiveView }) {
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mt-2 mb-1">
                   Live Profile Video (Optional)
                 </label>
-                <label className="block w-24 h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-orange-500/50 rounded-full cursor-pointer hover:border-orange-400 transition flex items-center justify-center overflow-hidden">
+                <label className="block w-24 h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
                   {profileVideoPreview ? (
                     <video
                       src={profileVideoPreview}
@@ -255,7 +255,7 @@ export default function CreateCommunity({ setActiveView }) {
                     />
                   ) : (
                     <div className="text-center">
-                      <Upload className="w-4 h-4 text-orange-500/70" />
+                      <Upload className="w-4 h-4 text-primary/70" />
                     </div>
                   )}
                   <input
@@ -273,7 +273,7 @@ export default function CreateCommunity({ setActiveView }) {
               {/* Add Topics */}
               <div>
                 <label className="block text-sm font-medium text-black dark:text-white mb-3">
-                  Add Topics <span className="text-orange-500">*</span>
+                  Add Topics <span className="text-primary">*</span>
                 </label>
                 <div className="flex flex-wrap gap-3">
                   {topics.map((topic) => (
@@ -282,7 +282,7 @@ export default function CreateCommunity({ setActiveView }) {
                       type="button"
                       onClick={() => handleTopicToggle(topic)}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition ${selectedTopics.includes(topic)
-                          ? "bg-orange-500 text-white border-2 border-orange-500"
+                          ? "bg-primary text-white border-2 border-primary"
                           : "bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-2 border-black dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
                         }`}
                     >
@@ -295,14 +295,14 @@ export default function CreateCommunity({ setActiveView }) {
               {/* Community Type */}
               <div>
                 <label className="block text-sm font-medium text-black dark:text-white mb-3">
-                  Community Type <span className="text-orange-500">*</span>
+                  Community Type <span className="text-primary">*</span>
                 </label>
                 <div className="space-y-3">
                   <button
                     type="button"
                     onClick={() => setCommunityType("public")}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition ${communityType === "public"
-                        ? "bg-orange-500/20 border-orange-500 text-black dark:text-white"
+                        ? "bg-primary/20 border-primary text-black dark:text-white"
                         : "bg-gray-100 dark:bg-gray-900 border-black dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600"
                       }`}
                   >
@@ -314,7 +314,7 @@ export default function CreateCommunity({ setActiveView }) {
                     type="button"
                     onClick={() => setCommunityType("restricted")}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition ${communityType === "restricted"
-                        ? "bg-orange-500/20 border-orange-500 text-black dark:text-white"
+                        ? "bg-primary/20 border-primary text-black dark:text-white"
                         : "bg-gray-100 dark:bg-gray-900 border-black dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600"
                       }`}
                   >
@@ -326,7 +326,7 @@ export default function CreateCommunity({ setActiveView }) {
                     type="button"
                     onClick={() => setCommunityType("private")}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition ${communityType === "private"
-                        ? "bg-orange-500/20 border-orange-500 text-black dark:text-white"
+                        ? "bg-primary/20 border-primary text-black dark:text-white"
                         : "bg-gray-100 dark:bg-gray-900 border-black dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600"
                       }`}
                   >
@@ -342,7 +342,7 @@ export default function CreateCommunity({ setActiveView }) {
           <div className="flex justify-end mt-8">
             <button
               type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-orange-500 via-orange-500 to-orange-600 hover:from-orange-600 hover:via-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition"
+              className="px-6 py-3 bg-gradient-to-r from-primary via-primary to-primary-700 hover:from-primary-700 hover:via-primary-700 hover:to-primary-800 text-white font-medium rounded-lg transition"
             >
               Create Community
             </button>
