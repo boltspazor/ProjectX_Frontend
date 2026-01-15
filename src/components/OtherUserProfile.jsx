@@ -194,7 +194,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
   if (loading) {
     return (
       <div className="min-h-screen bg-[#fffcfa] dark:bg-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -207,7 +207,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
           <p className="text-red-500 mb-4">{error}</p>
           <button
             onClick={fetchUserProfile}
-            className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
+            className="px-6 py-2 bg-primary hover:bg-primary-700 text-white rounded-lg"
           >
             Try Again
           </button>
@@ -335,7 +335,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
                 onClick={handleFollow}
                 className={`flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${isFollowing
                   ? "bg-gray-200 dark:bg-gray-800 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 border border-gray-400 dark:border-gray-700"
-                  : "bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
+                  : "bg-gradient-to-r from-primary-400 via-primary to-primary-700 text-white hover:from-primary hover:via-primary-700 hover:to-primary-800"
                   }`}
               >
                 {isFollowing ? "Following" : "Follow"}

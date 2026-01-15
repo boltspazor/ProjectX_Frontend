@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/baithub.svg";
+import logo from "../assets/logo.svg";
 import bell from "../assets/bell.svg";
 import shop from "../assets/shop.svg";
 import ThemeToggle from "./ThemeToggle";
@@ -19,7 +19,7 @@ export default function Navbar({ onCreatePostClick }) {
   };
 
   return (
-    <header className="w-full h-14 md:h-16 border-b border-black dark:border-gray-800 px-4 md:px-2 flex items-center justify-between sticky top-0 bg-gradient-to-r from-orange-100 via-orange-50 to-orange-100 dark:from-black dark:via-gray-950 dark:to-black z-20">
+    <header className="w-full h-14 md:h-16 border-b border-black dark:border-gray-800 px-4 md:px-2 flex items-center justify-between sticky top-0 bg-gradient-to-r from-secondary-100 via-secondary-50 to-secondary-100 dark:from-black dark:via-gray-950 dark:to-black z-20">
       <div
         onClick={handleLogoClick}
         className="flex items-center py-2 cursor-pointer hover:opacity-80 transition-opacity ml-2 md:ml-4"
@@ -50,7 +50,7 @@ export default function Navbar({ onCreatePostClick }) {
           onClick={handleCreatePost}
           className="relative rounded-full p-[2px] animate-spin-slow-glow hover:opacity-90"
         >
-          <span className="block px-3 py-1.5 md:px-5 md:py-2 text-xs md:text-sm font-medium rounded-full bg-white dark:bg-black text-black dark:text-white border border-orange-500 ">
+          <span className="block px-3 py-1.5 md:px-5 md:py-2 text-xs md:text-sm font-medium rounded-full bg-white dark:bg-black text-black dark:text-white border border-primary ">
             Create a Post
           </span>
         </button>

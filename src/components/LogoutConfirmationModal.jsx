@@ -29,7 +29,7 @@ export default function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) 
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300, duration: 0.3 }}
-              className="w-full max-w-[320px] sm:max-w-[360px] bg-gradient-to-br from-orange-100 via-orange-50 to-orange-100 dark:from-black border-2 border-orange-600 dark:border-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
+              className="w-full max-w-[320px] sm:max-w-[360px] bg-gradient-to-br from-secondary-100 via-secondary-50 to-secondary-100 dark:from-black border-2 border-primary-700 dark:border-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Content */}
@@ -51,7 +51,7 @@ export default function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) 
                     onClick={onClose}
                     whileHover={{ opacity: 0.8 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex-1 px-4 md:px-5 py-2.5 md:py-3 text-orange-500 dark:text-red-500 font-medium text-sm md:text-base hover:text-orange-400 dark:hover:text-red-400 transition-colors text-center"
+                    className="flex-1 px-4 md:px-5 py-2.5 md:py-3 text-primary dark:text-red-500 font-medium text-sm md:text-base hover:text-primary-400 dark:hover:text-red-400 transition-colors text-center"
                   >
                     Cancel
                   </motion.button>
@@ -64,7 +64,7 @@ export default function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) 
                     onClick={handleConfirm}
                     whileHover={{ opacity: 0.8 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex-1 px-4 md:px-5 py-2.5 md:py-3 text-orange-500 dark:text-red-500 font-bold text-sm md:text-base hover:text-orange-400 dark:hover:text-red-400 transition-colors text-center"
+                    className="flex-1 px-4 md:px-5 py-2.5 md:py-3 text-primary dark:text-red-500 font-bold text-sm md:text-base hover:text-primary-400 dark:hover:text-red-400 transition-colors text-center"
                   >
                     Log out
                   </motion.button>

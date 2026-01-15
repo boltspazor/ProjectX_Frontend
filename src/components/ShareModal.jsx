@@ -122,7 +122,7 @@ export default function ShareModal({ isOpen, onClose, onViewUserProfile }) {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.03, duration: 0.3 }}
                         onClick={() => handleFriendToggle(friend.id)}
-                        className="w-full flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl hover:bg-orange-50 dark:hover:bg-[#1a1a1a] transition-colors group"
+                        className="w-full flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl hover:bg-secondary-50 dark:hover:bg-[#1a1a1a] transition-colors group"
                       >
                         {/* Profile Picture */}
                         <div className="relative flex-shrink-0">
@@ -143,7 +143,7 @@ export default function ShareModal({ isOpen, onClose, onViewUserProfile }) {
                             <motion.div
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
-                              className="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-orange-500 rounded-full flex items-center justify-center border-2 border-white dark:border-[#0f0f0f]"
+                              className="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-primary rounded-full flex items-center justify-center border-2 border-white dark:border-[#0f0f0f]"
                             >
                               <svg className="w-3 h-3 md:w-4 md:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -171,7 +171,7 @@ export default function ShareModal({ isOpen, onClose, onViewUserProfile }) {
                         {/* Selection Indicator */}
                         <div
                           className={`w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected
-                            ? 'bg-orange-500 border-orange-500'
+                            ? 'bg-primary border-primary'
                             : 'border-gray-400 dark:border-gray-600 group-hover:border-gray-500'
                             }`}
                         >
@@ -206,7 +206,7 @@ export default function ShareModal({ isOpen, onClose, onViewUserProfile }) {
                   disabled={selectedFriends.size === 0}
                   whileHover={{ scale: selectedFriends.size > 0 ? 1.02 : 1 }}
                   whileTap={{ scale: selectedFriends.size > 0 ? 0.98 : 1 }}
-                  className="w-full py-3 md:py-3.5 px-4 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed dark:disabled:hover:bg-gray-700 disabled:hover:bg-gray-300 rounded-xl text-white font-semibold text-sm md:text-base transition-colors"
+                  className="w-full py-3 md:py-3.5 px-4 bg-gradient-to-r from-primary-400 via-primary to-primary-700 hover:from-primary hover:via-primary-700 hover:to-primary-800 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed dark:disabled:hover:bg-gray-700 disabled:hover:bg-gray-300 rounded-xl text-white font-semibold text-sm md:text-base transition-colors"
                 >
                   {selectedFriends.size > 0
                     ? `Send to ${selectedFriends.size} ${selectedFriends.size === 1 ? 'friend' : 'friends'}`

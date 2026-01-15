@@ -93,7 +93,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
           <h1 className="text-2xl font-bold text-white mb-4">Community not found</h1>
           <button
             onClick={() => setActiveView("communityDetail", communityId)}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition"
           >
             Back to Community
           </button>
@@ -110,7 +110,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
           <p className="text-gray-400 mb-4">You don't have permission to access this page.</p>
           <button
             onClick={() => setActiveView("communityDetail", communityId)}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition"
           >
             Back to Community
           </button>
@@ -293,7 +293,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-black dark:text-white" />
           </button>
           <div className="flex items-center gap-2 sm:gap-3">
-            <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
+            <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-black dark:text-white">Community Settings</h1>
           </div>
         </div>
@@ -315,13 +315,13 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
           {/* Community Name */}
           <div className="bg-white dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-4 sm:p-5 md:p-6">
             <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-              Community Name <span className="text-orange-500">*</span>
+              Community Name <span className="text-primary">*</span>
             </label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+              className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
               placeholder="Enter community name"
               required
             />
@@ -330,13 +330,13 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
           {/* Description */}
           <div className="bg-white dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-4 sm:p-5 md:p-6">
             <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-              Description <span className="text-orange-500">*</span>
+              Description <span className="text-primary">*</span>
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
-              className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition resize-none"
+              className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition resize-none"
               placeholder="Describe your community"
               required
             />
@@ -353,7 +353,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
               <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                 Banner Image
               </label>
-              <label className="block w-full h-24 sm:h-28 md:h-32 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-orange-500 rounded-lg cursor-pointer hover:border-orange-400 transition flex items-center justify-center overflow-hidden">
+              <label className="block w-full h-24 sm:h-28 md:h-32 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
                 {bannerPreview ? (
                   <img
                     src={bannerPreview}
@@ -362,7 +362,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                   />
                   ) : (
                     <div className="text-center">
-                      <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 mx-auto mb-1 sm:mb-2" />
+                      <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-primary mx-auto mb-1 sm:mb-2" />
                       <span className="text-xs sm:text-sm text-gray-400">Upload Image</span>
                     </div>
                   )}
@@ -380,7 +380,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
               <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                 Live Banner Video (Optional)
               </label>
-              <label className="block w-full h-20 sm:h-22 md:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-orange-500/50 rounded-lg cursor-pointer hover:border-orange-400 transition flex items-center justify-center overflow-hidden">
+              <label className="block w-full h-20 sm:h-22 md:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
                 {bannerVideoPreview ? (
                   <video
                     src={bannerVideoPreview}
@@ -390,7 +390,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                   />
                 ) : (
                   <div className="text-center">
-                    <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500/70 mx-auto mb-1" />
+                    <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-primary/70 mx-auto mb-1" />
                     <span className="text-xs text-gray-500">Upload Video (10s max)</span>
                   </div>
                 )}
@@ -415,7 +415,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
               <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                 Profile Image
               </label>
-              <label className="block w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-orange-500 rounded-full cursor-pointer hover:border-orange-400 transition flex items-center justify-center overflow-hidden mx-auto">
+              <label className="block w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden mx-auto">
                 {profilePreview ? (
                   <img
                     src={profilePreview}
@@ -424,7 +424,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                   />
                 ) : (
                   <div className="text-center">
-                    <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
+                    <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                   </div>
                 )}
                 <input
@@ -441,7 +441,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
               <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 text-center">
                 Live Profile Video (Optional)
               </label>
-              <label className="block w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-orange-500/50 rounded-full cursor-pointer hover:border-orange-400 transition flex items-center justify-center overflow-hidden mx-auto">
+              <label className="block w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden mx-auto">
                 {profileVideoPreview ? (
                   <video
                     src={profileVideoPreview}
@@ -451,7 +451,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                   />
                 ) : (
                   <div className="text-center">
-                    <Upload className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500/70" />
+                    <Upload className="w-3 h-3 sm:w-4 sm:h-4 text-primary/70" />
                   </div>
                 )}
                 <input
@@ -485,7 +485,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                   setSuccess("Community code copied to clipboard!");
                   setTimeout(() => setSuccess(""), 3000);
                 }}
-                className="px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition text-xs sm:text-sm whitespace-nowrap"
+                className="px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-primary text-white rounded-lg hover:bg-primary-700 transition text-xs sm:text-sm whitespace-nowrap"
               >
                 Copy
               </button>
@@ -502,7 +502,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                 type="button"
                 onClick={() => setFormData({ ...formData, communityType: "Public" })}
                 className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 rounded-lg border-2 transition ${formData.communityType === "Public"
-                    ? "bg-orange-500/20 border-orange-500 text-black dark:text-white"
+                    ? "bg-primary/20 border-primary text-black dark:text-white"
                     : "bg-gray-100 dark:bg-gray-900 border-black dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600"
                   }`}
               >
@@ -515,7 +515,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                 type="button"
                 onClick={() => setFormData({ ...formData, communityType: "Restricted" })}
                 className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 rounded-lg border-2 transition ${formData.communityType === "Restricted"
-                    ? "bg-orange-500/20 border-orange-500 text-black dark:text-white"
+                    ? "bg-primary/20 border-primary text-black dark:text-white"
                     : "bg-gray-100 dark:bg-gray-900 border-black dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600"
                   }`}
               >
@@ -528,7 +528,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                 type="button"
                 onClick={() => setFormData({ ...formData, communityType: "Private" })}
                 className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 rounded-lg border-2 transition ${formData.communityType === "Private"
-                    ? "bg-orange-500/20 border-orange-500 text-black dark:text-white"
+                    ? "bg-primary/20 border-primary text-black dark:text-white"
                     : "bg-gray-100 dark:bg-gray-900 border-black dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600"
                   }`}
               >
@@ -565,7 +565,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                         setPasswordValidationError("Password must be at least 6 characters");
                       }
                     }}
-                    className="px-3 py-1.5 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2 self-start sm:self-auto"
+                    className="px-3 py-1.5 bg-primary text-white text-xs rounded-lg hover:bg-primary-700 transition flex items-center justify-center gap-2 self-start sm:self-auto"
                   >
                     <RefreshCw className="w-3 h-3" />
                     Set Password
@@ -593,7 +593,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                           setPasswordValidationError("");
                         }
                       }}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition pr-10 sm:pr-12"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition pr-10 sm:pr-12"
                       placeholder="Enter new password"
                     />
                     <button
@@ -630,7 +630,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                           setPasswordValidationError("");
                         }
                       }}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition pr-10 sm:pr-12"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition pr-10 sm:pr-12"
                       placeholder="Confirm new password"
                     />
                     <button
@@ -681,12 +681,12 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                     handleAddRule();
                   }
                 }}
-                className="flex-1 px-3 sm:px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                className="flex-1 px-3 sm:px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
                 placeholder="Add a new rule"
               />
               <button
                 onClick={handleAddRule}
-                className="px-3 sm:px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2 text-sm sm:text-base whitespace-nowrap"
+                className="px-3 sm:px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition flex items-center justify-center gap-2 text-sm sm:text-base whitespace-nowrap"
               >
                 <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                 Add
@@ -740,13 +740,13 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
                       handleAddModerator();
                     }
                   }}
-                  className="flex-1 px-3 sm:px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  className="flex-1 px-3 sm:px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-sm sm:text-base text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
                   placeholder="Enter username to add as moderator"
                 />
                 <button
                   onClick={handleAddModerator}
                   disabled={loading}
-                  className="px-3 sm:px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base whitespace-nowrap"
+                  className="px-3 sm:px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base whitespace-nowrap"
                 >
                   <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                   Add
@@ -766,7 +766,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
             <button
               onClick={handleSaveChanges}
               disabled={saving || !formData.name.trim() || !formData.description.trim()}
-              className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-orange-500 via-orange-500 to-orange-600 hover:from-orange-600 hover:via-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-primary via-primary to-primary-700 hover:from-primary-700 hover:via-primary-700 hover:to-primary-800 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>

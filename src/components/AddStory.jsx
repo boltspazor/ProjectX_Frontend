@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { ArrowLeft, X, Type, Sparkles, Image as ImageIcon, Camera } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo.svg";
 
 export default function AddStory({ setActiveView }) {
   const [step, setStep] = useState("select"); // "select", "edit"
@@ -129,7 +129,7 @@ export default function AddStory({ setActiveView }) {
 
           {/* Recents Dropdown */}
           <div className="px-4 pb-3">
-            <button className="flex items-center gap-1 text-white text-sm hover:text-orange-500 transition">
+            <button className="flex items-center gap-1 text-white text-sm hover:text-primary transition">
               <span>Recents</span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -155,11 +155,11 @@ export default function AddStory({ setActiveView }) {
               onClick={() => {
                 // Generate AI image - placeholder
               }}
-              className="aspect-square rounded-lg flex flex-col items-center justify-center gap-2 border-2 border-orange-500/50 hover:border-orange-500 transition relative overflow-hidden bg-black"
+              className="aspect-square rounded-lg flex flex-col items-center justify-center gap-2 border-2 border-primary/50 hover:border-primary transition relative overflow-hidden bg-black"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 via-orange-500/20 to-orange-600/20" />
-              <Sparkles className="w-6 h-6 text-orange-400 relative z-10" />
-              <span className="text-xs text-orange-400 font-medium relative z-10">Generate</span>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-400/20 via-primary/20 to-primary-700/20" />
+              <Sparkles className="w-6 h-6 text-primary-400 relative z-10" />
+              <span className="text-xs text-primary-400 font-medium relative z-10">Generate</span>
             </button>
 
             {/* Recent Images */}
@@ -206,7 +206,7 @@ export default function AddStory({ setActiveView }) {
       {/* Share Button */}
       <button
         onClick={handleShare}
-        className="absolute top-4 right-4 z-50 px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-full text-white font-medium transition"
+        className="absolute top-4 right-4 z-50 px-4 py-2 bg-primary hover:bg-primary-700 rounded-full text-white font-medium transition"
       >
         Share
       </button>
@@ -243,7 +243,7 @@ export default function AddStory({ setActiveView }) {
               setShowFilters(false);
               setShowStickers(false);
             }}
-            className={`p-3 rounded-full transition ${showText ? "bg-orange-500" : "bg-white/20 hover:bg-white/30"
+            className={`p-3 rounded-full transition ${showText ? "bg-primary" : "bg-white/20 hover:bg-white/30"
               }`}
           >
             <Type className="w-6 h-6 text-white" />
@@ -256,7 +256,7 @@ export default function AddStory({ setActiveView }) {
               setShowText(false);
               setShowStickers(false);
             }}
-            className={`p-3 rounded-full transition ${showFilters ? "bg-orange-500" : "bg-white/20 hover:bg-white/30"
+            className={`p-3 rounded-full transition ${showFilters ? "bg-primary" : "bg-white/20 hover:bg-white/30"
               }`}
           >
             <ImageIcon className="w-6 h-6 text-white" />
@@ -269,7 +269,7 @@ export default function AddStory({ setActiveView }) {
               setShowText(false);
               setShowFilters(false);
             }}
-            className={`p-3 rounded-full transition ${showStickers ? "bg-orange-500" : "bg-white/20 hover:bg-white/30"
+            className={`p-3 rounded-full transition ${showStickers ? "bg-primary" : "bg-white/20 hover:bg-white/30"
               }`}
           >
             <Sparkles className="w-6 h-6 text-white" />
@@ -290,7 +290,7 @@ export default function AddStory({ setActiveView }) {
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
                 placeholder="Type something..."
-                className="w-full px-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3"
+                className="w-full px-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary mb-3"
               />
               <div className="flex gap-2 flex-wrap">
                 {textColors.map((color) => (
@@ -322,7 +322,7 @@ export default function AddStory({ setActiveView }) {
                     key={filterOption.id}
                     onClick={() => setFilter(filterOption.id)}
                     className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition ${filter === filterOption.id
-                        ? "bg-orange-500 text-white"
+                        ? "bg-primary text-white"
                         : "bg-white/20 text-white hover:bg-white/30"
                       }`}
                   >

@@ -231,7 +231,7 @@ const StatCard = ({ icon, title, value, color }) => {
     blue: 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300',
     green: 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300',
     purple: 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300',
-    orange: 'bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300',
+    orange: 'bg-secondary-100 dark:bg-primary-950 text-primary-700 dark:text-secondary-300',
   };
 
   return (

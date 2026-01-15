@@ -153,10 +153,10 @@ export default function ExplorePage({ onViewUserProfile }) {
         <div className="max-w-7xl mx-auto mb-6 md:mb-8">
           {/* Categories Title */}
           <div className="mb-4 md:mb-5">
-            <h2 className="text-xl md:text-2xl font-semibold text-orange-500 mb-2">
+            <h2 className="text-xl md:text-2xl font-semibold text-primary mb-2">
               Categories
             </h2>
-            <div className="h-0.5 w-16 md:w-20 bg-orange-500 rounded-full"></div>
+            <div className="h-0.5 w-16 md:w-20 bg-primary rounded-full"></div>
           </div>
 
           {/* Categories Grid */}
@@ -177,8 +177,8 @@ export default function ExplorePage({ onViewUserProfile }) {
                     text-sm md:text-base font-medium
                     transition-all duration-200
                     ${isSelected
-                      ? "bg-orange-500 text-white shadow-lg shadow-orange-500/50"
-                      : "bg-gray-100 dark:bg-[#1a1a1a] text-black dark:text-white border border-black dark:border-gray-700 hover:border-orange-500/50 hover:bg-gray-200 dark:hover:bg-[#222]"
+                      ? "bg-primary text-white shadow-lg shadow-primary/50"
+                      : "bg-gray-100 dark:bg-[#1a1a1a] text-black dark:text-white border border-black dark:border-gray-700 hover:border-primary/50 hover:bg-gray-200 dark:hover:bg-[#222]"
                     }
                   `}
                 >
@@ -201,7 +201,7 @@ export default function ExplorePage({ onViewUserProfile }) {
           
           {loading && (
             <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500"></div>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
             </div>
           )}
 

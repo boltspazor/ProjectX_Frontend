@@ -71,7 +71,7 @@ export default function ShopPage() {
             email: JSON.parse(localStorage.getItem('user') || '{}').email
           },
           theme: {
-            color: '#f97316'
+            color: '#770524'
           }
         };
         
@@ -89,7 +89,7 @@ export default function ShopPage() {
     <main className="flex-1 overflow-y-auto h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]">
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         {/* Current Balance */}
-        <div className="mb-6 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 rounded-lg p-6 text-center">
+        <div className="mb-6 bg-gradient-to-r from-primary-400 via-primary to-primary-700 rounded-lg p-6 text-center">
           <p className="text-white/80 text-sm mb-2">Available Credits</p>
           <p className="text-4xl font-bold text-white">{userCredits.toLocaleString()}</p>
         </div>
@@ -105,7 +105,7 @@ export default function ShopPage() {
             {activeTab === "store" && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-400 via-primary to-primary-700"
                 initial={false}
                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
@@ -120,7 +120,7 @@ export default function ShopPage() {
             {activeTab === "history" && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-400 via-primary to-primary-700"
                 initial={false}
                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
@@ -144,7 +144,7 @@ export default function ShopPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="relative rounded-xl overflow-hidden bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 p-6 md:p-12 text-center"
+                className="relative rounded-xl overflow-hidden bg-gradient-to-r from-primary-400 via-primary to-primary-700 p-6 md:p-12 text-center"
               >
                 <div className="space-y-3 md:space-y-4">
                   <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-black dark:text-white leading-tight">
@@ -166,7 +166,7 @@ export default function ShopPage() {
                 {/* Credit Packages */}
                 {loading ? (
                   <div className="flex justify-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                   </div>
                 ) : packages.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
@@ -179,24 +179,24 @@ export default function ShopPage() {
                         whileHover={{ scale: 1.02, y: -4 }}
                         className={`bg-gray-100 dark:bg-[#1a1a1a] border ${
                           pkg.isPopular 
-                            ? 'border-orange-500 ring-2 ring-orange-500/50' 
+                            ? 'border-primary ring-2 ring-primary/50' 
                             : 'border-gray-300 dark:border-gray-800'
-                        } rounded-lg p-6 cursor-pointer hover:border-orange-500 transition-all duration-300 relative`}
+                        } rounded-lg p-6 cursor-pointer hover:border-primary transition-all duration-300 relative`}
                       >
                         {pkg.isPopular && (
-                          <div className="absolute -top-3 right-4 bg-orange-500 text-white text-xs px-3 py-1 rounded-full">
+                          <div className="absolute -top-3 right-4 bg-primary text-white text-xs px-3 py-1 rounded-full">
                             Most Popular
                           </div>
                         )}
                         <div className="space-y-4">
-                          <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center">
+                          <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-700 rounded-lg flex items-center justify-center">
                             <FiPackage className="w-10 h-10 text-white" />
                           </div>
                           <div>
                             <h4 className="text-xl font-bold text-black dark:text-white mb-2">
                               {pkg.name}
                             </h4>
-                            <p className="text-3xl font-bold text-orange-500 mb-1">
+                            <p className="text-3xl font-bold text-primary mb-1">
                               {pkg.credits.toLocaleString()}
                             </p>
                             <p className="text-gray-400 text-sm mb-3">Credits</p>
@@ -218,7 +218,7 @@ export default function ShopPage() {
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handlePurchase(pkg._id)}
                               disabled={loading}
-                              className="w-full px-4 py-2.5 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50"
+                              className="w-full px-4 py-2.5 bg-primary text-white font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                             >
                               Purchase Now
                             </motion.button>
@@ -262,7 +262,7 @@ export default function ShopPage() {
                 
                 {loading ? (
                   <div className="flex justify-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                   </div>
                 ) : purchaseHistory.length > 0 ? (
                   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">

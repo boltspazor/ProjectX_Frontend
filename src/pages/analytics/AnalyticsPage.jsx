@@ -29,7 +29,7 @@ const AnalyticsPage = () => {
     return (
       <div className="page-container">
         <div className="content-wrapper max-w-6xl flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
       </div>
     );

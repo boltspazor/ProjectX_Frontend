@@ -148,7 +148,7 @@ export default function DiscoverCommunities({ onBack }) {
   };
 
   const CommunityCard = ({ community, onJoin, isJoining }) => (
-    <div className="bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 rounded-2xl p-4 hover:border-orange-500 transition-all duration-300">
+    <div className="bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 rounded-2xl p-4 hover:border-primary transition-all duration-300">
       <div className="flex items-start gap-3">
         <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
           <LiveProfilePhoto
@@ -178,7 +178,7 @@ export default function DiscoverCommunities({ onBack }) {
           <button
             onClick={() => onJoin(community)}
             disabled={isJoining}
-            className="px-4 py-1.5 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-full transition-colors flex-shrink-0"
+            className="px-4 py-1.5 bg-primary hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-full transition-colors flex-shrink-0"
           >
             {isJoining ? 'Joining...' : 'Join'}
           </button>
@@ -206,7 +206,7 @@ export default function DiscoverCommunities({ onBack }) {
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
         {loading && (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
           </div>
         )}
 
@@ -221,7 +221,7 @@ export default function DiscoverCommunities({ onBack }) {
             <p className="text-red-500 mb-4">{error}</p>
             <button
               onClick={fetchCommunities}
-              className="px-6 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+              className="px-6 py-2 rounded-lg bg-primary text-white hover:bg-primary-700 transition-colors"
             >
               Try again
             </button>
@@ -242,8 +242,8 @@ export default function DiscoverCommunities({ onBack }) {
                   key={category}
                   onClick={() => setActiveCategory(category)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-300 flex-shrink-0 ${activeCategory === category
-                      ? "bg-orange-500 text-white"
-                      : "bg-white dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-400 hover:bg-orange-100 dark:hover:bg-[#222] hover:text-black dark:hover:text-white border border-black dark:border-gray-800"
+                      ? "bg-primary text-white"
+                      : "bg-white dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-400 hover:bg-secondary-100 dark:hover:bg-[#222] hover:text-black dark:hover:text-white border border-black dark:border-gray-800"
                     }`}
                 >
                   {category}
@@ -323,7 +323,7 @@ export default function DiscoverCommunities({ onBack }) {
                     setCodeError("");
                   }}
                   placeholder="Enter community code"
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
                   autoFocus
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
@@ -349,7 +349,7 @@ export default function DiscoverCommunities({ onBack }) {
                 </button>
                 <button
                   onClick={handleCodeSubmit}
-                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition"
                 >
                   Submit
                 </button>
@@ -377,7 +377,7 @@ export default function DiscoverCommunities({ onBack }) {
                     setPasswordError("");
                   }}
                   placeholder="Enter password"
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-black dark:border-gray-700 rounded-lg text-black dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
                   autoFocus
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
@@ -403,7 +403,7 @@ export default function DiscoverCommunities({ onBack }) {
                 </button>
                 <button
                   onClick={handlePasswordSubmit}
-                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition"
                 >
                   Join
                 </button>

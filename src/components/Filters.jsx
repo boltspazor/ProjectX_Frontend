@@ -52,7 +52,7 @@ export default function Filters({
 
           {/* Underline indicator */}
           <div
-            className="absolute bottom-0 h-[2px] rounded-full bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 shadow-[0_0_8px_rgba(251,146,60,0.5)] transition-all duration-500 ease-[cubic-bezier(0.45,0.05,0.55,0.95)]"
+            className="absolute bottom-0 h-[2px] rounded-full bg-gradient-to-r from-primary-400 via-primary to-primary-700 shadow-[0_0_8px_rgba(119, 5, 36,0.5)] transition-all duration-500 ease-[cubic-bezier(0.45,0.05,0.55,0.95)]"
             style={indicatorStyle}
           ></div>
         </div>
@@ -67,7 +67,7 @@ export default function Filters({
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-gradient-to-r from-orange-100 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-black dark:border-gray-600 rounded-full pl-9 pr-4 py-2 text-sm text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition"
+              className="w-full bg-gradient-to-r from-secondary-100 to-secondary-50 dark:from-gray-800 dark:to-gray-900 border border-black dark:border-gray-600 rounded-full pl-9 pr-4 py-2 text-sm text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-primary dark:focus:border-primary-400 transition"
             />
           </div>
 
@@ -75,8 +75,8 @@ export default function Filters({
           <button
             onClick={() => setIsAIEnabled(!isAIEnabled)}
             className={`relative w-12 h-6 flex items-center rounded-full transition-all duration-500 flex-shrink-0 border border-black ${isAIEnabled
-                ? "bg-gradient-to-r from-orange-400 to-orange-600"
-                : "bg-gradient-to-r from-orange-200 to-orange-100 dark:from-gray-700 dark:to-gray-800"
+                ? "bg-gradient-to-r from-primary-400 to-primary-700"
+                : "bg-gradient-to-r from-secondary-200 to-secondary-100 dark:from-gray-700 dark:to-gray-800"
               }`}
           >
             <span
