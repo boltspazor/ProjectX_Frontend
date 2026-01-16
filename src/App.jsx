@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
 import Navbar from "./components/layout/Navbar";
 import Sidebar from "./components/layout/Sidebar";
 import MobileNav from "./components/layout/MobileNav";
@@ -52,23 +54,6 @@ export default function App() {
         </div>
       </div>
     );
-  }
-
-  // If not authenticated, show login/signup/forgot-password pages
-  if (!isAuthenticated && location.pathname !== '/auth/callback') {
-    return (
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    );
-  }
-
-  // Handle OAuth callback route separately
-  if (location.pathname === '/auth/callback') {
-    return <AuthCallback />;
   }
 
   // Swipe gesture handlers for mobile navigation
@@ -155,6 +140,67 @@ export default function App() {
   };
 
   return (
+    <Routes>
+      {/* Public Routes - Accessible only when NOT authenticated */}
+      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+      <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+      <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+      
+      {/* OAuth Callback - Special handling */}
+      <Route path="/auth/callback" element={<AuthCallback />} />
+
+      {/* Protected Routes - Require authentication */}
+      <Route path="/*" element={
+        <ProtectedRoute>
+          <AppLayout 
+            isStoryPage={isStoryPage}
+            handleLogout={handleLogout}
+            handleCreatePostClick={handleCreatePostClick}
+            isCreatePostOpen={isCreatePostOpen}
+            setIsCreatePostOpen={setIsCreatePostOpen}
+            swipeDirection={swipeDirection}
+            handleTouchStart={handleTouchStart}
+            handleTouchEnd={handleTouchEnd}
+          >
+            <Routes>
+              <Route path="/home" element={<HomePageWrapper />} />
+              <Route path="/explore" element={<ExplorePageWrapper />} />
+              <Route path="/messages" element={<MessagesPageWrapper />} />
+              <Route path="/profile" element={<ProfilePageWrapper />} />
+              <Route path="/user/:username" element={<UserProfileWrapper />} />
+              <Route path="/communities" element={<CommunitiesPageWrapper />} />
+              <Route path="/communities/create" element={<CreateCommunity />} />
+              <Route path="/communities/:id" element={<CommunityDetailWrapper />} />
+              <Route path="/communities/:id/settings" element={<CommunitySettingsWrapper />} />
+              <Route path="/notifications" element={<NotificationsWrapper />} />
+              <Route path="/shop" element={<ShopPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/story/add" element={<AddStory />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="*" element={<Navigate to="/home" replace />} />
+            </Routes>
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+    </Routes>
+  );
+}
+
+// Separate layout component for authenticated routes
+function AppLayout({ 
+  children, 
+  isStoryPage, 
+  handleLogout, 
+  handleCreatePostClick, 
+  isCreatePostOpen, 
+  setIsCreatePostOpen,
+  swipeDirection,
+  handleTouchStart,
+  handleTouchEnd
+}) {
+  const location = useLocation();
+
+  return (
     <div 
       className="bg-secondary-50 dark:bg-black text-black dark:text-white min-h-screen flex flex-col"
       onTouchStart={handleTouchStart}
@@ -191,22 +237,7 @@ export default function App() {
                   }}
                   className="h-full"
                 >
-                  <Routes>
-                    <Route path="/home" element={<HomePageWrapper />} />
-                    <Route path="/explore" element={<ExplorePageWrapper />} />
-                    <Route path="/messages" element={<MessagesPageWrapper />} />
-                    <Route path="/profile" element={<ProfilePageWrapper />} />
-                    <Route path="/user/:username" element={<UserProfileWrapper />} />
-                    <Route path="/communities" element={<CommunitiesPageWrapper />} />
-                    <Route path="/communities/create" element={<CreateCommunity />} />
-                    <Route path="/communities/:id" element={<CommunityDetailWrapper />} />
-                    <Route path="/communities/:id/settings" element={<CommunitySettingsWrapper />} />
-                    <Route path="/notifications" element={<NotificationsWrapper />} />
-                    <Route path="/shop" element={<ShopPage />} />
-                    <Route path="/analytics" element={<AnalyticsPage />} />
-                    <Route path="/" element={<Navigate to="/home" replace />} />
-                    <Route path="*" element={<Navigate to="/home" replace />} />
-                  </Routes>
+                  {children}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -216,11 +247,7 @@ export default function App() {
         </>
       )}
 
-      {isStoryPage && (
-        <Routes>
-          <Route path="/story/add" element={<AddStory />} />
-        </Routes>
-      )}
+      {isStoryPage && children}
 
       <CreatePost
         isOpen={isCreatePostOpen}
