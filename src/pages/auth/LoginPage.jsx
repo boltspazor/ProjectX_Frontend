@@ -289,9 +289,9 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     }
 
     try {
-      // Call API login - backend expects 'email' field
+      // Call API login - backend expects 'username' field
       const response = await login({
-        email: username, // Using username as email
+        username: username,
         password: password,
       });
 
