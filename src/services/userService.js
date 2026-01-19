@@ -70,7 +70,11 @@ export const userService = {
   async getUserByUsername(username) {
     try {
       const response = await api.get(API_ENDPOINTS.USERS.BY_USERNAME(username));
-      return response.success ? response.data : null;
+      if (response.success && response.data) {
+        // Backend returns { success: true, data: { user: {...} } }
+        return response.data.user || response.data;
+      }
+      return null;
     } catch (error) {
       console.error('Get user by username error:', error);
       throw error;
@@ -83,10 +87,14 @@ export const userService = {
   async getUserFollowers(username, page = 1, limit = 20) {
     try {
       const response = await api.get(API_ENDPOINTS.USERS.FOLLOWERS(username), { page, limit });
-      return response.success ? response.data : { followers: [], pagination: {} };
+      if (response.success && response.data) {
+        // Return the data object which should contain followers array
+        return response.data;
+      }
+      return { followers: [], pagination: {} };
     } catch (error) {
       console.error('Get user followers error:', error);
-      throw error;
+      return { followers: [], pagination: {} }; // Return empty instead of throwing
     }
   },
 
@@ -96,10 +104,14 @@ export const userService = {
   async getUserFollowing(username, page = 1, limit = 20) {
     try {
       const response = await api.get(API_ENDPOINTS.USERS.FOLLOWING(username), { page, limit });
-      return response.success ? response.data : { following: [], pagination: {} };
+      if (response.success && response.data) {
+        // Return the data object which should contain following array
+        return response.data;
+      }
+      return { following: [], pagination: {} };
     } catch (error) {
       console.error('Get user following error:', error);
-      throw error;
+      return { following: [], pagination: {} }; // Return empty instead of throwing
     }
   },
 

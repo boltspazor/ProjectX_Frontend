@@ -15,15 +15,22 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
 
   const fetchJoinedCommunities = async () => {
     try {
+      console.log('fetchJoinedCommunities: Starting...');
       setLoading(true);
       setError(null);
+      
       const data = await communityService.getUserCommunities();
+      console.log('fetchJoinedCommunities: Received data:', data);
+      
       // Ensure data is always an array
       if (Array.isArray(data)) {
+        console.log('fetchJoinedCommunities: Data is array, setting communities');
         setCommunities(data);
       } else if (data && Array.isArray(data.communities)) {
+        console.log('fetchJoinedCommunities: Data.communities is array, setting communities');
         setCommunities(data.communities);
       } else {
+        console.log('fetchJoinedCommunities: No valid array found, setting empty array');
         setCommunities([]);
       }
     } catch (err) {
@@ -32,6 +39,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
       // Set empty array on error to prevent undefined issues
       setCommunities([]);
     } finally {
+      console.log('fetchJoinedCommunities: Setting loading to false');
       setLoading(false);
     }
   };

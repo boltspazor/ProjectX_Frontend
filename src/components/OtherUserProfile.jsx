@@ -37,16 +37,25 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
 
   // Fetch user profile data with optimized parallel loading
   const fetchUserProfile = async () => {
+    console.log('fetchUserProfile: Starting...', viewedUser);
     setLoading(true);
     setError(null);
     
     try {
       // Fetch user data first (most important)
+      console.log('fetchUserProfile: Fetching user data...');
       const user = await userService.getUserByUsername(viewedUser);
+      console.log('fetchUserProfile: User data received:', user);
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+      
       setUserData(user);
       setIsFollowing(user?.isFollowing || false);
 
       // Fetch other data in parallel for faster loading
+      console.log('fetchUserProfile: Fetching posts, followers, following in parallel...');
       const [userPosts, followersData, followingData] = await Promise.allSettled([
         postService.getUserPosts(viewedUser),
         userService.getUserFollowers(viewedUser),
@@ -55,7 +64,9 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
 
       // Handle posts
       if (userPosts.status === 'fulfilled') {
-        setPosts(userPosts.value?.posts || userPosts.value || []);
+        console.log('fetchUserProfile: Posts data:', userPosts.value);
+        const postsArray = userPosts.value?.posts || [];
+        setPosts(Array.isArray(postsArray) ? postsArray : []);
       } else {
         console.error('Error fetching posts:', userPosts.reason);
         setPosts([]);
@@ -63,7 +74,9 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
 
       // Handle followers
       if (followersData.status === 'fulfilled') {
-        setFollowersList(followersData.value?.followers || followersData.value || []);
+        console.log('fetchUserProfile: Followers data:', followersData.value);
+        const followersArray = followersData.value?.followers || [];
+        setFollowersList(Array.isArray(followersArray) ? followersArray : []);
       } else {
         console.error('Error fetching followers:', followersData.reason);
         setFollowersList([]);
@@ -71,16 +84,20 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
 
       // Handle following
       if (followingData.status === 'fulfilled') {
-        setFollowingList(followingData.value?.following || followingData.value || []);
+        console.log('fetchUserProfile: Following data:', followingData.value);
+        const followingArray = followingData.value?.following || [];
+        setFollowingList(Array.isArray(followingArray) ? followingArray : []);
       } else {
         console.error('Error fetching following:', followingData.reason);
         setFollowingList([]);
       }
 
+      console.log('fetchUserProfile: Complete!');
     } catch (err) {
       console.error('Error fetching user profile:', err);
       setError(err.message || 'Failed to load user profile');
     } finally {
+      console.log('fetchUserProfile: Setting loading to false');
       setLoading(false);
     }
   };

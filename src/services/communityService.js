@@ -11,10 +11,20 @@ export const communityService = {
   async getPublicCommunities(limit = 20) {
     try {
       const response = await api.get(API_ENDPOINTS.COMMUNITIES.PUBLIC, { limit });
-      return response.success ? (response.data?.communities || response.data || []) : [];
+      if (response.success && response.data) {
+        // Handle nested structure: response.data.communities
+        if (Array.isArray(response.data.communities)) {
+          return response.data.communities;
+        }
+        // Handle direct array
+        if (Array.isArray(response.data)) {
+          return response.data;
+        }
+      }
+      return [];
     } catch (error) {
       console.error('Get public communities error:', error);
-      throw error;
+      return []; // Return empty array instead of throwing
     }
   },
 
@@ -24,10 +34,20 @@ export const communityService = {
   async getUserCommunities(limit = 20) {
     try {
       const response = await api.get(API_ENDPOINTS.COMMUNITIES.USER_COMMUNITIES, { limit });
-      return response.success ? (response.data?.communities || response.data || []) : [];
+      if (response.success && response.data) {
+        // Handle nested structure: response.data.communities
+        if (Array.isArray(response.data.communities)) {
+          return response.data.communities;
+        }
+        // Handle direct array
+        if (Array.isArray(response.data)) {
+          return response.data;
+        }
+      }
+      return [];
     } catch (error) {
       console.error('Get user communities error:', error);
-      throw error;
+      return []; // Return empty array instead of throwing to prevent crashes
     }
   },
 
