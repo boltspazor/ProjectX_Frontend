@@ -46,8 +46,8 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
 
   const handleLeaveCommunity = async (communityId) => {
     try {
-      // Optimistic update
-      setCommunities(prev => prev.filter(c => c.id !== communityId));
+      // Optimistic update - handle both _id and id
+      setCommunities(prev => prev.filter(c => (c._id || c.id) !== communityId));
       await communityService.leaveCommunity(communityId);
     } catch (err) {
       console.error('Error leaving community:', err);
@@ -125,15 +125,15 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
         <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2">
           {communities.map((community) => (
           <article
-            key={community.id}
-            onClick={() => handleCommunityClick(community.id)}
+            key={community._id || community.id}
+            onClick={() => handleCommunityClick(community._id || community.id)}
             className="group relative rounded-3xl border border-black dark:border-gray-800 bg-white dark:bg-[#121212] transition-all duration-500 hover:border-primary hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] cursor-pointer"
           >
             <div className="relative h-40 overflow-hidden rounded-t-3xl">
               <LiveBanner
-                imageSrc={community.cover}
-                videoSrc={getCommunityBannerVideoUrl(community.id, community.cover, community)}
-                alt={`${community.name} cover`}
+                imageSrc={community.cover || community.icon || ''}
+                videoSrc={getCommunityBannerVideoUrl(community._id || community.id, community.cover || community.icon, community)}
+                alt={`${community.name || 'Community'} cover`}
                 className="h-full w-full transition-transform duration-500 group-hover:scale-105"
                 maxDuration={10}
               />
@@ -144,9 +144,9 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
               <div className="absolute -top-8 left-6">
                 <div className="w-16 h-16 rounded-2xl border-4 border-[#121212] overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.35)]">
                   <LiveProfilePhoto
-                    imageSrc={community.avatar}
-                    videoSrc={getCommunityProfileVideoUrl(community.id, community.avatar, community)}
-                    alt={`${community.name} avatar`}
+                    imageSrc={community.avatar || community.icon || ''}
+                    videoSrc={getCommunityProfileVideoUrl(community._id || community.id, community.avatar || community.icon, community)}
+                    alt={`${community.name || 'Community'} avatar`}
                     className="h-full w-full rounded-2xl"
                     maxDuration={10}
                   />
@@ -154,9 +154,9 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
               </div>
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-lg font-semibold text-black dark:text-white">{community.name}</h2>
+                  <h2 className="text-lg font-semibold text-black dark:text-white">{community.name || 'Unnamed Community'}</h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">
-                    {community.description}
+                    {community.description || 'No description available'}
                   </p>
                 </div>
                 <span className="text-xs font-medium uppercase tracking-wide text-primary-400 bg-primary/10 border border-primary/40 px-3 py-1 rounded-full">
@@ -165,25 +165,31 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
-                <span className="text-gray-600 dark:text-gray-400">{community.members}</span>
-                <span className="w-1 h-1 rounded-full bg-gray-400 dark:bg-gray-700" />
-                <div className="flex flex-wrap items-center gap-2">
-                  {community.badges.map((badge) => (
-                    <span
-                      key={badge}
-                      className="px-3 py-1 rounded-full text-xs font-medium text-primary-700 dark:text-secondary-300 bg-secondary-100 dark:bg-primary/10 border border-secondary-300 dark:border-primary/30"
-                    >
-                      {badge}
-                    </span>
-                  ))}
-                </div>
+                <span className="text-gray-600 dark:text-gray-400">
+                  {community.membersCount || community.members?.length || 0} members
+                </span>
+                {community.topics && community.topics.length > 0 && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-gray-400 dark:bg-gray-700" />
+                    <div className="flex flex-wrap items-center gap-2">
+                      {community.topics.slice(0, 3).map((topic, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 rounded-full text-xs font-medium text-primary-700 dark:text-secondary-300 bg-secondary-100 dark:bg-primary/10 border border-secondary-300 dark:border-primary/30"
+                        >
+                          {topic}
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="mt-6 flex items-center justify-between gap-3">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleCommunityClick(community.id);
+                    handleCommunityClick(community._id || community.id);
                   }}
                   className="flex-1 rounded-xl border border-black dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 transition-all duration-300 hover:border-primary hover:text-black dark:hover:text-white"
                 >
@@ -192,7 +198,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleLeaveCommunity(community.id);
+                    handleLeaveCommunity(community._id || community.id);
                   }}
                   className="rounded-xl border border-red-500 px-4 py-2 text-sm text-red-500 transition-all duration-300 hover:bg-red-500 hover:text-white"
                 >
