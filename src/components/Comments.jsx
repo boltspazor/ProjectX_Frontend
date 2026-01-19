@@ -4,8 +4,9 @@ import { Heart } from "lucide-react";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import { formatDistanceToNow } from "date-fns";
 
-export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [], onViewUserProfile, onAddComment }) {
+export default function Comments({ isOpen, onClose, variant = "sidebar", initialComments = [], onViewUserProfile, onAddComment, onLikeComment }) {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState(initialComments);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,12 +19,22 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
     }
   }, [isOpen, initialComments]);
 
-  const handleLikeComment = (commentId) => {
-    setComments(comments.map(comment =>
-      comment.id === commentId
-        ? { ...comment, liked: !comment.liked, likes: comment.liked ? comment.likes - 1 : comment.likes + 1 }
-        : comment
-    ));
+  const handleLikeComment = async (commentId) => {
+    if (onLikeComment) {
+      try {
+        await onLikeComment(commentId);
+        // The parent will update initialComments which triggers useEffect
+      } catch (error) {
+        console.error('Error liking comment:', error);
+      }
+    } else {
+      // Fallback to local state
+      setComments(comments.map(comment =>
+        comment.id === commentId
+          ? { ...comment, liked: !comment.liked, likes: comment.liked ? comment.likes - 1 : comment.likes + 1 }
+          : comment
+      ));
+    }
   };
 
   const handleSendComment = async () => {
@@ -132,7 +143,9 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
                         {comment.likes > 0 ? comment.likes.toLocaleString() : 'Like'}
                       </span>
                     </button>
-                    <span className="text-xs md:text-sm text-gray-500">2h</span>
+                    <span className="text-xs md:text-sm text-gray-500">
+                      {comment.createdAt ? formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true }) : ''}
+                    </span>
                   </div>
                 </div>
               </motion.div>

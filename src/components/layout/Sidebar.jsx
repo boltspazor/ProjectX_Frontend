@@ -20,11 +20,13 @@ import LogoutConfirmationModal from "../LogoutConfirmationModal";
 import LiveProfilePhoto from "../LiveProfilePhoto";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import { userService } from "../../services";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Sidebar({ onLogout }) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLogoutHovered, setIsLogoutHovered] = useState(false);
   const { profilePhoto, profileVideo, username } = useUserProfile();
+  const { user } = useAuth();
   
   // Fetch stats from backend
   const [stats, setStats] = useState({
@@ -93,7 +95,7 @@ export default function Sidebar({ onLogout }) {
       </div>
 
       <h2 className="text-lg font-semibold text-center">{username}</h2>
-      <p className="text-sm dark:text-gray-400 text-gray-600 text-center mb-8">Rahul Chauhan</p>
+      <p className="text-sm dark:text-gray-400 text-gray-600 text-center mb-8">{user?.displayName || username}</p>
 
       {/* Stats */}
       <div className="flex justify-center text-center mb-10 text-sm">
