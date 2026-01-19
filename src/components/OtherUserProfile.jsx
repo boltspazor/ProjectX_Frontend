@@ -35,28 +35,47 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
   const followersCount = userData?.stats?.followers || followersList.length;
   const followingCount = userData?.stats?.following || followingList.length;
 
-  // Fetch user profile data
+  // Fetch user profile data with optimized parallel loading
   const fetchUserProfile = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      // Fetch user data
+      // Fetch user data first (most important)
       const user = await userService.getUserByUsername(viewedUser);
       setUserData(user);
       setIsFollowing(user?.isFollowing || false);
 
-      // Fetch user posts
-      const userPosts = await postService.getUserPosts(viewedUser);
-      setPosts(userPosts?.posts || userPosts || []);
+      // Fetch other data in parallel for faster loading
+      const [userPosts, followersData, followingData] = await Promise.allSettled([
+        postService.getUserPosts(viewedUser),
+        userService.getUserFollowers(viewedUser),
+        userService.getUserFollowing(viewedUser)
+      ]);
 
-      // Fetch followers
-      const followersData = await userService.getUserFollowers(viewedUser);
-      setFollowersList(followersData?.followers || followersData || []);
+      // Handle posts
+      if (userPosts.status === 'fulfilled') {
+        setPosts(userPosts.value?.posts || userPosts.value || []);
+      } else {
+        console.error('Error fetching posts:', userPosts.reason);
+        setPosts([]);
+      }
 
-      // Fetch following
-      const followingData = await userService.getUserFollowing(viewedUser);
-      setFollowingList(followingData?.following || followingData || []);
+      // Handle followers
+      if (followersData.status === 'fulfilled') {
+        setFollowersList(followersData.value?.followers || followersData.value || []);
+      } else {
+        console.error('Error fetching followers:', followersData.reason);
+        setFollowersList([]);
+      }
+
+      // Handle following
+      if (followingData.status === 'fulfilled') {
+        setFollowingList(followingData.value?.following || followingData.value || []);
+      } else {
+        console.error('Error fetching following:', followingData.reason);
+        setFollowingList([]);
+      }
 
     } catch (err) {
       console.error('Error fetching user profile:', err);

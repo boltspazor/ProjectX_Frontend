@@ -18,10 +18,19 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
       setLoading(true);
       setError(null);
       const data = await communityService.getUserCommunities();
-      setCommunities(data || []);
+      // Ensure data is always an array
+      if (Array.isArray(data)) {
+        setCommunities(data);
+      } else if (data && Array.isArray(data.communities)) {
+        setCommunities(data.communities);
+      } else {
+        setCommunities([]);
+      }
     } catch (err) {
       console.error('Error fetching joined communities:', err);
       setError(err.message || 'Failed to load communities');
+      // Set empty array on error to prevent undefined issues
+      setCommunities([]);
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Navbar from "./components/layout/Navbar";
 import Sidebar from "./components/layout/Sidebar";
 import MobileNav from "./components/layout/MobileNav";
@@ -116,27 +117,71 @@ export default function App() {
   const isStoryPage = location.pathname === "/story/add";
 
   // Wrapper components to pass navigation props
-  const HomePageWrapper = () => <HomePage onViewUserProfile={handleViewUserProfile} />;
-  const ExplorePageWrapper = () => <ExplorePage onViewUserProfile={handleViewUserProfile} />;
+  const HomePageWrapper = () => (
+    <ErrorBoundary>
+      <HomePage onViewUserProfile={handleViewUserProfile} />
+    </ErrorBoundary>
+  );
+  
+  const ExplorePageWrapper = () => (
+    <ErrorBoundary>
+      <ExplorePage onViewUserProfile={handleViewUserProfile} />
+    </ErrorBoundary>
+  );
+  
   const MessagesPageWrapper = () => {
     const params = new URLSearchParams(location.search);
     const selectedChatUsername = params.get('user');
-    return <MessagesPage onViewUserProfile={handleViewUserProfile} selectedChatUsername={selectedChatUsername} />;
+    return (
+      <ErrorBoundary>
+        <MessagesPage onViewUserProfile={handleViewUserProfile} selectedChatUsername={selectedChatUsername} />
+      </ErrorBoundary>
+    );
   };
-  const ProfilePageWrapper = () => <ProfilePage onLogout={handleLogout} onViewUserProfile={handleViewUserProfile} />;
-  const CommunitiesPageWrapper = () => <CommunitiesPage onViewUserProfile={handleViewUserProfile} />;
-  const NotificationsWrapper = () => <Notifications onViewUserProfile={handleViewUserProfile} />;
+  
+  const ProfilePageWrapper = () => (
+    <ErrorBoundary>
+      <ProfilePage onLogout={handleLogout} onViewUserProfile={handleViewUserProfile} />
+    </ErrorBoundary>
+  );
+  
+  const CommunitiesPageWrapper = () => (
+    <ErrorBoundary>
+      <CommunitiesPage onViewUserProfile={handleViewUserProfile} />
+    </ErrorBoundary>
+  );
+  
+  const NotificationsWrapper = () => (
+    <ErrorBoundary>
+      <Notifications onViewUserProfile={handleViewUserProfile} />
+    </ErrorBoundary>
+  );
+  
   const UserProfileWrapper = () => {
     const { username } = useParams();
-    return <OtherUserProfile username={username} onViewUserProfile={handleViewUserProfile} />;
+    return (
+      <ErrorBoundary>
+        <OtherUserProfile username={username} onViewUserProfile={handleViewUserProfile} />
+      </ErrorBoundary>
+    );
   };
+  
   const CommunityDetailWrapper = () => {
     const { id } = useParams();
-    return <CommunityDetail communityId={id} onViewUserProfile={handleViewUserProfile} />;
+    return (
+      <ErrorBoundary>
+        <CommunityDetail communityId={id} onViewUserProfile={handleViewUserProfile} />
+      </ErrorBoundary>
+    );
   };
+  
   const CommunitySettingsWrapper = () => {
     const { id } = useParams();
-    return <CommunitySettings communityId={id} onViewUserProfile={handleViewUserProfile} />;
+    return (
+      <ErrorBoundary>
+        <CommunitySettings communityId={id} onViewUserProfile={handleViewUserProfile} />
+      </ErrorBoundary>
+    );
   };
 
   return (

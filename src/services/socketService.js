@@ -11,11 +11,20 @@ class SocketService {
    * Connect to Socket.io server
    */
   connect(token) {
+    // Return existing connection if already connected
     if (this.socket?.connected) {
+      console.log('✅ Socket already connected');
       return this.socket;
     }
 
+    // Disconnect existing socket if not connected
+    if (this.socket && !this.socket.connected) {
+      this.socket.disconnect();
+      this.socket = null;
+    }
+
     const socketUrl = import.meta.env.VITE_SOCKET_URL || API_CONFIG.BASE_URL;
+    console.log('🔌 Connecting to socket server:', socketUrl);
 
     this.socket = io(socketUrl, {
       auth: {
@@ -24,20 +33,55 @@ class SocketService {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
       reconnectionAttempts: 5,
+      timeout: 10000,
+      autoConnect: true,
     });
 
     // Connection events
     this.socket.on('connect', () => {
       this.connected = true;
+      console.log('✅ Socket connected successfully:', this.socket.id);
     });
 
     this.socket.on('disconnect', (reason) => {
       this.connected = false;
+      console.log('❌ Socket disconnected:', reason);
+      
+      // Attempt to reconnect if disconnected unexpectedly
+      if (reason === 'io server disconnect') {
+        // Server disconnected, try to reconnect manually
+        setTimeout(() => {
+          if (token && !this.socket?.connected) {
+            console.log('🔄 Attempting manual reconnection...');
+            this.socket?.connect();
+          }
+        }, 1000);
+      }
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('Socket.io connection error:', error);
+      console.error('❌ Socket.io connection error:', error.message);
+      this.connected = false;
+    });
+
+    this.socket.on('reconnect', (attemptNumber) => {
+      console.log('✅ Socket reconnected after', attemptNumber, 'attempts');
+      this.connected = true;
+    });
+
+    this.socket.on('reconnect_attempt', (attemptNumber) => {
+      console.log('🔄 Socket reconnection attempt', attemptNumber);
+    });
+
+    this.socket.on('reconnect_error', (error) => {
+      console.error('❌ Socket reconnection error:', error.message);
+    });
+
+    this.socket.on('reconnect_failed', () => {
+      console.error('❌ Socket reconnection failed after max attempts');
+      this.connected = false;
     });
 
     return this.socket;
