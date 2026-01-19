@@ -89,6 +89,9 @@ export default function LiveBanner({
 
   // If no video source or error occurred, just show static image
   const showVideo = isHovered && videoSrc && !hasError;
+  
+  // Provide fallback for missing imageSrc
+  const displayImage = imageSrc || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23ddd" width="400" height="300"/%3E%3C/svg%3E';
 
   return (
     <div
@@ -98,12 +101,16 @@ export default function LiveBanner({
     >
       {/* Static Image - Always visible as fallback */}
       <img
-        src={imageSrc}
+        src={displayImage}
         alt={alt}
         className={`w-full h-full object-cover transition-opacity duration-300 ${showVideo ? "opacity-0 absolute inset-0" : "opacity-100"
           }`}
         loading="lazy"
         decoding="async"
+        onError={(e) => {
+          // Fallback to placeholder if image fails to load
+          e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23ddd" width="400" height="300"/%3E%3C/svg%3E';
+        }}
       />
 
       {/* Video - Only shown on hover */}

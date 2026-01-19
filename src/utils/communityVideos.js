@@ -8,14 +8,6 @@ export const getCommunityBannerVideoUrl = (communityId, bannerSrc = null, commun
     return community.bannerVideo;
   }
   
-  // If community object not provided, try to get it by ID
-  if (communityId) {
-    const communityData = getCommunityById(communityId);
-    if (communityData && communityData.bannerVideo) {
-      return communityData.bannerVideo;
-    }
-  }
-  
   // In a real app, you would:
   // 1. Check if community has a live banner video
   // 2. Fetch from your database/CDN
@@ -30,14 +22,6 @@ export const getCommunityProfileVideoUrl = (communityId, profileSrc = null, comm
   // First check if community object was passed and has a profileVideo property
   if (community && community.profileVideo) {
     return community.profileVideo;
-  }
-  
-  // If community object not provided, try to get it by ID
-  if (communityId) {
-    const communityData = getCommunityById(communityId);
-    if (communityData && communityData.profileVideo) {
-      return communityData.profileVideo;
-    }
   }
   
   // In a real app, you would:
