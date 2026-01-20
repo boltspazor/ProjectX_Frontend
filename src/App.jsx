@@ -27,6 +27,7 @@ import Notifications from "./components/Notifications";
 import AddStory from "./components/AddStory";
 import OtherUserProfile from "./components/OtherUserProfile";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import AITools from "./components/AITools";
 
 export default function App() {
   const { isAuthenticated, isLoading: authLoading, logout } = useAuth();
@@ -185,6 +186,12 @@ export default function App() {
     );
   };
 
+  const AIToolsWrapper = () => (
+    <ErrorBoundary>
+      <AITools />
+    </ErrorBoundary>
+  );
+
   return (
     <Routes>
       {/* Public Routes - Accessible only when NOT authenticated */}
@@ -215,6 +222,7 @@ export default function App() {
               <Route path="/profile" element={<ProfilePageWrapper />} />
               <Route path="/user/:username" element={<UserProfileWrapper />} />
               <Route path="/communities" element={<CommunitiesPageWrapper />} />
+              <Route path="/ai-tools" element={<AIToolsWrapper />} />
               <Route path="/communities/create" element={<CreateCommunity />} />
               <Route path="/communities/:id" element={<CommunityDetailWrapper />} />
               <Route path="/communities/:id/settings" element={<CommunitySettingsWrapper />} />

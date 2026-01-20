@@ -75,6 +75,14 @@ export const authService = {
    */
   async logout() {
     try {
+      // Call logout endpoint
+      try {
+        await api.post(API_ENDPOINTS.AUTH.LOGOUT);
+      } catch (error) {
+        // Continue with logout even if API call fails
+        console.warn('Logout API call failed:', error);
+      }
+      
       // Clear all tokens and user data
       tokenManager.clearTokens();
       

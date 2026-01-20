@@ -1,11 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { authService } from "../services/authService";
 
 export default function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) {
-  const handleConfirm = () => {
-    onConfirm();
-    onClose();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleConfirm = async () => {
+    try {
+      setIsLoggingOut(true);
+      await authService.logout();
+      
+      if (onConfirm) {
+        onConfirm();
+      }
+      
+      onClose();
+      
+      // Redirect to login page
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still close and redirect even if API fails
+      onClose();
+      window.location.href = '/login';
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const modalContent = (
@@ -62,11 +83,12 @@ export default function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) 
                   {/* Logout Button */}
                   <motion.button
                     onClick={handleConfirm}
+                    disabled={isLoggingOut}
                     whileHover={{ opacity: 0.8 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex-1 px-4 md:px-5 py-2.5 md:py-3 text-primary dark:text-red-500 font-bold text-sm md:text-base hover:text-primary-400 dark:hover:text-red-400 transition-colors text-center"
+                    className="flex-1 px-4 md:px-5 py-2.5 md:py-3 text-primary dark:text-red-500 font-bold text-sm md:text-base hover:text-primary-400 dark:hover:text-red-400 transition-colors text-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Log out
+                    {isLoggingOut ? 'Logging out...' : 'Log out'}
                   </motion.button>
                 </div>
               </div>
