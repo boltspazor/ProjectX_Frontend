@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import PostDetailModal from "../components/PostDetailModal";
@@ -8,7 +9,8 @@ import { getProfileVideoUrl } from "../utils/profileVideos";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { userService, postService } from "../services";
 
-export default function OtherUserProfile({ username: viewedUsername, setActiveView, onViewUserProfile }) {
+export default function OtherUserProfile({ username: viewedUsername, onViewUserProfile }) {
+  const navigate = useNavigate();
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -214,16 +216,12 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
 
   const handleMessage = () => {
     // Navigate to messages page and open chat with this user
-    if (setActiveView) {
-      const usernameToMessage = viewedUsername || userData.username;
-      setActiveView("messages", null, null, usernameToMessage);
-    }
+    const usernameToMessage = viewedUsername || userData.username;
+    navigate(`/messages?user=${usernameToMessage}`);
   };
 
   const handleBack = () => {
-    if (setActiveView) {
-      setActiveView("home");
-    }
+    navigate(-1);
   };
 
   // Loading state
@@ -396,7 +394,7 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
         >
           {posts.map((post, index) => (
             <motion.div
-              key={post.id}
+              key={post.id || post._id}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4 + index * 0.03, duration: 0.4 }}
@@ -404,8 +402,8 @@ export default function OtherUserProfile({ username: viewedUsername, setActiveVi
               className="aspect-square overflow-hidden bg-gray-200 dark:bg-gray-900 cursor-pointer group border-2 border-black dark:border-gray-800 transition-all"
             >
               <img
-                src={post.image}
-                alt={`Post ${post.id + 1}`}
+                src={post.imageUrl || post.image}
+                alt={`Post ${(post.id || post._id) + 1}`}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
                 decoding="async"

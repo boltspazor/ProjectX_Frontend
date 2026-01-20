@@ -135,7 +135,7 @@ export default function ExplorePage({ onViewUserProfile }) {
   };
 
   return (
-    <main className="flex-1 overflow-y-auto p-4 md:p-8 h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]">
+    <main className="flex-1 overflow-y-auto p-4 md:p-8 h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)] bg-white dark:bg-black">
       {/* Filters */}
       <div onKeyPress={handleSearchKeyPress}>
         <Filters

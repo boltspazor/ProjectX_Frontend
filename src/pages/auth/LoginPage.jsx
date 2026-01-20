@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { authService } from "../../services/authService";
 
-export default function LoginPage({ onLogin, onSwitchToSignup }) {
+export default function LoginPage() {
+  const navigate = useNavigate();
   const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -535,8 +537,10 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
       controller.style.opacity = "0";
       controller.style.transform = "scale(0.95)";
       setTimeout(() => {
-        onSwitchToSignup();
+        navigate('/register');
       }, 400);
+    } else {
+      navigate('/register');
     }
   };
 

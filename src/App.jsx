@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Toaster } from "react-hot-toast";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
@@ -258,7 +259,7 @@ function AppLayout({
           <div className="flex flex-1 overflow-hidden pb-14 md:pb-0">
             <Sidebar onLogout={handleLogout} />
 
-            <div className="flex-1 md:ml-80 overflow-hidden">
+            <div className="flex-1 md:ml-80 overflow-hidden bg-white dark:bg-black">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={location.pathname}
@@ -280,7 +281,7 @@ function AppLayout({
                     damping: 30,
                     mass: 0.8
                   }}
-                  className="h-full"
+                  className="h-full min-h-screen bg-white dark:bg-black"
                 >
                   {children}
                 </motion.div>
@@ -297,6 +298,31 @@ function AppLayout({
       <CreatePost
         isOpen={isCreatePostOpen}
         onClose={() => setIsCreatePostOpen(false)}
+      />
+      
+      {/* Toast Notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#1a1a1a',
+            color: '#fff',
+            border: '1px solid #333',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
       />
     </div>
   );

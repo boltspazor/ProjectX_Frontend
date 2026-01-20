@@ -1,9 +1,14 @@
 import React, { useState, useRef } from "react";
-import { ArrowLeft, X, Type, Sparkles, Image as ImageIcon, Camera } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, X, Type, Sparkles, Image as ImageIcon, Camera, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/logo.svg";
+import { storyService } from "../services/storyService";
+import { uploadService } from "../services/uploadService";
+import { toast } from "react-hot-toast";
 
-export default function AddStory({ setActiveView }) {
+export default function AddStory() {
+  const navigate = useNavigate();
   const [step, setStep] = useState("select"); // "select", "edit"
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -13,26 +18,8 @@ export default function AddStory({ setActiveView }) {
   const [textValue, setTextValue] = useState("");
   const [textColor, setTextColor] = useState("#FFFFFF");
   const [filter, setFilter] = useState("none");
+  const [isUploading, setIsUploading] = useState(false);
   const imageInputRef = useRef(null);
-
-  // Mock recent images - in production, these would come from device storage
-  const recentImages = [
-    { id: 1, url: "https://i.pravatar.cc/300?img=1" },
-    { id: 2, url: "https://i.pravatar.cc/300?img=2" },
-    { id: 3, url: "https://i.pravatar.cc/300?img=3" },
-    { id: 4, url: "https://i.pravatar.cc/300?img=4" },
-    { id: 5, url: "https://i.pravatar.cc/300?img=5" },
-    { id: 6, url: "https://i.pravatar.cc/300?img=6" },
-    { id: 7, url: "https://i.pravatar.cc/300?img=7" },
-    { id: 8, url: "https://i.pravatar.cc/300?img=8" },
-    { id: 9, url: "https://i.pravatar.cc/300?img=9" },
-    { id: 10, url: "https://i.pravatar.cc/300?img=10" },
-    { id: 11, url: "https://i.pravatar.cc/300?img=11" },
-    { id: 12, url: "https://i.pravatar.cc/300?img=12" },
-    { id: 13, url: "https://i.pravatar.cc/300?img=13" },
-    { id: 14, url: "https://i.pravatar.cc/300?img=14" },
-    { id: 15, url: "https://i.pravatar.cc/300?img=15" },
-  ];
 
   const filters = [
     { id: "none", name: "Normal" },
@@ -89,10 +76,38 @@ export default function AddStory({ setActiveView }) {
     return filterClasses[filterId] || "";
   };
 
-  const handleShare = () => {
-    // Handle story sharing
-    // Close and go back
-    setActiveView("home");
+  const handleShare = async () => {
+    if (!selectedImage || isUploading) return;
+
+    setIsUploading(true);
+    try {
+      // Upload image if it's a local file
+      let mediaUrl = selectedImage.url;
+      
+      if (selectedImage.url.startsWith('data:')) {
+        const uploadResponse = await uploadService.uploadBase64(selectedImage.url);
+        if (!uploadResponse.success || !uploadResponse.url) {
+          throw new Error('Failed to upload image');
+        }
+        mediaUrl = uploadResponse.url;
+      }
+
+      // Create story
+      await storyService.createStory({
+        mediaUrl,
+        mediaType: 'image',
+        caption: textValue || ''
+      });
+
+      toast.success('Story shared successfully!');
+      handleClose();
+      navigate('/home');
+    } catch (error) {
+      console.error('Share story error:', error);
+      toast.error(error.message || 'Failed to share story');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleClose = () => {
@@ -116,7 +131,7 @@ export default function AddStory({ setActiveView }) {
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setActiveView("home")}
+                onClick={() => navigate('/home')}
                 className="p-2 hover:bg-gray-800 rounded-full transition"
               >
                 <ArrowLeft className="w-6 h-6 text-white" />
@@ -150,32 +165,14 @@ export default function AddStory({ setActiveView }) {
               <span className="text-xs text-gray-400">Camera</span>
             </button>
 
-            {/* Generate Button */}
+            {/* File Upload Button */}
             <button
-              onClick={() => {
-                // Generate AI image - placeholder
-              }}
-              className="aspect-square rounded-lg flex flex-col items-center justify-center gap-2 border-2 border-primary/50 hover:border-primary transition relative overflow-hidden bg-black"
+              onClick={() => imageInputRef.current?.click()}
+              className="aspect-square bg-gray-800 rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-gray-700 transition border border-gray-700"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-400/20 via-primary/20 to-primary-700/20" />
-              <Sparkles className="w-6 h-6 text-primary-400 relative z-10" />
-              <span className="text-xs text-primary-400 font-medium relative z-10">Generate</span>
+              <ImageIcon className="w-8 h-8 text-white" />
+              <span className="text-xs text-gray-400">Gallery</span>
             </button>
-
-            {/* Recent Images */}
-            {recentImages.map((image) => (
-              <button
-                key={image.id}
-                onClick={() => handleImageSelect(image)}
-                className="aspect-square rounded-lg overflow-hidden hover:opacity-90 transition"
-              >
-                <img
-                  src={image.url}
-                  alt={`Recent ${image.id}`}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
           </div>
         </div>
 
@@ -206,9 +203,11 @@ export default function AddStory({ setActiveView }) {
       {/* Share Button */}
       <button
         onClick={handleShare}
-        className="absolute top-4 right-4 z-50 px-4 py-2 bg-primary hover:bg-primary-700 rounded-full text-white font-medium transition"
+        disabled={isUploading}
+        className="absolute top-4 right-4 z-50 px-4 py-2 bg-primary hover:bg-primary-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full text-white font-medium transition flex items-center gap-2"
       >
-        Share
+        {isUploading && <Loader2 className="w-4 h-4 animate-spin" />}
+        {isUploading ? 'Sharing...' : 'Share'}
       </button>
 
       {/* Image Preview with Filter */}

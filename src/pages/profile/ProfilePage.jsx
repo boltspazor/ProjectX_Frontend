@@ -27,72 +27,8 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Posts state - counts will be dynamic based on this array length
-  const [posts, setPosts] = useState([
-    {
-      id: 0,
-      image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=400&fit=crop",
-      caption: "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 1,
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop",
-      caption: "Sunset vibes 🌅",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
-      caption: "Palm trees and paradise",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 3,
-      image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=400&fit=crop",
-      caption: "Beach day 🏖️",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 4,
-      image: "https://images.unsplash.com/photo-1490772888775-55fceea286b8?w=400&h=400&fit=crop",
-      caption: "Breakfast of champions",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 5,
-      image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
-      caption: "Mirror selfie vibes",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 6,
-      image: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&h=400&fit=crop",
-      caption: "Cloud watching",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 7,
-      image: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&h=400&fit=crop",
-      caption: "Golden hour",
-      profileImage: profilePhoto,
-      username: username
-    },
-    {
-      id: 8,
-      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop",
-      caption: "Tropical vibes",
-      profileImage: profilePhoto,
-      username: username
-    },
-  ]);
+  // Posts state - will be fetched from API
+  const [posts, setPosts] = useState([]);
 
   // Followers and Following lists - counts will be dynamic based on these array lengths
   const [followersList, setFollowersList] = useState([]);
@@ -106,13 +42,13 @@ export default function ProfilePage({ onLogout, onViewUserProfile }) {
   const hasFetchedProfile = React.useRef(false);
 
   // Fetch profile data on mount
-useEffect(() => {
-  if (!user || !user.username) return;
-  if (hasFetchedProfile.current) return;
+  useEffect(() => {
+    if (!user || !user.username) return;
+    if (hasFetchedProfile.current) return;
 
-  hasFetchedProfile.current = true;
-  fetchProfileData();
-}, [user]);
+    hasFetchedProfile.current = true;
+    fetchProfileData();
+  }, [user?.username]);
 
 
   // Listen for new posts created from CreatePost component
@@ -138,19 +74,20 @@ const fetchProfileData = async () => {
 
     // Fetch user profile data
     const userData = await userService.getUserByUsername(actualUsername);
+    
+    if (!userData) {
+      throw new Error('Failed to load profile data');
+    }
+    
     setProfileData(userData);
 
     // Fetch user posts
     const userPosts = await postService.getUserPosts(actualUsername);
-    setPosts(userPosts?.posts || userPosts || []);
+    const postsArray = userPosts?.posts || userPosts || [];
+    setPosts(Array.isArray(postsArray) ? postsArray : []);
 
-    // Fetch followers
-    const followersData = await userService.getUserFollowers(actualUsername);
-    setFollowersList(followersData?.followers || followersData || []);
-
-    // Fetch following
-    const followingData = await userService.getUserFollowing(actualUsername);
-    setFollowingList(followingData?.following || followingData || []);
+    // Don't fetch followers/following immediately - lazy load when modal opens
+    // This improves initial page load time
   } catch (err) {
     console.error("Error fetching profile data:", err);
     setError(err.message || "Failed to load profile");
@@ -181,14 +118,34 @@ const fetchProfileData = async () => {
     setIsLogoutModalOpen(false);
   };
 
-  const handleFollowersClick = () => {
+  const handleFollowersClick = async () => {
     setFollowersModalType("followers");
     setFollowersModalOpen(true);
+    
+    // Lazy load followers when modal opens
+    if (followersList.length === 0 && user?.username) {
+      try {
+        const followersData = await userService.getUserFollowers(user.username);
+        setFollowersList(followersData?.followers || followersData || []);
+      } catch (err) {
+        console.error("Error fetching followers:", err);
+      }
+    }
   };
 
-  const handleFollowingClick = () => {
+  const handleFollowingClick = async () => {
     setFollowersModalType("following");
     setFollowersModalOpen(true);
+    
+    // Lazy load following when modal opens
+    if (followingList.length === 0 && user?.username) {
+      try {
+        const followingData = await userService.getUserFollowing(user.username);
+        setFollowingList(followingData?.following || followingData || []);
+      } catch (err) {
+        console.error("Error fetching following:", err);
+      }
+    }
   };
 
   const handleFollow = async (targetUsername) => {
@@ -243,11 +200,36 @@ const fetchProfileData = async () => {
     return <ProfileSettings onBack={() => setShowSettings(false)} onProfileUpdate={fetchProfileData} />;
   }
 
-  // Loading state
+  // Loading state with skeleton
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#fffcfa] dark:bg-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-[#fffcfa] dark:bg-black">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
+          {/* Skeleton Profile */}
+          <div className="flex flex-col items-center gap-6 mb-8">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gray-300 dark:bg-gray-700 animate-pulse"></div>
+            <div className="flex flex-col items-center gap-3 w-full">
+              <div className="h-6 w-32 bg-gray-300 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-4 w-48 bg-gray-300 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-4 w-64 bg-gray-300 dark:bg-gray-700 rounded animate-pulse"></div>
+            </div>
+            {/* Stats skeleton */}
+            <div className="flex gap-8">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="flex flex-col items-center">
+                  <div className="h-5 w-12 bg-gray-300 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+                  <div className="h-4 w-16 bg-gray-300 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Posts skeleton */}
+          <div className="grid grid-cols-3 gap-1 md:gap-2">
+            {[...Array(9)].map((_, i) => (
+              <div key={i} className="aspect-square bg-gray-300 dark:bg-gray-700 rounded animate-pulse"></div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -330,7 +312,7 @@ const fetchProfileData = async () => {
               transition={{ delay: 0.15, duration: 0.5 }}
               className="text-gray-600 dark:text-gray-300 mb-3"
             >
-              {profileData?.displayName || user?.displayName || "Rahul Chauhan"}
+              {profileData?.displayName || user?.displayName || username}
             </motion.p>
 
             {/* Bio */}
@@ -340,7 +322,7 @@ const fetchProfileData = async () => {
               transition={{ delay: 0.2, duration: 0.5 }}
               className="text-black dark:text-white mb-6 text-sm md:text-base"
             >
-              {profileData?.bio || profile?.bio || "Wish I was half as interesting as my bio"}
+              {profileData?.bio || profile?.bio || "No bio yet"}
             </motion.p>
 
             {/* Stats */}
@@ -385,7 +367,12 @@ const fetchProfileData = async () => {
           transition={{ delay: 0.3, duration: 0.5 }}
           className="grid grid-cols-3 gap-1 md:gap-2"
         >
-          {posts.map((post, index) => (
+          {posts.length === 0 ? (
+            <div className="col-span-3 text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400">No posts yet</p>
+            </div>
+          ) : (
+            posts.map((post, index) => (
   <motion.div
     key={`${post.id || post._id}-${index}`}
     initial={{ scale: 0.9, opacity: 0 }}
@@ -395,15 +382,15 @@ const fetchProfileData = async () => {
     className="aspect-square overflow-hidden bg-gray-900 cursor-pointer group"
   >
     <img
-      src={post.image}
+      src={post.imageUrl || post.image}
       alt={`Post ${index + 1}`}
       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
       loading="lazy"
       decoding="async"
     />
   </motion.div>
-))}
-
+))
+          )}
         </motion.div>
       </div>
 

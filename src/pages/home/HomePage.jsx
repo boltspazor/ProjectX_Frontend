@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Stories from "../../components/Stories";
 import PostCard from "../../components/PostCard";
 import Comments from "../../components/Comments";
 import { postService } from "../../services";
 
-export default function HomePage({ setActiveView, onViewUserProfile }) {
+export default function HomePage({ onViewUserProfile }) {
+  const navigate = useNavigate();
   const [activePostId, setActivePostId] = useState(null);
   const [postsComments, setPostsComments] = useState({});
 
@@ -114,13 +116,11 @@ export default function HomePage({ setActiveView, onViewUserProfile }) {
   };
 
   const handleAddStory = () => {
-    if (setActiveView) {
-      setActiveView("addStory");
-    }
+    navigate('/story/add');
   };
 
   return (
-    <main className="flex-1 overflow-y-auto h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)]">
+    <main className="flex-1 overflow-y-auto h-[calc(100vh-7.5rem)] md:h-[calc(100vh-4rem)] bg-white dark:bg-black">
       <div className="p-4 md:p-8">
         {/* Stories Section - Centered */}
         <div className="w-full flex justify-center mb-6">

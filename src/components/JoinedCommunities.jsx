@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { communityService } from "../services/communityService";
 import LiveBanner from "./LiveBanner";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getCommunityBannerVideoUrl, getCommunityProfileVideoUrl } from "../utils/communityVideos";
 
-export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
+export default function JoinedCommunities({ onDiscoverClick }) {
+  const navigate = useNavigate();
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -57,9 +59,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
   };
 
   const handleCommunityClick = (communityId) => {
-    if (setActiveView) {
-      setActiveView("communityDetail", communityId);
-    }
+    navigate(`/communities/${communityId}`);
   };
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -81,7 +81,7 @@ export default function JoinedCommunities({ setActiveView, onDiscoverClick }) {
             Discover more
           </button>
           <button
-            onClick={() => setActiveView("createCommunity")}
+            onClick={() => navigate('/communities/create')}
             className="px-4 py-2 rounded-lg bg-gradient-to-r from-primary via-primary to-primary-700 text-sm font-medium text-white hover:shadow-[0_0_24px_rgba(119,5,36,0.35)] transition-all duration-300"
           >
             Create community

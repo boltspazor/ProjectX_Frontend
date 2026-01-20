@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import StoryViewer from "./StoryViewer";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { storyService } from "../services/storyService";
 
 export default function Stories({ onAddStory }) {
   const scrollContainerRef = useRef(null);
@@ -11,7 +12,26 @@ export default function Stories({ onAddStory }) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [selectedStoryIndex, setSelectedStoryIndex] = useState(null);
   const [viewedStoryIds, setViewedStoryIds] = useState([]);
+  const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { profilePhoto, profileVideo } = useUserProfile();
+
+  // Fetch stories on mount
+  useEffect(() => {
+    fetchStories();
+  }, []);
+
+  const fetchStories = async () => {
+    try {
+      setLoading(true);
+      const data = await storyService.getStories();
+      setStories(data || []);
+    } catch (err) {
+      console.error('Error fetching stories:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Helper function to get ring style based on creator tier
   const getRingStyle = (tier, isViewed) => {
@@ -40,21 +60,6 @@ export default function Stories({ onAddStory }) {
 
     return tierStyles[tier] || tierStyles.gold;
   };
-
-  const stories = [
-    { id: 1, username: "shresque", image: "https://i.pravatar.cc/100?img=1", creatorTier: "gold" },
-    { id: 2, username: "aaravgoel_", image: "https://i.pravatar.cc/100?img=2", creatorTier: "silver" },
-    { id: 3, username: "nandihknee", image: "https://i.pravatar.cc/100?img=3", creatorTier: "ruby" },
-    { id: 4, username: "_anirudhp...", image: "https://i.pravatar.cc/100?img=4", creatorTier: "emerald" },
-    { id: 5, username: "slayyush", image: "https://i.pravatar.cc/100?img=5" }, // Normal user
-    { id: 6, username: "excuseyo...", image: "https://i.pravatar.cc/100?img=6", creatorTier: "gold" },
-    { id: 7, username: "samad_123", image: "https://i.pravatar.cc/100?img=7" }, // Normal user
-    { id: 8, username: "rahul_04", image: "https://i.pravatar.cc/100?img=8", creatorTier: "silver" },
-    { id: 9, username: "sheryanne_xoxo", image: "https://i.pravatar.cc/100?img=9", creatorTier: "ruby" },
-    { id: 10, username: "idkwhoisrahul", image: "https://i.pravatar.cc/100?img=10", creatorTier: "emerald" },
-    { id: 11, username: "user_123", image: "https://i.pravatar.cc/100?img=11" }, // Normal user
-    { id: 12, username: "creative_mind", image: "https://i.pravatar.cc/100?img=12" }, // Normal user
-  ];
 
   // Sort stories: unseen first, then seen (stable by id)
   const sortedStories = [...stories].sort((a, b) => {
@@ -164,14 +169,23 @@ export default function Stories({ onAddStory }) {
           </motion.div>
 
           {/* Story Items */}
-          {sortedStories.map((story, index) => {
+          {loading && (
+            <div className="flex items-center justify-center py-4 px-6">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          )}
+          {!loading && sortedStories.map((story, index) => {
             const isLastStory = index === sortedStories.length - 1;
             const shouldShowArrow = isLastStory && showRightArrow;
-            const originalIndex = stories.findIndex((s) => s.id === story.id);
+            const originalIndex = stories.findIndex((s) => (s._id || s.id) === (story._id || story.id));
+            const storyId = story._id || story.id;
+            const storyUsername = story.author?.username || story.user?.username || story.username;
+            const storyImage = story.author?.avatar || story.user?.profilePhoto || story.image;
+            const storyTier = story.author?.tier || story.user?.tier || story.creatorTier;
 
             return (
               <motion.div
-                key={story.id}
+                key={storyId}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.02 }}
@@ -179,13 +193,13 @@ export default function Stories({ onAddStory }) {
               >
                 <div className="relative group py-1">
                   <div
-                    className={`w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] cursor-pointer hover:scale-105 transition-transform duration-200 ${getRingStyle(story.creatorTier, viewedStoryIds.includes(story.id))}`}
-                    onClick={() => handleStoryClick(originalIndex, story.id)}
+                    className={`w-14 h-14 md:w-16 md:h-16 rounded-full p-[2.5px] cursor-pointer hover:scale-105 transition-transform duration-200 ${getRingStyle(storyTier, viewedStoryIds.includes(storyId))}`}
+                    onClick={() => handleStoryClick(originalIndex, storyId)}
                   >
                     <div className="w-full h-full rounded-full border-2 border-white dark:border-black overflow-hidden relative">
                       <img
-                        src={story.image}
-                        alt={story.username}
+                        src={storyImage}
+                        alt={storyUsername}
                         className="w-full h-full object-cover"
                         loading="lazy"
                         decoding="async"
@@ -207,7 +221,7 @@ export default function Stories({ onAddStory }) {
                   </div>
                 </div>
                 <span className="text-xs dark:text-white text-black max-w-[70px] md:max-w-[80px] truncate text-center">
-                  {story.username}
+                  {storyUsername}
                 </span>
               </motion.div>
             );
