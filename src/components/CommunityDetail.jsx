@@ -105,10 +105,16 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
     );
   }
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     // If already joined, leave
     if (isJoined) {
-      setIsJoined(false);
+      try {
+        await communityService.leaveCommunity(community.id || community._id);
+        setIsJoined(false);
+      } catch (err) {
+        console.error("Error leaving community:", err);
+        setError("Failed to leave community. Please try again.");
+      }
       return;
     }
 
@@ -123,7 +129,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
     setShowCodeModal(true);
   };
 
-  const handleCodeSubmit = () => {
+  const handleCodeSubmit = async () => {
     const communityCode = community.code || community.id?.toString() || "";
     
     if (codeInput.trim() !== communityCode) {
@@ -140,17 +146,17 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
       setShowPasswordModal(true);
     } else {
       // For public communities, join after code verification
-      setIsJoined(true);
-      // Call API if needed
       try {
-        communityService.joinCommunity(community.id);
+        await communityService.joinCommunity(community.id || community._id);
+        setIsJoined(true);
       } catch (err) {
         console.error("Error joining community:", err);
+        setError("Failed to join community. Please try again.");
       }
     }
   };
 
-  const handlePasswordSubmit = () => {
+  const handlePasswordSubmit = async () => {
     // In a real app, verify password from API
     // For now, check if password matches (this should come from community data or API)
     const correctPassword = community.password || "";
@@ -168,13 +174,14 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
     setPasswordError("");
     setShowPasswordModal(false);
     setPasswordInput("");
-    setIsJoined(true);
 
-    // Call API if needed
+    // Call API to join
     try {
-      communityService.joinCommunity(community.id, { password: passwordInput });
+      await communityService.joinCommunity(community.id || community._id, { password: passwordInput });
+      setIsJoined(true);
     } catch (err) {
       console.error("Error joining community:", err);
+      setError("Failed to join community. Please try again.");
     }
   };
 

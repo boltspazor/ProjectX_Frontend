@@ -10,7 +10,7 @@ export const userService = {
    */
   async searchUsers(query, limit = 10) {
     try {
-      const response = await api.get(API_ENDPOINTS.USERS.SEARCH, { q: query, limit });
+      const response = await api.get(API_ENDPOINTS.USERS.SEARCH, { query, limit });
       return response.success ? response.data : [];
     } catch (error) {
       console.error('Search users error:', error);

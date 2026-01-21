@@ -391,7 +391,13 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
           </div>
 
           {/* Share Modal */}
-          <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} onViewUserProfile={onViewUserProfile} />
+          <ShareModal 
+            isOpen={isShareModalOpen} 
+            onClose={() => setIsShareModalOpen(false)} 
+            onViewUserProfile={onViewUserProfile}
+            postId={post?.id}
+            postUrl={post?.imageUrl || post?.image || post?.images?.[0]}
+          />
         </>
       )}
     </AnimatePresence>

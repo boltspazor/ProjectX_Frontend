@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Globe, Eye, Lock, Upload } from "lucide-react";
+import { ArrowLeft, Globe, Lock, Upload } from "lucide-react";
 import { communityService } from "../services/communityService";
 import { useUserProfile } from "../hooks/useUserProfile";
 
@@ -8,7 +8,7 @@ export default function CreateCommunity({ setActiveView }) {
   const [communityName, setCommunityName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedTopics, setSelectedTopics] = useState([]);
-  const [communityType, setCommunityType] = useState("restricted");
+  const [communityType, setCommunityType] = useState("public");
   const [bannerPreview, setBannerPreview] = useState(null);
   const [iconPreview, setIconPreview] = useState(null);
   const [bannerVideoPreview, setBannerVideoPreview] = useState(null);
@@ -85,8 +85,7 @@ export default function CreateCommunity({ setActiveView }) {
       const newCommunity = {
         name: communityName,
         description: description,
-        type: communityType.charAt(0).toUpperCase() + communityType.slice(1),
-        topics: selectedTopics,
+        type: communityType, // Use lowercase directly since state already has 'public' or 'private'
         rules: [
           "Be respectful to all members",
           "No spam or self-promotion",
@@ -102,10 +101,15 @@ export default function CreateCommunity({ setActiveView }) {
       if (profileVideoPreview) newCommunity.profileVideo = profileVideoPreview;
 
       // Create community via API
-      const createdCommunity = await communityService.createCommunity(newCommunity);
-
-      // Navigate to the newly created community detail page
-      setActiveView("communityDetail", createdCommunity.id);
+      const response = await communityService.createCommunity(newCommunity);
+      
+      if (response && response.community) {
+        // Navigate to the newly created community detail page using slug or id
+        const communityId = response.community.slug || response.community.id || response.community._id;
+        setActiveView("communityDetail", communityId);
+      } else {
+        throw new Error('Failed to create community');
+      }
     } catch (err) {
       console.error("Error creating community:", err);
       setError(err.response?.data?.message || "Failed to create community");
@@ -308,18 +312,6 @@ export default function CreateCommunity({ setActiveView }) {
                   >
                     <Globe className="w-5 h-5" />
                     <span className="font-medium">Public</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setCommunityType("restricted")}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition ${communityType === "restricted"
-                        ? "bg-primary/20 border-primary text-black dark:text-white"
-                        : "bg-gray-100 dark:bg-gray-900 border-black dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600"
-                      }`}
-                  >
-                    <Eye className="w-5 h-5" />
-                    <span className="font-medium">Restricted</span>
                   </button>
 
                   <button

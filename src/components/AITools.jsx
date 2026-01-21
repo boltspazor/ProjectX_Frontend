@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { aiService, userService } from '../services';
-import { FiImage, FiMessageSquare, FiUser, FiPalette, FiCircle, FiZap } from 'react-icons/fi';
+import { FiImage, FiMessageSquare, FiUser, FiGrid, FiCircle, FiZap } from 'react-icons/fi';
 
 const AITools = () => {
   const [loading, setLoading] = useState(false);
@@ -153,7 +153,7 @@ const AITools = () => {
           <TabButton active={activeTab === 'bio'} onClick={() => setActiveTab('bio')} icon={<FiUser />}>
             Bio
           </TabButton>
-          <TabButton active={activeTab === 'theme'} onClick={() => setActiveTab('theme')} icon={<FiPalette />}>
+          <TabButton active={activeTab === 'theme'} onClick={() => setActiveTab('theme')} icon={<FiGrid />}>
             Theme
           </TabButton>
           <TabButton active={activeTab === 'avatar'} onClick={() => setActiveTab('avatar')} icon={<FiCircle />}>

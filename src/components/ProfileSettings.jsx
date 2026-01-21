@@ -75,14 +75,12 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
           
           try {
             // Upload to backend
-            const response = await uploadService.uploadFromBase64({
-              base64Data: dataUrl,
-              fileName: file.name,
-              folder: 'profiles'
-            });
+            const response = await uploadService.uploadFromBase64(dataUrl, 'profiles');
             
             // Update preview with uploaded URL
-            setProfilePhotoPreview(response.url);
+            if (response && response.url) {
+              setProfilePhotoPreview(response.url);
+            }
           } catch (err) {
             console.error("Error uploading photo:", err);
             alert("Failed to upload photo. Please try again.");
@@ -121,14 +119,12 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
           
           try {
             // Upload to backend
-            const response = await uploadService.uploadFromBase64({
-              base64Data: dataUrl,
-              fileName: file.name,
-              folder: 'profile-videos'
-            });
+            const response = await uploadService.uploadFromBase64(dataUrl, 'profile-videos');
             
             // Update preview with uploaded URL
-            setProfileVideoPreview(response.url);
+            if (response && response.url) {
+              setProfileVideoPreview(response.url);
+            }
           } catch (err) {
             console.error("Error uploading video:", err);
             alert("Failed to upload video. Please try again.");
@@ -158,41 +154,32 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
     setSaveError(null);
     
     try {
-      // Use FormData for file uploads
-      const formDataToSend = new FormData();
-      formDataToSend.append('username', formData.username);
-      formDataToSend.append('bio', formData.bio);
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('phone', formData.phone || '');
-      formDataToSend.append('gender', formData.gender || '');
-      formDataToSend.append('accountType', accountType);
-      formDataToSend.append('notificationSettings', JSON.stringify(notifications));
-      formDataToSend.append('readReceiptsEnabled', readReceiptsEnabled);
+      // Create update data object (not FormData since we already uploaded images)
+      const updateData = {
+        username: formData.username,
+        bio: formData.bio,
+        email: formData.email,
+        phone: formData.phone || '',
+        gender: formData.gender || '',
+        accountType: accountType,
+        notificationSettings: notifications,
+        readReceiptsEnabled: readReceiptsEnabled
+      };
 
-      // Add photo file if it was uploaded (not just preview)
-      if (photoInputRef.current?.files?.[0]) {
-        formDataToSend.append('profilePhoto', photoInputRef.current.files[0]);
+      // Add uploaded media URLs if they exist
+      if (profilePhotoPreview && profilePhotoPreview !== profilePhotoDefault) {
+        updateData.avatar = profilePhotoPreview;
+        updateData.profilePhoto = profilePhotoPreview;
       }
       
-      // Add video file if it was uploaded
-      if (videoInputRef.current?.files?.[0]) {
-        formDataToSend.append('profileVideo', videoInputRef.current.files[0]);
+      if (profileVideoPreview) {
+        updateData.profileVideo = profileVideoPreview;
       }
 
       // Call API to update profile
-      const response = await userService.updateProfile(formDataToSend);
+      const response = await userService.updateProfile(updateData);
       
       if (response && response.user) {
-        // Save to localStorage
-        const profileData = {
-          profilePhoto: response.user.profilePhoto || profilePhotoPreview,
-          profileVideo: response.user.profileVideo || profileVideoPreview,
-          username: response.user.username || formData.username,
-          bio: response.user.bio || formData.bio,
-          fullName: response.user.fullName || response.user.displayName || "Rahul Chauhan"
-        };
-        saveUserProfile(profileData);
-        
         // Update auth context
         if (updateUser) {
           updateUser(response.user);

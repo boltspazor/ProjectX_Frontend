@@ -73,13 +73,12 @@ export default function ExplorePage({ onViewUserProfile }) {
       setLoading(true);
       setError(null);
       
-      const params = {
-        query: searchQuery,
-        type: activeTab.toLowerCase(),
-        category: selectedCategory
-      };
-
-      const results = await searchService.search(params);
+      const results = await searchService.search(
+        searchQuery,
+        activeTab.toLowerCase(),
+        1,
+        20
+      );
       
       if (activeTab === "Posts") {
         setPosts(results.posts || []);

@@ -10,7 +10,7 @@ export const searchService = {
    */
   async search(query, type = 'all', page = 1, limit = 20) {
     try {
-      const response = await api.get(API_ENDPOINTS.SEARCH.UNIVERSAL, { q: query, type, page, limit });
+      const response = await api.get(API_ENDPOINTS.SEARCH.UNIVERSAL, { query, type, limit });
       return response.success ? response.data : {};
     } catch (error) {
       console.error('Search error:', error);

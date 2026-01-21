@@ -4,9 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
+import { postService } from "../services/postService";
 
-export default function ShareModal({ isOpen, onClose, onViewUserProfile }) {
+export default function ShareModal({ isOpen, onClose, onViewUserProfile, postId, postUrl }) {
   const [selectedFriends, setSelectedFriends] = useState(new Set());
+  const [isSharing, setIsSharing] = useState(false);
 
   // Sample friends data
   const friends = [
@@ -30,10 +32,26 @@ export default function ShareModal({ isOpen, onClose, onViewUserProfile }) {
     setSelectedFriends(newSelected);
   };
 
-  const handleShare = () => {
-    // Handle share logic here
-    onClose();
-    setSelectedFriends(new Set());
+  const handleShare = async () => {
+    if (!postId || selectedFriends.size === 0) return;
+
+    try {
+      setIsSharing(true);
+      
+      // Call backend API to record the share
+      await postService.sharePost(postId);
+      
+      // In a real app, you would also send messages to selected friends
+      // For now, we'll just show a success message
+      
+      onClose();
+      setSelectedFriends(new Set());
+    } catch (error) {
+      console.error('Error sharing post:', error);
+      alert('Failed to share post. Please try again.');
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   // Prevent body scroll when modal is open
@@ -203,14 +221,16 @@ export default function ShareModal({ isOpen, onClose, onViewUserProfile }) {
               >
                 <motion.button
                   onClick={handleShare}
-                  disabled={selectedFriends.size === 0}
-                  whileHover={{ scale: selectedFriends.size > 0 ? 1.02 : 1 }}
-                  whileTap={{ scale: selectedFriends.size > 0 ? 0.98 : 1 }}
+                  disabled={selectedFriends.size === 0 || isSharing}
+                  whileHover={{ scale: selectedFriends.size > 0 && !isSharing ? 1.02 : 1 }}
+                  whileTap={{ scale: selectedFriends.size > 0 && !isSharing ? 0.98 : 1 }}
                   className="w-full py-3 md:py-3.5 px-4 bg-gradient-to-r from-primary-400 via-primary to-primary-700 hover:from-primary hover:via-primary-700 hover:to-primary-800 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed dark:disabled:hover:bg-gray-700 disabled:hover:bg-gray-300 rounded-xl text-white font-semibold text-sm md:text-base transition-colors"
                 >
-                  {selectedFriends.size > 0
-                    ? `Send to ${selectedFriends.size} ${selectedFriends.size === 1 ? 'friend' : 'friends'}`
-                    : 'Select friends to share'}
+                  {isSharing 
+                    ? 'Sharing...'
+                    : selectedFriends.size > 0
+                      ? `Send to ${selectedFriends.size} ${selectedFriends.size === 1 ? 'friend' : 'friends'}`
+                      : 'Select friends to share'}
                 </motion.button>
               </motion.div>
             </motion.div>

@@ -475,11 +475,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
       }
 
       // Upload image to backend
-      const uploadResponse = await uploadService.uploadFromBase64({
-        base64Data: imageToUpload,
-        fileName: selectedFile?.name || `post-${Date.now()}.jpg`,
-        fileType: selectedFile?.type || 'image/jpeg'
-      });
+      const uploadResponse = await uploadService.uploadFromBase64(imageToUpload, 'posts');
 
       if (!uploadResponse?.url) {
         throw new Error('Failed to upload image');
