@@ -25,9 +25,15 @@ export default function Stories({ onAddStory }) {
     try {
       setLoading(true);
       const data = await storyService.getStories();
-      setStories(data || []);
+      // Ensure all stories have consistent id field
+      const normalizedStories = (data || []).map(story => ({
+        ...story,
+        id: story._id || story.id,
+      }));
+      setStories(normalizedStories);
     } catch (err) {
       console.error('Error fetching stories:', err);
+      setStories([]); // Set empty array on error
     } finally {
       setLoading(false);
     }

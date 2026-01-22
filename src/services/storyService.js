@@ -11,10 +11,29 @@ export const storyService = {
   async getStories() {
     try {
       const response = await api.get(API_ENDPOINTS.STORIES.LIST, {}, false);
-      return response.success ? response.data?.stories || [] : [];
+      if (response.success && response.data) {
+        return response.data.stories || [];
+      }
+      return [];
     } catch (error) {
       console.error('Get stories error:', error);
-      throw error;
+      return []; // Return empty array instead of throwing
+    }
+  },
+
+  /**
+   * Get user's stories
+   */
+  async getUserStories(userId) {
+    try {
+      const response = await api.get(API_ENDPOINTS.STORIES.BY_USER(userId));
+      if (response.success && response.data) {
+        return response.data.stories || [];
+      }
+      return [];
+    } catch (error) {
+      console.error('Get user stories error:', error);
+      return [];
     }
   },
 
@@ -24,7 +43,10 @@ export const storyService = {
   async createStory(story) {
     try {
       const response = await api.post(API_ENDPOINTS.STORIES.CREATE, story);
-      return response.success ? response.data?.story || null : null;
+      if (response.success && response.data) {
+        return response.data.story || null;
+      }
+      return null;
     } catch (error) {
       console.error('Create story error:', error);
       throw error;

@@ -72,7 +72,8 @@ export default function StoryViewer({ stories, initialIndex, onClose, onStoryVie
       return nextSet;
     });
     if (onStoryViewed && stories[index]) {
-      onStoryViewed(stories[index].id);
+      const storyId = stories[index]._id || stories[index].id;
+      onStoryViewed(storyId);
     }
   };
 
