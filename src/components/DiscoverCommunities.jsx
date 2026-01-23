@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Key } from "lucide-react";
 import { communityService } from "../services/communityService";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getCommunityProfileVideoUrl } from "../utils/communityVideos";
@@ -76,26 +76,60 @@ export default function DiscoverCommunities({ onBack }) {
     setShowCodeModal(true);
   };
 
-  const handleCodeSubmit = () => {
-    if (!selectedCommunity) return;
-
-    const communityCode = selectedCommunity.code || selectedCommunity.id?.toString() || "";
-    
-    if (codeInput.trim() !== communityCode) {
-      setCodeError("Invalid community code. Please try again.");
+  const handleCodeSubmit = async () => {
+    if (!codeInput.trim()) {
+      setCodeError("Please enter a community code.");
       return;
     }
 
-    setCodeError("");
-    setShowCodeModal(false);
-    setCodeInput("");
+    try {
+      // If selectedCommunity is null, this is a direct join by code (not from the discover list)
+      if (!selectedCommunity) {
+        setJoiningIds(prev => new Set(prev).add('joining-by-code'));
+        
+        // Use the joinCommunityByCode endpoint
+        await communityService.joinCommunityByCode(codeInput.trim().toUpperCase());
+        
+        setCodeError("");
+        setShowCodeModal(false);
+        setCodeInput("");
+        
+        // Show success message
+        alert("Successfully joined the community!");
+        
+        // Refresh communities list
+        await fetchCommunities();
+        
+        setJoiningIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete('joining-by-code');
+          return newSet;
+        });
+        return;
+      }
 
-    // If private community, show password modal after code is correct
-    if (selectedCommunity.type === "Private") {
-      setShowPasswordModal(true);
-    } else {
-      // For public communities, join after code verification
-      joinCommunityAfterVerification();
+      // Original code verification logic for communities from the list
+      const communityCode = selectedCommunity.code || selectedCommunity.id?.toString() || "";
+      
+      if (codeInput.trim().toUpperCase() !== communityCode.toUpperCase()) {
+        setCodeError("Invalid community code. Please try again.");
+        return;
+      }
+
+      setCodeError("");
+      setShowCodeModal(false);
+      setCodeInput("");
+
+      // If private community, show password modal after code is correct
+      if (selectedCommunity.type === "Private") {
+        setShowPasswordModal(true);
+      } else {
+        // For public communities, join after code verification
+        await joinCommunityAfterVerification();
+      }
+    } catch (err) {
+      console.error('Error joining by code:', err);
+      setCodeError(err.response?.data?.message || "Failed to join community. Please check the code and try again.");
     }
   };
 
@@ -204,6 +238,20 @@ export default function DiscoverCommunities({ onBack }) {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
+        {/* Join by Code Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => {
+              setSelectedCommunity(null);
+              setShowCodeModal(true);
+            }}
+            className="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-primary via-primary to-primary-700 hover:from-primary-700 hover:via-primary-700 hover:to-primary-800 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
+          >
+            <Key className="w-5 h-5" />
+            Join by Community Code
+          </button>
+        </div>
+
         {loading && (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>

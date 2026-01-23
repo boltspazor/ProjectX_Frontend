@@ -130,6 +130,19 @@ export const communityService = {
   },
 
   /**
+   * Join community by code
+   */
+  async joinCommunityByCode(code) {
+    try {
+      const response = await api.post('/api/communities/join-by-code', { code });
+      return response;
+    } catch (error) {
+      console.error('Join community by code error:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Leave community
    */
   async leaveCommunity(communityId) {

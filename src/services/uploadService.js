@@ -84,6 +84,13 @@ export const uploadService = {
   },
 
   /**
+   * Upload base64 image (alias for uploadFromBase64)
+   */
+  async uploadBase64(base64, folder = 'posts') {
+    return this.uploadFromBase64(base64, folder);
+  },
+
+  /**
    * Upload file (multipart form data)
    */
   async uploadFile(file, folder = 'posts') {

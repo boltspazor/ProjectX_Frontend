@@ -104,6 +104,10 @@ export default function CreateCommunity({ setActiveView }) {
       const response = await communityService.createCommunity(newCommunity);
       
       if (response && response.community) {
+        // Show the community code to the user
+        const communityCode = response.community.code;
+        alert(`Community created successfully!\n\nYour Community Code: ${communityCode}\n\nShare this code with others so they can join your community.`);
+        
         // Navigate to the newly created community detail page using slug or id
         const communityId = response.community.slug || response.community.id || response.community._id;
         setActiveView("communityDetail", communityId);

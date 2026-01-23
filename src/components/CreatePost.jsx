@@ -467,10 +467,56 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
         return;
       }
 
-      // If filters or adjustments are applied, process them first
-      if ((selectedFilter !== "original" || Object.values(adjustments).some(v => v !== 0)) && !finalEditedImage) {
+      // Always apply filters and adjustments if they exist
+      if (selectedFilter !== "original" || Object.values(adjustments).some(v => v !== 0)) {
+        // Create canvas to apply filters and adjustments
         imageToUpload = await new Promise((resolve) => {
-          applyAllEdits(imageToUpload, resolve);
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            
+            // Apply CSS filters via canvas
+            const filterMap = {
+              original: '',
+              aden: 'contrast(0.9) brightness(1.2) saturate(0.85)',
+              clarendon: 'contrast(1.2) brightness(1) saturate(1.35)',
+              crema: 'contrast(0.9) brightness(1.1) saturate(1)',
+              gingham: 'contrast(1.05) brightness(1.05) saturate(1)',
+              juno: 'contrast(1.15) brightness(1) saturate(1.2)',
+              lark: 'contrast(1.1) brightness(1.1) saturate(1.1)',
+              ludwig: 'contrast(1.05) brightness(1.05) saturate(1)',
+              moon: 'contrast(1.1) grayscale(1)',
+              perpetua: 'contrast(0.9) brightness(1.1) saturate(0.9)',
+              reyes: 'contrast(0.85) brightness(1.15) saturate(0.75)',
+              slumber: 'contrast(0.9) brightness(0.95) saturate(0.85)',
+            };
+            
+            let filterString = filterMap[selectedFilter] || '';
+            
+            // Add adjustments
+            if (adjustments.brightness !== 0) {
+              filterString += ` brightness(${1 + adjustments.brightness / 100})`;
+            }
+            if (adjustments.contrast !== 0) {
+              filterString += ` contrast(${1 + adjustments.contrast / 100})`;
+            }
+            if (adjustments.saturation !== 0) {
+              filterString += ` saturate(${1 + adjustments.saturation / 100})`;
+            }
+            if (adjustments.fade !== 0) {
+              filterString += ` opacity(${1 - Math.abs(adjustments.fade) / 100})`;
+            }
+            
+            ctx.filter = filterString;
+            ctx.drawImage(img, 0, 0);
+            ctx.filter = 'none';
+            
+            resolve(canvas.toDataURL('image/jpeg', 0.95));
+          };
+          img.src = imageToUpload;
         });
       }
 
