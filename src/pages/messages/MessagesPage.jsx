@@ -14,7 +14,16 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
   const [activeChat, setActiveChat] = useState(null);
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([]);
-  const [chatThemes, setChatThemes] = useState({}); // key: chat id -> theme key
+  const [chatThemes, setChatThemes] = useState(() => {
+    // Load chat themes from localStorage
+    try {
+      const saved = localStorage.getItem('chatThemes');
+      return saved ? JSON.parse(saved) : {};
+    } catch (error) {
+      console.error('Error loading chat themes:', error);
+      return {};
+    }
+  }); // key: chat id -> theme key
   const [showThemePicker, setShowThemePicker] = useState(false);
   const themePickerRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -248,7 +257,14 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
   const handleSelectTheme = (key) => {
     if (!activeChat) return;
     const chatKey = activeChat.id || activeChat.username;
-    setChatThemes((prev) => ({ ...prev, [chatKey]: key }));
+    const updatedThemes = { ...chatThemes, [chatKey]: key };
+    setChatThemes(updatedThemes);
+    // Save to localStorage
+    try {
+      localStorage.setItem('chatThemes', JSON.stringify(updatedThemes));
+    } catch (error) {
+      console.error('Error saving chat theme:', error);
+    }
     setShowThemePicker(false);
   };
 

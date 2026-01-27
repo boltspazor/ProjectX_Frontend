@@ -70,16 +70,34 @@ const fetchProfileData = async () => {
     setLoading(true);
     setError(null);
 
-    const actualUsername = user.username;
+    const actualUsername = user?.username;
+    
+    if (!actualUsername) {
+      throw new Error('Username not available');
+    }
 
-    // Fetch user profile data
+    // Fetch user profile data - getUserByUsername returns user object directly
     const userData = await userService.getUserByUsername(actualUsername);
     
     if (!userData) {
       throw new Error('Failed to load profile data');
     }
     
-    setProfileData(userData);
+    // Ensure all required fields have default values
+    const safeUserData = {
+      ...userData,
+      profilePhoto: userData.profilePhoto || userData.avatar || profilePhotoDefault,
+      profileVideo: userData.profileVideo || null,
+      bio: userData.bio || '',
+      displayName: userData.displayName || userData.username || '',
+      stats: userData.stats || {
+        posts: userData.totalPosts || 0,
+        followers: userData.followers?.length || 0,
+        following: userData.following?.length || 0
+      }
+    };
+    
+    setProfileData(safeUserData);
 
     // Fetch user posts
     const userPosts = await postService.getUserPosts(actualUsername);
