@@ -106,47 +106,98 @@ class SocketService {
   }
 
   /**
-   * Join a conversation room
+   * Join a chat room (updated to match backend)
    */
   joinConversation(conversationId) {
     if (this.socket) {
-      this.socket.emit('join-conversation', conversationId);
+      // Backend expects join_group event with { chatId }
+      this.socket.emit('join_group', { chatId: conversationId });
     }
   }
 
   /**
-   * Leave a conversation room
+   * Leave a chat room (updated to match backend)
    */
   leaveConversation(conversationId) {
     if (this.socket) {
-      this.socket.emit('leave-conversation', conversationId);
+      // Backend expects leave_group event with { chatId }
+      this.socket.emit('leave_group', { chatId: conversationId });
     }
   }
 
   /**
-   * Send typing indicator
+   * Send typing indicator (updated to match backend)
    */
   sendTyping(conversationId, isTyping) {
     if (this.socket) {
-      this.socket.emit('typing', { conversationId, isTyping });
+      // Backend expects typing_start or typing_stop with { chatId }
+      const event = isTyping ? 'typing_start' : 'typing_stop';
+      this.socket.emit(event, { chatId: conversationId });
     }
   }
 
   /**
-   * Listen for new messages
+   * Send a message (updated to match backend)
+   */
+  sendMessage(chatId, content, type = 'text') {
+    if (this.socket) {
+      // Backend expects send_message event with { chatId, content, type }
+      this.socket.emit('send_message', {
+        chatId,
+        content,
+        type,
+        tempId: `temp_${Date.now()}`,
+      });
+    }
+  }
+
+  /**
+   * Listen for new messages (updated to match backend)
    */
   onNewMessage(callback) {
     if (this.socket) {
-      this.socket.on('new-message', callback);
+      // Backend sends receive_message event
+      this.socket.on('receive_message', callback);
     }
   }
 
   /**
-   * Listen for typing indicators
+   * Listen for message sent confirmation (updated to match backend)
+   */
+  onMessageSent(callback) {
+    if (this.socket) {
+      // Backend sends message_sent event for confirmation
+      this.socket.on('message_sent', callback);
+    }
+  }
+
+  /**
+   * Listen for typing indicators (updated to match backend)
    */
   onTyping(callback) {
     if (this.socket) {
-      this.socket.on('typing', callback);
+      // Backend sends user_typing event
+      this.socket.on('user_typing', callback);
+    }
+  }
+
+  /**
+   * Mark messages as read (updated to match backend)
+   */
+  markMessagesSeen(chatId, messageId = null) {
+    if (this.socket) {
+      // Backend expects message_seen event with { chatId, messageId }
+      this.socket.emit('message_seen', { chatId, messageId });
+    }
+  }
+
+  /**
+   * Listen for read receipts (updated to match backend)
+   */
+  onMessageReadReceipt(callback) {
+    if (this.socket) {
+      // Backend sends message_read_receipt event
+      this.socket.on('message_read_receipt', callback);
     }
   }
 
@@ -165,6 +216,42 @@ class SocketService {
   onUserOffline(callback) {
     if (this.socket) {
       this.socket.on('user-offline', callback);
+    }
+  }
+
+  /**
+   * Listen for joined chat confirmation
+   */
+  onJoinedChat(callback) {
+    if (this.socket) {
+      this.socket.on('joined_chat', callback);
+    }
+  }
+
+  /**
+   * Listen for user joined chat notification
+   */
+  onUserJoinedChat(callback) {
+    if (this.socket) {
+      this.socket.on('user_joined_chat', callback);
+    }
+  }
+
+  /**
+   * Listen for user left chat notification
+   */
+  onUserLeftChat(callback) {
+    if (this.socket) {
+      this.socket.on('user_left_chat', callback);
+    }
+  }
+
+  /**
+   * Listen for errors
+   */
+  onError(callback) {
+    if (this.socket) {
+      this.socket.on('error', callback);
     }
   }
 

@@ -100,15 +100,20 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
       const msgs = await messageService.getMessagesByConversation(conversationId, 50, 0);
       
       // Transform API messages to component format
+      // Backend message format: { _id, senderId, text, mediaUrl, type, readAt, deliveredAt, createdAt, sender: {...} }
       const transformedMsgs = msgs.map(msg => ({
         id: msg._id,
-        text: msg.text, // Backend uses 'text', not 'content'
+        text: msg.text || msg.mediaUrl || '', // Backend uses 'text' field, mediaUrl for media messages
         sender: msg.senderId === currentUserId ? 'sender' : 'receiver', // Compare senderId with currentUserId
         time: new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-        // Read receipt status - check if message was delivered/seen
-        status: msg.senderId === currentUserId ? (msg.isRead ? 'read' : (msg.isDelivered ? 'delivered' : 'sent')) : null,
-        isDelivered: msg.isDelivered || false,
-        isRead: msg.isRead || false,
+        // Read receipt status - check readAt and deliveredAt timestamps
+        status: msg.senderId === currentUserId 
+          ? (msg.readAt ? 'read' : (msg.deliveredAt ? 'delivered' : 'sent')) 
+          : null,
+        isDelivered: !!msg.deliveredAt,
+        isRead: !!msg.readAt,
+        type: msg.type || 'text', // Message type: text, image, video, voice
+        mediaUrl: msg.mediaUrl, // Media URL if present
       }));
       
       setMessages(transformedMsgs);
@@ -291,10 +296,13 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
 
             <div className="space-y-2">
               {conversations.map((convo) => {
+                // Backend returns: otherUser (populated), lastMessageText, lastMessageAt, unreadCount (calculated per user)
                 const otherUser = convo.otherUser || {};
-                const lastMessage = convo.lastMessage || {};
-                const timeAgo = lastMessage.createdAt
-                  ? new Date(lastMessage.createdAt).toLocaleDateString()
+                const lastMessageText = convo.lastMessageText || '';
+                const lastMessageAt = convo.lastMessageAt;
+                const unreadCount = convo.unreadCount || 0;
+                const timeAgo = lastMessageAt
+                  ? new Date(lastMessageAt).toLocaleDateString()
                   : "";
                 
                 return (
@@ -334,8 +342,8 @@ export default function MessagesPage({ onViewUserProfile, selectedChatUsername }
                         {timeAgo}
                       </span>
                     </div>
-                    <p className={`text-xs md:text-sm truncate ${convo.unreadCount > 0 ? 'text-black dark:text-white font-medium' : 'text-gray-400'}`}>
-                      {lastMessage.text || "No messages yet"}
+                    <p className={`text-xs md:text-sm truncate ${unreadCount > 0 ? 'text-black dark:text-white font-medium' : 'text-gray-400'}`}>
+                      {lastMessageText || "No messages yet"}
                     </p>
                   </div>
                 </div>

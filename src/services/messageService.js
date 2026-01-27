@@ -20,12 +20,15 @@ export const messageService = {
   },
 
   /**
-   * Get conversations
+   * Get conversations (updated to match backend response format)
    */
   async getConversations(limit = 20, skip = 0) {
     try {
       // Backend expects skip, not page
       const response = await api.get(API_ENDPOINTS.MESSAGES.LIST_CONVERSATIONS, { limit, skip });
+      // Backend returns: { success: true, data: { conversations: [] } }
+      // Each conversation has: _id, participants, isGroup, name, avatar, creatorId, admins, 
+      // lastMessageText, lastMessageAt, unreadCounts, otherUser (populated), unreadCount
       return response.success ? response.data.conversations : [];
     } catch (error) {
       console.error('Get conversations error:', error);
@@ -34,17 +37,23 @@ export const messageService = {
   },
 
   /**
-   * Send message
+   * Send message (updated to match backend)
+   * Backend expects: conversationId, recipientId, text, mediaUrl
+   * For WebSocket: use socketService.sendMessage() instead
    */
-  async sendMessage(conversationId, recipientId, text, mediaUrl = null) {
+  async sendMessage(conversationId, recipientId, text, mediaUrl = null, type = 'text') {
     try {
       // Backend expects: conversationId, recipientId, text, mediaUrl
       const response = await api.post(API_ENDPOINTS.MESSAGES.SEND, {
         conversationId,
         recipientId,
-        text,
-        mediaUrl,
+        text: type === 'text' ? text : '', // Text content for text messages
+        mediaUrl: type !== 'text' ? text : mediaUrl, // Use text as URL for media messages
+        type, // Message type: text, image, video, voice
       });
+      // Backend returns: { success: true, data: { message: {...} }, message: 'Message sent' }
+      // Message fields: _id, conversationId, senderId, recipientId, text, mediaUrl, type, 
+      // createdAt, updatedAt, sender: { uid, username, displayName, avatar }
       return response.success ? response.data.message : null;
     } catch (error) {
       console.error('Send message error:', error);
@@ -53,12 +62,16 @@ export const messageService = {
   },
 
   /**
-   * Get messages by conversation
+   * Get messages by conversation (updated to match backend response)
    */
   async getMessagesByConversation(conversationId, limit = 50, skip = 0) {
     try {
       // Backend expects skip, not page
       const response = await api.get(API_ENDPOINTS.MESSAGES.BY_CONVERSATION(conversationId), { limit, skip });
+      // Backend returns: { success: true, data: { messages: [] } }
+      // Each message has: _id, conversationId, senderId, recipientId, text, mediaUrl, type,
+      // duration, fileSize, readAt, deliveredAt, reactions, replyTo, isDeleted,
+      // createdAt, updatedAt, sender: { uid, username, displayName, avatar }
       return response.success ? response.data.messages : [];
     } catch (error) {
       console.error('Get messages error:', error);
