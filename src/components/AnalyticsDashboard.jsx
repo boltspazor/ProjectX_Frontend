@@ -64,30 +64,30 @@ const AnalyticsDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             icon={<FiEye className="w-6 h-6" />}
-            title="Total Views"
-            value={analytics?.totalViews || 0}
-            trend="+12.5%"
+            title="Total Posts"
+            value={analytics?.posts?.total || 0}
+            trend=""
             color="blue"
           />
           <StatCard
             icon={<FiHeart className="w-6 h-6" />}
             title="Total Likes"
-            value={analytics?.totalLikes || 0}
-            trend="+8.3%"
+            value={analytics?.posts?.totalLikes || 0}
+            trend={`Avg: ${analytics?.posts?.averageLikes || 0}`}
             color="red"
           />
           <StatCard
             icon={<FiMessageCircle className="w-6 h-6" />}
             title="Total Comments"
-            value={analytics?.totalComments || 0}
-            trend="+15.2%"
+            value={analytics?.posts?.totalComments || 0}
+            trend=""
             color="green"
           />
           <StatCard
-            icon={<FiUsers className="w-6 h-6" />}
-            title="Followers"
-            value={analytics?.followersCount || 0}
-            trend="+5.7%"
+            icon={<FiTrendingUp className="w-6 h-6" />}
+            title="Total Shares"
+            value={analytics?.posts?.totalShares || 0}
+            trend=""
             color="purple"
           />
         </div>

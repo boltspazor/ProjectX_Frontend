@@ -135,12 +135,9 @@ export const authService = {
         if (newRefreshToken) {
           tokenManager.setRefreshToken(newRefreshToken);
         }
-        
-        // Update expiry
-        const expiryTime = Date.now() + (2 * 60 * 60 * 1000);
+        // Set token expiry (24 hours from now)
+        const expiryTime = Date.now() + (24 * 60 * 60 * 1000);
         localStorage.setItem('tokenExpiry', expiryTime.toString());
-        localStorage.setItem('authToken', accessToken);
-        
         return { success: true, accessToken };
       }
       
