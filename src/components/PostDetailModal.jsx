@@ -4,10 +4,10 @@ import { Heart, X } from "lucide-react";
 import ShareModal from "./ShareModal";
 import commentIcon from "../assets/comment.svg";
 import messageIcon from "../assets/message.svg";
-import profilePhoto from "../assets/profile-photo.jpg";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 import { postService } from "../services/postService";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfile }) {
   const [liked, setLiked] = useState(post?.isLiked || false);
@@ -19,30 +19,52 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Get current logged-in user data
+  const { profilePhoto: currentUserPhoto, profileVideo: currentUserVideo } = useUserProfile();
 
-  // Sample post data if not provided
-  const postImage = post?.imageUrl || post?.image || post?.images?.[0] || "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=800";
-  const profileImage = post?.user?.profilePhoto || post?.profileImage || profilePhoto;
-  const username = post?.user?.username || post?.username || "idkwhoisrahul_04";
-  const caption = post?.caption || "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.";
+  // Get post ID (handle both _id and id)
+  const postId = post?.id || post?._id;
+
+  // Post data from backend - no hardcoded defaults
+  const postImage = post?.imageUrl || post?.image || post?.images?.[0];
+  const profileImage = post?.user?.profilePhoto || post?.profileImage;
+  const username = post?.user?.username || post?.username;
+  const caption = post?.caption || "";
 
   // Fetch comments when modal opens or post changes
   useEffect(() => {
-    if (isOpen && post?.id) {
-      fetchComments();
+    const loadComments = async () => {
+      if (!postId) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await postService.getPostComments(postId);
+        setComments(response.comments || []);
+      } catch (err) {
+        console.error('Error fetching comments:', err);
+        setError(err.message || 'Failed to load comments');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isOpen && postId) {
+      loadComments();
       // Update like state from post prop
       setLiked(post?.isLiked || false);
       setLikes(post?.likesCount || 0);
     }
-  }, [isOpen, post?.id]);
+  }, [isOpen, postId, post?.isLiked, post?.likesCount]);
 
   const fetchComments = async () => {
-    if (!post?.id) return;
+    if (!postId) return;
     
     try {
       setLoading(true);
       setError(null);
-      const response = await postService.getPostComments(post.id);
+      const response = await postService.getPostComments(postId);
       setComments(response.comments || []);
     } catch (err) {
       console.error('Error fetching comments:', err);
@@ -72,7 +94,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
   }, [comments]);
 
   const handleLike = async () => {
-    if (!post?.id) return;
+    if (!postId) return;
     
     try {
       // Optimistic update
@@ -82,9 +104,9 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
 
       // API call
       if (wasLiked) {
-        await postService.unlikePost(post.id);
+        await postService.unlikePost(postId);
       } else {
-        await postService.likePost(post.id);
+        await postService.likePost(postId);
       }
     } catch (error) {
       console.error('Error liking post:', error);
@@ -95,26 +117,28 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
   };
 
   const handleLikeComment = async (commentId) => {
-    if (!post?.id) return;
+    if (!postId) return;
     
     try {
-      const comment = comments.find(c => c.id === commentId || c._id === commentId);
+      const comment = comments.find(c => (c._id || c.id) === commentId);
       if (!comment) return;
       
       const isLiked = comment.isLiked || comment.liked;
+      const actualCommentId = comment._id || comment.id;
       
       // Optimistic update
-      setComments(comments.map(c =>
-        (c.id === commentId || c._id === commentId)
+      setComments(comments.map(c => {
+        const cId = c._id || c.id;
+        return cId === commentId
           ? { ...c, isLiked: !isLiked, liked: !isLiked, likesCount: isLiked ? (c.likesCount || 0) - 1 : (c.likesCount || 0) + 1, likes: isLiked ? (c.likes || 0) - 1 : (c.likes || 0) + 1 }
-          : c
-      ));
+          : c;
+      }));
       
-      // Call API
+      // Call API with actual comment ID
       if (isLiked) {
-        await postService.unlikeComment(post.id, commentId);
+        await postService.unlikeComment(postId, actualCommentId);
       } else {
-        await postService.likeComment(post.id, commentId);
+        await postService.likeComment(postId, actualCommentId);
       }
     } catch (error) {
       console.error('Error liking comment:', error);
@@ -124,14 +148,14 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
   };
 
   const handleSendComment = async () => {
-    if (!newComment.trim() || !post?.id) return;
+    if (!newComment.trim() || !postId) return;
     
     const commentText = newComment.trim();
     setNewComment("");
     
     try {
       // Call API to save comment
-      const response = await postService.addComment(post.id, { 
+      const response = await postService.addComment(postId, { 
         content: commentText,
         text: commentText 
       });
@@ -156,6 +180,11 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
   };
 
   if (!isOpen) return null;
+
+  // Don't render if post data is missing
+  if (!post || !postId) {
+    return null;
+  }
 
   return (
     <AnimatePresence>
@@ -247,17 +276,19 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                 </div>
 
                 {/* Caption */}
-                <div className="px-4 pb-4 flex-shrink-0">
-                  <p className="text-sm">
-                    <button
-                      onClick={() => onViewUserProfile && onViewUserProfile(username)}
-                      className="font-semibold mr-2 hover:opacity-70 transition-opacity cursor-pointer"
-                    >
-                      {username}
-                    </button>
-                    <span className="text-gray-700 dark:text-gray-300">{caption}</span>
-                  </p>
-                </div>
+                {caption && (
+                  <div className="px-4 pb-4 flex-shrink-0">
+                    <p className="text-sm">
+                      <button
+                        onClick={() => onViewUserProfile && onViewUserProfile(username)}
+                        className="font-semibold mr-2 hover:opacity-70 transition-opacity cursor-pointer"
+                      >
+                        {username}
+                      </button>
+                      <span className="text-gray-700 dark:text-gray-300">{caption}</span>
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Right Side - Comments Section */}
@@ -293,9 +324,12 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                     </div>
                   ) : (
                     <>
-                      {comments.map((comment, index) => (
+                      {comments.map((comment, index) => {
+                        const commentId = comment._id || comment.id;
+                        const commentContent = comment.content || comment.text;
+                        return (
                         <motion.div
-                          key={comment.id}
+                          key={commentId}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05, duration: 0.3 }}
@@ -318,12 +352,12 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                                 {comment.user?.username || comment.username}
                               </button>
                               <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed break-words">
-                                {comment.text}
+                                {commentContent}
                               </p>
                             </div>
                             <div className="flex items-center gap-4 md:gap-5 mt-2 px-2">
                               <button
-                                onClick={() => handleLikeComment(comment.id)}
+                                onClick={() => handleLikeComment(commentId)}
                                 className="flex items-center gap-1.5 text-xs md:text-sm hover:scale-105 transition-transform group"
                               >
                                 <Heart
@@ -342,7 +376,8 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                             </div>
                           </div>
                         </motion.div>
-                      ))}
+                      );
+                      })}
                       {/* Invisible element to scroll to */}
                       <div ref={commentsEndRef} />
                     </>
@@ -359,8 +394,8 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
                   <div className="flex gap-2 md:gap-4 items-center">
                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-700">
                       <LiveProfilePhoto
-                        imageSrc={profilePhoto}
-                        videoSrc={getProfileVideoUrl(profilePhoto, "idkwhoisrahul_04")}
+                        imageSrc={currentUserPhoto}
+                        videoSrc={currentUserVideo}
                         alt="Your profile"
                         className="w-8 h-8 md:w-10 md:h-10 rounded-full"
                       />
@@ -395,8 +430,8 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
             isOpen={isShareModalOpen} 
             onClose={() => setIsShareModalOpen(false)} 
             onViewUserProfile={onViewUserProfile}
-            postId={post?.id}
-            postUrl={post?.imageUrl || post?.image || post?.images?.[0]}
+            postId={postId}
+            postUrl={postImage}
           />
         </>
       )}

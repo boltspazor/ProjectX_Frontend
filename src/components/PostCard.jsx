@@ -3,7 +3,6 @@ import { Heart } from "lucide-react";
 import ShareModal from "./ShareModal";
 import commentIcon from "../assets/comment.svg";
 import messageIcon from "../assets/message.svg";
-import postSampleImage from "../assets/post-sample.jpg";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getProfileVideoUrl } from "../utils/profileVideos";
 import { postService } from "../services";

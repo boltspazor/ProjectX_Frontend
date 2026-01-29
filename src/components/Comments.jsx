@@ -29,11 +29,12 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
       }
     } else {
       // Fallback to local state
-      setComments(comments.map(comment =>
-        comment.id === commentId
-          ? { ...comment, liked: !comment.liked, likes: comment.liked ? comment.likes - 1 : comment.likes + 1 }
-          : comment
-      ));
+      setComments(comments.map(comment => {
+        const cId = comment._id || comment.id;
+        return cId === commentId
+          ? { ...comment, liked: !comment.liked, isLiked: !comment.liked, likes: comment.liked ? (comment.likes || 0) - 1 : (comment.likes || 0) + 1, likesCount: comment.liked ? (comment.likesCount || 0) - 1 : (comment.likesCount || 0) + 1 }
+          : comment;
+      }));
     }
   };
 
@@ -57,12 +58,20 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
       } else {
         // Fallback to local state if no callback provided
         const newCommentObj = {
-          id: comments.length + 1,
+          id: Date.now(),
           username: username,
           text: commentText,
+          content: commentText,
           likes: 0,
+          likesCount: 0,
           liked: false,
-          image: profilePhoto
+          isLiked: false,
+          image: profilePhoto,
+          user: {
+            username: username,
+            profilePhoto: profilePhoto
+          },
+          createdAt: new Date().toISOString()
         };
         setComments([...comments, newCommentObj]);
       }
@@ -104,9 +113,16 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
           </div>
         ) : (
           <AnimatePresence>
-            {comments.map((comment, index) => (
+            {comments.map((comment, index) => {
+              const commentId = comment._id || comment.id;
+              const commentContent = comment.content || comment.text;
+              const commentUser = comment.user?.username || comment.username;
+              const commentImage = comment.user?.profilePhoto || comment.image;
+              const commentLikes = comment.likesCount || comment.likes || 0;
+              const isCommentLiked = comment.isLiked || comment.liked;
+              return (
               <motion.div
-                key={comment.id}
+                key={commentId}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05, duration: 0.3 }}
@@ -114,33 +130,33 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
               >
                 <div className="w-9 h-9 md:w-10 md:h-10 rounded-full overflow-hidden flex-shrink-0 border dark:border-gray-700 border-gray-300">
                   <LiveProfilePhoto
-                    imageSrc={comment.image}
-                    videoSrc={getProfileVideoUrl(comment.image, comment.username)}
-                    alt={comment.username}
+                    imageSrc={commentImage}
+                    videoSrc={getProfileVideoUrl(commentImage, commentUser)}
+                    alt={commentUser}
                     className="w-9 h-9 md:w-10 md:h-10 rounded-full"
                   />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="bg-gray-100 dark:bg-[#1a1a1a] rounded-2xl px-4 py-2.5 md:px-5 md:py-3 dark:hover:bg-[#1f1f1f] hover:bg-gray-200 transition-colors">
                     <button
-                      onClick={() => onViewUserProfile && onViewUserProfile(comment.username)}
+                      onClick={() => onViewUserProfile && onViewUserProfile(commentUser)}
                       className="font-semibold text-sm md:text-base dark:text-white text-black mb-1 hover:opacity-70 transition-opacity cursor-pointer"
                     >
-                      {comment.username}
+                      {commentUser}
                     </button>
-                    <p className="text-sm md:text-base dark:text-gray-300 text-gray-700 leading-relaxed break-words">{comment.text}</p>
+                    <p className="text-sm md:text-base dark:text-gray-300 text-gray-700 leading-relaxed break-words">{commentContent}</p>
                   </div>
                   <div className="flex items-center gap-4 md:gap-5 mt-2 px-2">
                     <button
-                      onClick={() => handleLikeComment(comment.id)}
+                      onClick={() => handleLikeComment(commentId)}
                       className="flex items-center gap-1.5 text-xs md:text-sm hover:scale-105 transition-transform group"
                     >
                       <Heart
-                        className={`h-4 w-4 md:h-5 md:w-5 transition-all group-hover:scale-110 ${comment.liked ? 'fill-red-500 text-red-500' : 'text-gray-400 group-hover:text-gray-300'
+                        className={`h-4 w-4 md:h-5 md:w-5 transition-all group-hover:scale-110 ${isCommentLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 group-hover:text-gray-300'
                           }`}
                       />
-                      <span className={comment.liked ? 'text-red-500 font-semibold' : 'text-gray-400 group-hover:text-gray-300'}>
-                        {comment.likes > 0 ? comment.likes.toLocaleString() : 'Like'}
+                      <span className={isCommentLiked ? 'text-red-500 font-semibold' : 'text-gray-400 group-hover:text-gray-300'}>
+                        {commentLikes > 0 ? commentLikes.toLocaleString() : 'Like'}
                       </span>
                     </button>
                     <span className="text-xs md:text-sm text-gray-500">
@@ -149,7 +165,8 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
                   </div>
                 </div>
               </motion.div>
-            ))}
+            );
+            })}
           </AnimatePresence>
         )}
       </div>

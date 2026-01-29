@@ -37,15 +37,17 @@ export default function FollowersFollowingModal({
     };
   }, [isOpen]);
 
-  const handleFollow = (username) => {
+  const handleFollow = (user) => {
     if (onFollow) {
-      onFollow(username);
+      const userId = user.uid || user.id;
+      onFollow(userId, user.username);
     }
   };
 
-  const handleUnfollow = (username) => {
+  const handleUnfollow = (user) => {
     if (onUnfollow) {
-      onUnfollow(username);
+      const userId = user.uid || user.id;
+      onUnfollow(userId, user.username);
     }
   };
 
@@ -149,8 +151,8 @@ export default function FollowersFollowingModal({
                           >
                             <div className="w-11 h-11 md:w-12 md:h-12 rounded-full overflow-hidden">
                               <LiveProfilePhoto
-                                imageSrc={user.image || user.profilePhoto}
-                                videoSrc={getProfileVideoUrl(user.image || user.profilePhoto, user.username)}
+                                imageSrc={user.profilePhoto || user.image || user.avatar}
+                                videoSrc={getProfileVideoUrl(user.profilePhoto || user.image || user.avatar, user.username)}
                                 alt={user.username}
                                 className="w-11 h-11 md:w-12 md:h-12 rounded-full"
                               />
@@ -171,9 +173,9 @@ export default function FollowersFollowingModal({
                               <p className="font-semibold text-sm md:text-base text-black dark:text-white truncate hover:opacity-70 transition-opacity">
                                 {user.username}
                               </p>
-                              {user.fullName && (
+                              {(user.displayName || user.fullName) && (
                                 <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate">
-                                  {user.fullName}
+                                  {user.displayName || user.fullName}
                                 </p>
                               )}
                             </button>
@@ -184,9 +186,9 @@ export default function FollowersFollowingModal({
                             <button
                               onClick={() => {
                                 if (user.isFollowing) {
-                                  handleUnfollow(user.username);
+                                  handleUnfollow(user);
                                 } else {
-                                  handleFollow(user.username);
+                                  handleFollow(user);
                                 }
                               }}
                               className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${user.isFollowing

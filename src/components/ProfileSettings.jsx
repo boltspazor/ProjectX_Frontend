@@ -8,29 +8,34 @@ import { userService, uploadService } from "../services";
 export default function ProfileSettings({ onBack, onProfileUpdate }) {
   const { user, updateUser } = useAuth();
   
-  // Load saved profile from user data
-  const savedProfile = user;
+  // Fetch user stats
+  const [stats, setStats] = useState({
+    posts: 0,
+    followers: 0,
+    following: 0,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
 
   const [formData, setFormData] = useState({
-    username: savedProfile?.username || user?.username || "idkwhoisrahul_04",
-    bio: savedProfile?.bio || user?.bio || "Wish I was half as interesting as my bio",
-    email: user?.email || "rahul@example.com",
+    displayName: user?.displayName || "",
+    bio: user?.bio || "",
+    email: user?.email || "",
     phone: user?.phone || "",
-    gender: user?.gender || ""
+    gender: user?.gender || "",
+    website: user?.website || ""
   });
-  const [accountType, setAccountType] = useState("private");
+  const [accountType, setAccountType] = useState(user?.accountType || "private");
   const [notifications, setNotifications] = useState({
-    likes: true,
-    comments: true,
-    messages: true,
-    followRequests: true
+    likes: user?.notificationSettings?.likes ?? true,
+    comments: user?.notificationSettings?.comments ?? true,
+    messages: user?.notificationSettings?.messages ?? true,
+    followRequests: user?.notificationSettings?.followRequests ?? true
   });
   
-  // Read receipts setting - load from localStorage
-  const [readReceiptsEnabled, setReadReceiptsEnabled] = useState(() => {
-    const saved = localStorage.getItem('readReceiptsEnabled');
-    return saved !== null ? saved === 'true' : true; // Default to enabled
-  });
+  // Read receipts setting - load from user data
+  const [readReceiptsEnabled, setReadReceiptsEnabled] = useState(
+    user?.readReceiptsEnabled ?? true
+  );
 
   // API state
   const [isSaving, setIsSaving] = useState(false);
@@ -40,11 +45,34 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
 
   // Preview states (not saved until "Save Changes" is clicked)
   const [profilePhotoPreview, setProfilePhotoPreview] = useState(
-    savedProfile?.profilePhoto || profilePhotoDefault
+    user?.profilePhoto || user?.avatar || profilePhotoDefault
   );
   const [profileVideoPreview, setProfileVideoPreview] = useState(
-    savedProfile?.profileVideo || null
+    user?.profileVideo || null
   );
+
+  // Fetch user stats on mount
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      if (!user?.username) return;
+      try {
+        const response = await userService.getUserStats(user.username);
+        if (response) {
+          setStats({
+            posts: response.posts || 0,
+            followers: response.followers || 0,
+            following: response.following || 0,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch user stats:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    fetchUserStats();
+  }, [user?.username]);
 
   const photoInputRef = useRef(null);
   const videoInputRef = useRef(null);
@@ -154,13 +182,14 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
     setSaveError(null);
     
     try {
-      // Create update data object (not FormData since we already uploaded images)
+      // Create update data object matching backend validation schema
       const updateData = {
-        username: formData.username,
+        displayName: formData.displayName,
         bio: formData.bio,
         email: formData.email,
         phone: formData.phone || '',
         gender: formData.gender || '',
+        website: formData.website || '',
         accountType: accountType,
         notificationSettings: notifications,
         readReceiptsEnabled: readReceiptsEnabled
@@ -174,6 +203,9 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
       
       if (profileVideoPreview) {
         updateData.profileVideo = profileVideoPreview;
+      } else {
+        // If video was removed, send empty string to clear it
+        updateData.profileVideo = '';
       }
 
       // Call API to update profile
@@ -265,22 +297,22 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                 </button>
               </div>
               <p className="text-center md:text-left text-sm text-gray-400 mt-2">
-                {formData.username}
+                @{user?.username || 'username'}
               </p>
               <p className="text-center md:text-left text-xs text-gray-500">
-                Rahul Chauhan
+                {user?.displayName || user?.username || 'User'}
               </p>
               <div className="flex justify-center md:justify-start gap-6 mt-3 text-sm">
                 <div className="text-center">
-                  <p className="font-bold">21</p>
+                  <p className="font-bold">{statsLoading ? "..." : stats.posts}</p>
                   <p className="text-gray-400 text-xs">Posts</p>
                 </div>
                 <div className="text-center">
-                  <p className="font-bold">738</p>
+                  <p className="font-bold">{statsLoading ? "..." : stats.followers}</p>
                   <p className="text-gray-400 text-xs">Followers</p>
                 </div>
                 <div className="text-center">
-                  <p className="font-bold">512</p>
+                  <p className="font-bold">{statsLoading ? "..." : stats.following}</p>
                   <p className="text-gray-400 text-xs">Following</p>
                 </div>
               </div>
@@ -334,17 +366,33 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
               </div>
             </div>
 
-            {/* Username */}
+            {/* Username (Read-only) */}
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
                 Username
               </label>
               <input
                 type="text"
-                name="username"
-                value={formData.username}
+                value={user?.username || ''}
+                readOnly
+                disabled
+                className="w-full bg-gray-200 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              />
+              <p className="text-xs text-gray-500 mt-1">Username cannot be changed</p>
+            </div>
+
+            {/* Display Name */}
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">
+                Display Name
+              </label>
+              <input
+                type="text"
+                name="displayName"
+                value={formData.displayName}
                 onChange={handleInputChange}
-                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-primary transition-colors"
+                placeholder="Your display name"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-primary transition-colors"
               />
             </div>
 
@@ -357,8 +405,26 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
                 name="bio"
                 value={formData.bio}
                 onChange={handleInputChange}
+                placeholder="Tell us about yourself..."
                 rows="3"
-                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white focus:outline-none focus:border-primary transition-colors resize-none"
+                maxLength="500"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-primary transition-colors resize-none"
+              />
+              <p className="text-xs text-gray-500 mt-1">{formData.bio.length}/500 characters</p>
+            </div>
+
+            {/* Website */}
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">
+                Website
+              </label>
+              <input
+                type="url"
+                name="website"
+                value={formData.website}
+                onChange={handleInputChange}
+                placeholder="https://example.com"
+                className="w-full bg-gray-100 dark:bg-[#1a1a1a] border border-black dark:border-gray-800 rounded-lg px-4 py-3 text-black dark:text-white placeholder-gray-600 focus:outline-none focus:border-primary transition-colors"
               />
             </div>
 

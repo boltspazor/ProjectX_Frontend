@@ -166,50 +166,67 @@ const fetchProfileData = async () => {
     }
   };
 
-  const handleFollow = async (targetUsername) => {
+  const handleFollow = async (userId, targetUsername) => {
+    if (!userId) {
+      console.error("User ID is required to follow");
+      alert("Unable to follow user. Missing user information.");
+      return;
+    }
+
     try {
-      await userService.followUser(targetUsername);
+      await userService.followUser(userId);
+      
+      // Trigger event to refresh stats in sidebar
+      window.dispatchEvent(new CustomEvent('followUpdated'));
       
       // Update followers list (if following back)
       setFollowersList(followersList.map(user =>
-        user.username === targetUsername ? { ...user, isFollowing: true } : user
+        (user.uid === userId || user.id === userId) ? { ...user, isFollowing: true } : user
       ));
 
       // Add to following list if not already there
-      const isInFollowing = followingList.find(u => u.username === targetUsername);
+      const isInFollowing = followingList.find(u => (u.uid === userId || u.id === userId));
       if (!isInFollowing) {
-        const userToAdd = followersList.find(u => u.username === targetUsername) || {
-          username: targetUsername,
-          fullName: targetUsername,
-          image: `https://i.pravatar.cc/100?u=${encodeURIComponent(targetUsername)}`,
-          isFollowing: true
-        };
-        setFollowingList([...followingList, userToAdd]);
+        const userToAdd = followersList.find(u => (u.uid === userId || u.id === userId));
+        if (userToAdd) {
+          setFollowingList([...followingList, { ...userToAdd, isFollowing: true }]);
+        }
       } else {
         setFollowingList(followingList.map(user =>
-          user.username === targetUsername ? { ...user, isFollowing: true } : user
+          (user.uid === userId || user.id === userId) ? { ...user, isFollowing: true } : user
         ));
       }
     } catch (err) {
       console.error("Error following user:", err);
-      alert("Failed to follow user. Please try again.");
+      alert(err.message || "Failed to follow user. Please try again.");
     }
   };
 
-  const handleUnfollow = async (targetUsername) => {
+  const handleUnfollow = async (userId, targetUsername) => {
+    if (!userId) {
+      console.error("User ID is required to unfollow");
+      alert("Unable to unfollow user. Missing user information.");
+      return;
+    }
+
     try {
-      await userService.unfollowUser(targetUsername);
+      await userService.unfollowUser(userId);
+      
+      // Trigger event to refresh stats in sidebar
+      window.dispatchEvent(new CustomEvent('followUpdated'));
       
       // Update followers list
       setFollowersList(followersList.map(user =>
-        user.username === targetUsername ? { ...user, isFollowing: false } : user
+        (user.uid === userId || user.id === userId) ? { ...user, isFollowing: false } : user
       ));
 
-      // Remove from following list
-      setFollowingList(followingList.filter(u => u.username !== targetUsername));
+      // Update following list
+      setFollowingList(followingList.map(user =>
+        (user.uid === userId || user.id === userId) ? { ...user, isFollowing: false } : user
+      ));
     } catch (err) {
       console.error("Error unfollowing user:", err);
-      alert("Failed to unfollow user. Please try again.");
+      alert(err.message || "Failed to unfollow user. Please try again.");
     }
   };
 
