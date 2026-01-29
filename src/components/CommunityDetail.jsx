@@ -12,6 +12,7 @@ import { getProfileVideoUrl } from "../utils/profileVideos";
 import { getCommunityBannerVideoUrl, getCommunityProfileVideoUrl } from "../utils/communityVideos";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { communityService } from "../services/communityService";
+import { postService } from "../services/postService";
 
 export default function CommunityDetail({ setActiveView, communityId, onViewUserProfile }) {
   const { username } = useUserProfile();
@@ -202,12 +203,121 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
     });
   };
 
-  const handleCommentClick = (postId) => {
+  const handleCommentClick = async (postId) => {
+    // Fetch comments when opening comments section
+    try {
+      const response = await postService.getPostComments(postId);
+      setPosts(posts.map(p => {
+        if (p.id === postId) {
+          return {
+            ...p,
+            commentsList: response.comments || [],
+            comments: response.comments?.length || 0,
+            commentsCount: response.comments?.length || 0
+          };
+        }
+        return p;
+      }));
+    } catch (err) {
+      console.error("Error fetching comments:", err);
+    }
     setOpenCommentsPostId(postId);
   };
 
   const handleCloseComments = () => {
     setOpenCommentsPostId(null);
+  };
+
+  const handleAddComment = async (commentText) => {
+    if (!openCommentsPostId || !commentText.trim()) return;
+
+    try {
+      const response = await postService.addComment(openCommentsPostId, { 
+        text: commentText,
+        content: commentText 
+      });
+
+      const newComment = response.comment || response.data || response;
+
+      // Update local state with the new comment
+      setPosts(posts.map(p => {
+        if (p.id === openCommentsPostId) {
+          return {
+            ...p,
+            commentsList: [...(p.commentsList || []), newComment],
+            comments: (p.comments || 0) + 1,
+            commentsCount: (p.commentsCount || 0) + 1
+          };
+        }
+        return p;
+      }));
+
+      return newComment;
+    } catch (err) {
+      console.error("Error adding comment:", err);
+      throw err;
+    }
+  };
+
+  const handleLikeComment = async (commentId) => {
+    if (!openCommentsPostId) return;
+
+    try {
+      const post = posts.find(p => p.id === openCommentsPostId);
+      if (!post) return;
+
+      const comment = post.commentsList?.find(c => (c._id || c.id) === commentId);
+      if (!comment) return;
+
+      const isLiked = comment.isLiked || comment.liked;
+      const actualCommentId = comment._id || comment.id;
+
+      // Optimistic update
+      setPosts(posts.map(p => {
+        if (p.id === openCommentsPostId) {
+          return {
+            ...p,
+            commentsList: p.commentsList.map(c => {
+              const cId = c._id || c.id;
+              return cId === commentId
+                ? { 
+                    ...c, 
+                    isLiked: !isLiked, 
+                    liked: !isLiked, 
+                    likesCount: isLiked ? (c.likesCount || 0) - 1 : (c.likesCount || 0) + 1,
+                    likes: isLiked ? (c.likes || 0) - 1 : (c.likes || 0) + 1 
+                  }
+                : c;
+            })
+          };
+        }
+        return p;
+      }));
+
+      // Call API
+      if (isLiked) {
+        await postService.unlikeComment(openCommentsPostId, actualCommentId);
+      } else {
+        await postService.likeComment(openCommentsPostId, actualCommentId);
+      }
+    } catch (err) {
+      console.error("Error liking comment:", err);
+      // Revert on error - refetch comments
+      try {
+        const response = await postService.getPostComments(openCommentsPostId);
+        setPosts(posts.map(p => {
+          if (p.id === openCommentsPostId) {
+            return {
+              ...p,
+              commentsList: response.comments || []
+            };
+          }
+          return p;
+        }));
+      } catch (refetchErr) {
+        console.error("Error refetching comments:", refetchErr);
+      }
+    }
   };
 
   const handleAddPost = () => {
@@ -592,6 +702,8 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
             : []
         }
         onViewUserProfile={onViewUserProfile}
+        onAddComment={handleAddComment}
+        onLikeComment={handleLikeComment}
       />
 
       {/* Share Modal */}

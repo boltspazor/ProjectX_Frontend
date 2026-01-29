@@ -115,6 +115,78 @@ export default function ExplorePage({ onViewUserProfile }) {
     setActivePostId(null);
   };
 
+  const handleAddComment = async (commentText) => {
+    if (!activePostId || !commentText.trim()) return;
+
+    try {
+      const response = await postService.addComment(activePostId, { 
+        text: commentText,
+        content: commentText 
+      });
+
+      const newComment = response.comment || response.data || response;
+
+      // Update local state with the new comment
+      setPostsComments((prev) => ({
+        ...prev,
+        [activePostId]: [...(prev[activePostId] || []), newComment]
+      }));
+
+      return newComment;
+    } catch (err) {
+      console.error("Error adding comment:", err);
+      throw err;
+    }
+  };
+
+  const handleLikeComment = async (commentId) => {
+    if (!activePostId) return;
+
+    try {
+      const comment = postsComments[activePostId]?.find(c => (c._id || c.id) === commentId);
+      if (!comment) return;
+
+      const isLiked = comment.isLiked || comment.liked;
+      const actualCommentId = comment._id || comment.id;
+
+      // Optimistic update
+      setPostsComments((prev) => ({
+        ...prev,
+        [activePostId]: prev[activePostId].map(c => {
+          const cId = c._id || c.id;
+          return cId === commentId
+            ? { 
+                ...c, 
+                isLiked: !isLiked, 
+                liked: !isLiked, 
+                likesCount: isLiked ? (c.likesCount || 0) - 1 : (c.likesCount || 0) + 1,
+                likes: isLiked ? (c.likes || 0) - 1 : (c.likes || 0) + 1 
+              }
+            : c;
+        })
+      }));
+
+      // Call API
+      if (isLiked) {
+        await postService.unlikeComment(activePostId, actualCommentId);
+      } else {
+        await postService.likeComment(activePostId, actualCommentId);
+      }
+    } catch (err) {
+      console.error("Error liking comment:", err);
+      // Revert on error - refetch comments
+      try {
+        const response = await postService.getPostComments(activePostId);
+        setPostsComments((prev) => ({
+          ...prev,
+          [activePostId]: response.comments || []
+        }));
+      } catch (refetchErr) {
+        console.error("Error refetching comments:", refetchErr);
+      }
+    }
+  };
+
   const categories = [
     "Memes",
     "Entertainment",
@@ -245,6 +317,8 @@ export default function ExplorePage({ onViewUserProfile }) {
             variant="overlay"
             initialComments={activePostId !== null ? (postsComments[activePostId] || []) : []}
             onViewUserProfile={onViewUserProfile}
+            onAddComment={handleAddComment}
+            onLikeComment={handleLikeComment}
           />
         </>
       )}
