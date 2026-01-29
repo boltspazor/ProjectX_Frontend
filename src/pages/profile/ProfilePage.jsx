@@ -176,6 +176,9 @@ const fetchProfileData = async () => {
     try {
       await userService.followUser(userId);
       
+      // Trigger event to refresh stats in sidebar
+      window.dispatchEvent(new CustomEvent('followUpdated'));
+      
       // Update followers list (if following back)
       setFollowersList(followersList.map(user =>
         (user.uid === userId || user.id === userId) ? { ...user, isFollowing: true } : user
@@ -208,6 +211,9 @@ const fetchProfileData = async () => {
 
     try {
       await userService.unfollowUser(userId);
+      
+      // Trigger event to refresh stats in sidebar
+      window.dispatchEvent(new CustomEvent('followUpdated'));
       
       // Update followers list
       setFollowersList(followersList.map(user =>

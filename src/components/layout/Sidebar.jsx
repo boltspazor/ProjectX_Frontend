@@ -43,9 +43,9 @@ export default function Sidebar({ onLogout }) {
         const response = await userService.getUserStats(username);
         if (response) {
           setStats({
-            posts: response.posts || response.postsCount || 0,
-            followers: response.followers || response.followersCount || 0,
-            following: response.following || response.followingCount || 0,
+            posts: response.posts || 0,
+            followers: response.followers || 0,
+            following: response.following || 0,
           });
         }
       } catch (error) {
@@ -56,6 +56,20 @@ export default function Sidebar({ onLogout }) {
     };
 
     fetchUserStats();
+
+    // Listen for profile updates and follow/unfollow events to refresh stats
+    const handleStatsUpdate = () => {
+      setStatsLoading(true);
+      fetchUserStats();
+    };
+
+    window.addEventListener('profileUpdated', handleStatsUpdate);
+    window.addEventListener('followUpdated', handleStatsUpdate);
+
+    return () => {
+      window.removeEventListener('profileUpdated', handleStatsUpdate);
+      window.removeEventListener('followUpdated', handleStatsUpdate);
+    };
   }, [username]);
   const items = [
     { label: "Home", value: "/home", icon: homeIcon, iconActive: homeIconActive },

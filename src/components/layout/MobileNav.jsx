@@ -2,19 +2,21 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import profilePhoto from "../../assets/profile-photo.jpg";
+import profilePhotoDefault from "../../assets/profile-photo.jpg";
 import homeIcon from "../../assets/home_mobnav_icon.png";
 import exploreIcon from "../../assets/explore_mobnav_icon.png";
 import messageIcon from "../../assets/message_mobnav_icon.png";
 import communitiesIcon from "../../assets/communities.svg";
+import { useUserProfile } from "../../hooks/useUserProfile";
 
 export default function MobileNav() {
   const location = useLocation();
+  const { profilePhoto } = useUserProfile();
   
   const navItems = [
     { id: "home", icon: homeIcon, path: "/home", needsInvert: true },
     { id: "explore", icon: exploreIcon, path: "/explore", needsInvert: true },
-    { id: "profile", icon: profilePhoto, path: "/profile", isProfile: true },
+    { id: "profile", icon: profilePhoto || profilePhotoDefault, path: "/profile", isProfile: true },
     { id: "messages", icon: messageIcon, path: "/messages", needsInvert: true },
     { id: "communities", icon: communitiesIcon, path: "/communities", needsInvert: true },
   ];

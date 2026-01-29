@@ -167,7 +167,6 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
               </motion.div>
             );
             })}
-            ))}
           </AnimatePresence>
         )}
       </div>

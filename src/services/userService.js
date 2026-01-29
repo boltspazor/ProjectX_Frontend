@@ -121,7 +121,10 @@ export const userService = {
   async getUserStats(username) {
     try {
       const response = await api.get(API_ENDPOINTS.USERS.STATS(username));
-      return response.success ? response.data : { posts: 0, followers: 0, following: 0 };
+      // Backend returns { data: { stats: { posts, followers, following } } }
+      return response.success && response.data?.stats 
+        ? response.data.stats 
+        : { posts: 0, followers: 0, following: 0 };
     } catch (error) {
       console.error('Get user stats error:', error);
       throw error;
