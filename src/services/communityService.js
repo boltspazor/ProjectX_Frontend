@@ -70,7 +70,11 @@ export const communityService = {
   async getCommunityBySlug(slug) {
     try {
       const response = await api.get(API_ENDPOINTS.COMMUNITIES.BY_SLUG(slug));
-      return response.success ? response.data : null;
+      // Backend returns { success: true, data: { community: {...} } }
+      if (response.success && response.data) {
+        return response.data.community || response.data;
+      }
+      return null;
     } catch (error) {
       console.error('Get community by slug error:', error);
       throw error;

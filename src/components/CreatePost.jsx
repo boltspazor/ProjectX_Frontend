@@ -13,7 +13,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
   const [imagePreview, setImagePreview] = useState(null);
   const [croppedImage, setCroppedImage] = useState(null);
   const [editedImage, setEditedImage] = useState(null);
-  const [aspectRatio, setAspectRatio] = useState("4:3");
+  const [aspectRatio, setAspectRatio] = useState("9:16"); // Changed default to 9:16 for mobile
   const [cropData, setCropData] = useState({ x: 0, y: 0, zoom: 1 });
   const [imageDimensions, setImageDimensions] = useState({ width: 1000, height: 1000 });
   const [containerDimensions, setContainerDimensions] = useState({ width: 600, height: 600 });
@@ -30,6 +30,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
     vignette: 0
   });
   const [caption, setCaption] = useState("");
+  const [category, setCategory] = useState("general"); // Add category state
   const [taggedPeople, setTaggedPeople] = useState([]);
   const [location, setLocation] = useState("");
   const [collaborators, setCollaborators] = useState([]);
@@ -122,19 +123,19 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
     const imageAspectRatio = imageDimensions.width / imageDimensions.height;
     const containerAspectRatio = containerDimensions.width / containerDimensions.height;
     
-    // Size image to cover container (be at least as large in both dimensions)
-    // Base size without zoom - zoom is applied via transform
+    // Calculate size to fit image within container (not cover)
+    // This prevents excessive zooming
     if (imageAspectRatio > containerAspectRatio) {
-      // Image is wider - height determines size
-      return {
-        width: `${containerDimensions.height * imageAspectRatio}px`,
-        height: `${containerDimensions.height}px`
-      };
-    } else {
-      // Image is taller - width determines size
+      // Image is wider - width determines size
       return {
         width: `${containerDimensions.width}px`,
         height: `${containerDimensions.width / imageAspectRatio}px`
+      };
+    } else {
+      // Image is taller - height determines size
+      return {
+        width: `${containerDimensions.height * imageAspectRatio}px`,
+        height: `${containerDimensions.height}px`
       };
     }
   }, [imageDimensions.width, imageDimensions.height, containerDimensions.width, containerDimensions.height]);
@@ -531,6 +532,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
       const postData = {
         imageUrl: uploadResponse.url,
         caption: caption,
+        category: category, // Include category
         taggedUsers: taggedPeople.map(p => p.id || p.username).filter(Boolean),
         location: location,
         collaborators: collaborators.map(c => c.id || c.username).filter(Boolean),
@@ -570,7 +572,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
     setCroppedImage(null);
     setEditedImage(null);
     setSelectedGalleryImage(null);
-    setAspectRatio("4:3");
+    setAspectRatio("9:16");
     setCropData({ x: 0, y: 0, zoom: 1 });
     setSelectedFilter("original");
     setAdjustments({
@@ -582,6 +584,7 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
       vignette: 0
     });
     setCaption("");
+    setCategory("general");
     setTaggedPeople([]);
     setLocation("");
     setCollaborators([]);
@@ -2623,6 +2626,29 @@ export default function CreatePost({ setActiveView, isOpen, onClose, onPostCreat
                       {caption.length}/2,200
                     </span>
                   </div>
+                </div>
+
+                {/* Category Selection */}
+                <div className="px-4 py-3 border-b border-gray-800">
+                  <label className="text-sm text-gray-400 mb-2 block">Category</label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                  >
+                    <option value="general">General</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="food">Food & Drink</option>
+                    <option value="travel">Travel</option>
+                    <option value="fitness">Fitness & Health</option>
+                    <option value="tech">Technology</option>
+                    <option value="art">Art & Design</option>
+                    <option value="music">Music</option>
+                    <option value="gaming">Gaming</option>
+                    <option value="education">Education</option>
+                    <option value="business">Business</option>
+                    <option value="lifestyle">Lifestyle</option>
+                  </select>
                 </div>
 
                 {/* Add Audio */}

@@ -42,14 +42,18 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
     const fetchCommunityData = async () => {
       setLoading(true);
       try {
-        // Fetch community details
-        const communityData = await communityService.getCommunityBySlug(communityId);
+        // Fetch community details - returns { community: {...} }
+        const response = await communityService.getCommunityBySlug(communityId);
+        const communityData = response?.community || response;
         setCommunity(communityData);
         setIsJoined(communityData?.isJoined || false);
 
-        // Fetch community posts
-        const postsData = await communityService.getCommunityPosts(communityId);
-        setPosts(postsData?.posts || []);
+        // Fetch community posts using actual MongoDB _id, not slug
+        const actualCommunityId = communityData?._id || communityData?.id;
+        if (actualCommunityId) {
+          const postsData = await communityService.getCommunityPosts(actualCommunityId);
+          setPosts(postsData?.posts || []);
+        }
 
         // Initialize likes state
         if (postsData?.posts) {
