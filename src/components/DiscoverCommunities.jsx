@@ -54,7 +54,8 @@ export default function DiscoverCommunities({ onBack }) {
   };
 
   const handleJoinCommunity = async (community) => {
-    if (joiningIds.has(community.id)) return;
+    const communityId = community._id || community.id;
+    if (joiningIds.has(communityId)) return;
 
     // Restricted communities cannot be joined
     if (community.type === "Restricted") {
@@ -66,12 +67,12 @@ export default function DiscoverCommunities({ onBack }) {
     // For public communities, join directly without code
     if (community.type === "public" || community.type === "Public" || !community.type) {
       try {
-        setJoiningIds(prev => new Set(prev).add(community.id));
-        await communityService.joinCommunity(community.id || community._id);
+        setJoiningIds(prev => new Set(prev).add(communityId));
+        await communityService.joinCommunity(communityId);
         
         // Optimistic update - remove from lists after joining
-        setRecommendedCommunities(prev => prev.filter(c => c.id !== community.id));
-        setCategoryCommunities(prev => prev.filter(c => c.id !== community.id));
+        setRecommendedCommunities(prev => prev.filter(c => (c._id || c.id) !== communityId));
+        setCategoryCommunities(prev => prev.filter(c => (c._id || c.id) !== communityId));
       } catch (err) {
         console.error('Error joining community:', err);
         setError("Failed to join community. Please try again.");
@@ -79,7 +80,7 @@ export default function DiscoverCommunities({ onBack }) {
       } finally {
         setJoiningIds(prev => {
           const newSet = new Set(prev);
-          newSet.delete(community.id);
+          newSet.delete(communityId);
           return newSet;
         });
       }
@@ -196,7 +197,9 @@ export default function DiscoverCommunities({ onBack }) {
     }
   };
 
-  const CommunityCard = ({ community, onJoin, isJoining }) => (
+  const CommunityCard = ({ community, onJoin, isJoining }) => {
+    const communityId = community._id || community.id;
+    return (
     <div className="bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 rounded-2xl p-4 hover:border-primary transition-all duration-300">
       <div className="flex items-start gap-3">
         <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
@@ -234,7 +237,8 @@ export default function DiscoverCommunities({ onBack }) {
         )}
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#fffcfa] dark:bg-[#0b0b0b] text-black dark:text-white pb-20 md:pb-0">
@@ -323,10 +327,10 @@ export default function DiscoverCommunities({ onBack }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {recommendedCommunities.map((community) => (
                 <CommunityCard
-                  key={community.id}
+                  key={community._id || community.id}
                   community={community}
                   onJoin={handleJoinCommunity}
-                  isJoining={joiningIds.has(community.id)}
+                  isJoining={joiningIds.has(community._id || community.id)}
                 />
               ))}
             </div>
@@ -343,7 +347,7 @@ export default function DiscoverCommunities({ onBack }) {
                   key={community.id}
                   community={community}
                   onJoin={handleJoinCommunity}
-                  isJoining={joiningIds.has(community.id)}
+                  isJoining={joiningIds.has(community._id || community.id)}
                 />
               ))}
             </div>

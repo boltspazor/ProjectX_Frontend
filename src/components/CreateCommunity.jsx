@@ -18,6 +18,8 @@ export default function CreateCommunity({ setActiveView }) {
   const [profileVideoPreview, setProfileVideoPreview] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState("");
+  const [rules, setRules] = useState([]);
+  const [newRule, setNewRule] = useState("");
 
   const topics = COMMUNITY_CATEGORIES;
 
@@ -71,6 +73,17 @@ export default function CreateCommunity({ setActiveView }) {
     }
   };
 
+  const handleAddRule = () => {
+    if (newRule.trim() && rules.length < 10) {
+      setRules([...rules, newRule.trim()]);
+      setNewRule("");
+    }
+  };
+
+  const handleRemoveRule = (index) => {
+    setRules(rules.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -88,13 +101,9 @@ export default function CreateCommunity({ setActiveView }) {
       const newCommunity = {
         name: communityName,
         description: description,
-        type: communityType, // Use lowercase directly since state already has 'public' or 'private'
-        rules: [
-          "Be respectful to all members",
-          "No spam or self-promotion",
-          "Keep discussions relevant to the community",
-          "Share your knowledge and experiences",
-        ],
+        type: communityType,
+        topics: selectedTopics,
+        rules: rules.length > 0 ? rules : [],
       };
 
       // Add banner and icon if provided
@@ -183,7 +192,7 @@ export default function CreateCommunity({ setActiveView }) {
                 <label className="block text-sm font-medium text-black dark:text-white mb-2">
                   Community Banner
                 </label>
-                <label className="block w-full h-32 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center">
+                <label className="w-full h-32 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center">
                   {bannerPreview ? (
                     <img
                       src={bannerPreview}
@@ -206,7 +215,7 @@ export default function CreateCommunity({ setActiveView }) {
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mt-2 mb-1">
                   Live Banner Video (Optional)
                 </label>
-                <label className="block w-full h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center">
+                <label className="w-full h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center">
                   {bannerVideoPreview ? (
                     <video
                       src={bannerVideoPreview}
@@ -234,7 +243,7 @@ export default function CreateCommunity({ setActiveView }) {
                 <label className="block text-sm font-medium text-black dark:text-white mb-2">
                   Community Icon
                 </label>
-                <label className="block w-24 h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
+                <label className="w-24 h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
                   {iconPreview ? (
                     <img
                       src={iconPreview}
@@ -256,7 +265,7 @@ export default function CreateCommunity({ setActiveView }) {
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mt-2 mb-1">
                   Live Profile Video (Optional)
                 </label>
-                <label className="block w-24 h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
+                <label className="w-24 h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
                   {profileVideoPreview ? (
                     <video
                       src={profileVideoPreview}
@@ -300,6 +309,51 @@ export default function CreateCommunity({ setActiveView }) {
                       {topic}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Community Rules */}
+              <div>
+                <label className="block text-sm font-medium text-black dark:text-white mb-3">
+                  Community Rules (Optional)
+                </label>
+                <div className="space-y-3">
+                  {rules.map((rule, index) => (
+                    <div key={index} className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-900 rounded-lg">
+                      <span className="text-sm text-gray-700 dark:text-gray-300 flex-1">
+                        {index + 1}. {rule}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveRule(index)}
+                        className="text-red-500 hover:text-red-700 text-xs font-medium px-2"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newRule}
+                      onChange={(e) => setNewRule(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddRule())}
+                      placeholder="Add a new rule..."
+                      maxLength={200}
+                      className="flex-1 px-4 py-2 bg-white dark:bg-[#1a1a1a] border border-black dark:border-gray-700 rounded-lg text-black dark:text-white focus:outline-none focus:border-primary text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddRule}
+                      disabled={!newRule.trim() || rules.length >= 10}
+                      className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {rules.length}/10 rules • Press Enter to add
+                  </p>
                 </div>
               </div>
 

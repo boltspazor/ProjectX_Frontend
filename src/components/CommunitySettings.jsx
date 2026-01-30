@@ -5,9 +5,8 @@ import { useUserProfile } from "../hooks/useUserProfile";
 import { communityService } from "../services/communityService";
 import LiveBanner from "./LiveBanner";
 import LiveProfilePhoto from "./LiveProfilePhoto";
-import { getCommunityBannerVideoUrl, getCommunityProfileVideoUrl } from "../utils/communityVideos";
 
-export default function CommunitySettings({ setActiveView, communityId, onViewUserProfile }) {
+export default function CommunitySettings({ communityId, setActiveView }) {
   const navigate = useNavigate();
   const { username } = useUserProfile();
   const [loading, setLoading] = useState(true);
@@ -94,7 +93,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Community not found</h1>
           <button
-            onClick={() => setActiveView("communityDetail", communityId)}
+            onClick={() => setActiveView ? setActiveView("detail") : navigate(`/communities/${communityId}`)}
             className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition"
           >
             Back to Community
@@ -111,7 +110,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
           <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
           <p className="text-gray-400 mb-4">You don't have permission to access this page.</p>
           <button
-            onClick={() => setActiveView("communityDetail", communityId)}
+            onClick={() => setActiveView ? setActiveView("detail") : navigate(`/communities/${communityId}`)}
             className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition"
           >
             Back to Community
@@ -202,8 +201,40 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
       } catch (err) {
         console.error("Error adding moderator:", err);
       }
-    } catch (err) {
+    } catch {
       setError("Failed to add moderator");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteCommunity = async () => {
+    const confirmation = window.confirm(
+      `Are you sure you want to delete "${community.name}"? This action cannot be undone.`
+    );
+    
+    if (!confirmation) return;
+    
+    const secondConfirmation = window.prompt(
+      `To confirm deletion, please type the community name: ${community.name}`
+    );
+    
+    if (secondConfirmation !== community.name) {
+      setError("Community name doesn't match. Deletion cancelled.");
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      await communityService.deleteCommunity(communityId);
+      setSuccess("Community deleted successfully");
+      // Navigate back to communities list after a short delay
+      setTimeout(() => {
+        navigate("/communities");
+      }, 1500);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete community");
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -268,15 +299,15 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
         await communityService.updateCommunity(communityId, updateData);
         setSuccess("Community settings updated successfully!");
         
-        // Refresh community detail page after a short delay
+        // Return to detail view after a short delay
         setTimeout(() => {
-          setActiveView("communityDetail", communityId);
+          setActiveView("detail");
         }, 1500);
       } catch (err) {
         console.error("Error updating community:", err);
         setError(err.message || "Failed to update community settings");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred while saving changes");
     } finally {
       setSaving(false);
@@ -289,7 +320,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
         {/* Header */}
         <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 md:mb-8">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => setActiveView("detail")}
             className="p-1.5 sm:p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-black dark:text-white" />
@@ -355,7 +386,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
               <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                 Banner Image
               </label>
-              <label className="block w-full h-24 sm:h-28 md:h-32 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
+              <label className="w-full h-24 sm:h-28 md:h-32 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
                 {bannerPreview ? (
                   <img
                     src={bannerPreview}
@@ -382,7 +413,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
               <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                 Live Banner Video (Optional)
               </label>
-              <label className="block w-full h-20 sm:h-22 md:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
+              <label className="w-full h-20 sm:h-22 md:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-lg cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden">
                 {bannerVideoPreview ? (
                   <video
                     src={bannerVideoPreview}
@@ -417,7 +448,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
               <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                 Profile Image
               </label>
-              <label className="block w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden mx-auto">
+              <label className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden mx-auto">
                 {profilePreview ? (
                   <img
                     src={profilePreview}
@@ -443,7 +474,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
               <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 text-center">
                 Live Profile Video (Optional)
               </label>
-              <label className="block w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden mx-auto">
+              <label className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 dark:bg-gray-900 border-2 border-dashed border-primary/50 rounded-full cursor-pointer hover:border-primary-400 transition flex items-center justify-center overflow-hidden mx-auto">
                 {profileVideoPreview ? (
                   <video
                     src={profileVideoPreview}
@@ -757,10 +788,37 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
             </div>
           )}
 
+          {/* Danger Zone - Only for Admins */}
+          {isAdmin && (
+            <div className="border border-red-500/30 rounded-lg p-4 sm:p-6 bg-red-500/5">
+              <h3 className="text-base sm:text-lg font-bold text-red-500 mb-3 sm:mb-4 flex items-center gap-2">
+                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                Danger Zone
+              </h3>
+              
+              {/* Delete Community */}
+              <div className="space-y-3">
+                <div>
+                  <h4 className="text-sm font-semibold text-white mb-2">Delete Community</h4>
+                  <p className="text-xs sm:text-sm text-gray-400 mb-3">
+                    Once you delete a community, there is no going back. This action is permanent.
+                  </p>
+                  <button
+                    onClick={handleDeleteCommunity}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition text-sm font-medium flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete This Community
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Save Button */}
           <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
             <button
-              onClick={() => setActiveView("communityDetail", communityId)}
+              onClick={() => setActiveView("detail")}
               className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition text-sm sm:text-base"
             >
               Cancel
