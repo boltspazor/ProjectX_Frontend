@@ -23,10 +23,10 @@ export default function PostCard({
   const [likes, setLikes] = useState(postData.likesCount || postData.likes || 0);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
-  const postImage = postData.imageUrl || postData.image || postData.images?.[0] || 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=800';
-  const profileImage = author.profilePhoto || author.profilePicture || postData.profileImage || "https://i.pravatar.cc/100";
-  const username = author.username || postData.username || "sheryanne_xoxo";
-  const caption = postData.caption || postData.content || "Found that's guitar I saw last rly as a rockstar. Still waiting for my negro to learn what a Ghost is.";
+  const postImage = postData.imageUrl || postData.image || postData.images?.[0];
+  const profileImage = author.profilePhoto || author.profilePicture || postData.profileImage;
+  const username = author.username || postData.username;
+  const caption = postData.caption || postData.content || "";
 
   const handleLike = async () => {
     const previousLiked = liked;
@@ -133,17 +133,19 @@ export default function PostCard({
           </div>
 
           {/* Caption */}
-          <div className="px-4 pb-4 flex-shrink-0">
-            <p className="text-sm">
-              <button
-                onClick={() => onViewUserProfile && onViewUserProfile(username)}
-                className="font-semibold mr-2 hover:opacity-70 transition-opacity cursor-pointer"
-              >
-                {username}
-              </button>
-              <span className="dark:text-gray-300 text-gray-700">{caption}</span>
-            </p>
-          </div>
+          {caption && (
+            <div className="px-4 pb-4 flex-shrink-0">
+              <p className="text-sm">
+                <button
+                  onClick={() => onViewUserProfile && onViewUserProfile(username)}
+                  className="font-semibold mr-2 hover:opacity-70 transition-opacity cursor-pointer"
+                >
+                  {username}
+                </button>
+                <span className="dark:text-gray-300 text-gray-700">{caption}</span>
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Share Modal */}
