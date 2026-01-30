@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Settings, Upload, X, Plus, Trash2, Eye, EyeOff, Globe, Lock, Eye as EyeIcon, RefreshCw } from "lucide-react";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { communityService } from "../services/communityService";
@@ -7,6 +8,7 @@ import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getCommunityBannerVideoUrl, getCommunityProfileVideoUrl } from "../utils/communityVideos";
 
 export default function CommunitySettings({ setActiveView, communityId, onViewUserProfile }) {
+  const navigate = useNavigate();
   const { username } = useUserProfile();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -287,7 +289,7 @@ export default function CommunitySettings({ setActiveView, communityId, onViewUs
         {/* Header */}
         <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 md:mb-8">
           <button
-            onClick={() => setActiveView("communityDetail", communityId)}
+            onClick={() => navigate(-1)}
             className="p-1.5 sm:p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-black dark:text-white" />

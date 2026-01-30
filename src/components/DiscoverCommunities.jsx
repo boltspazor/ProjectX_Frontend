@@ -3,6 +3,7 @@ import { ArrowLeft, Key } from "lucide-react";
 import { communityService } from "../services/communityService";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getCommunityProfileVideoUrl } from "../utils/communityVideos";
+import { DISCOVERY_CATEGORIES } from "../constants/communityCategories";
 
 export default function DiscoverCommunities({ onBack }) {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -19,17 +20,7 @@ export default function DiscoverCommunities({ onBack }) {
   const [codeError, setCodeError] = useState("");
   const [selectedCommunity, setSelectedCommunity] = useState(null);
 
-  const categories = [
-    "All",
-    "Technology",
-    "Games",
-    "Pop Culture",
-    "Anime & Manga",
-    "Food & Recipes",
-    "Music",
-    "Sports",
-    "Art & Design"
-  ];
+  const categories = DISCOVERY_CATEGORIES;
 
   useEffect(() => {
     fetchCommunities();
@@ -62,7 +53,7 @@ export default function DiscoverCommunities({ onBack }) {
     }
   };
 
-  const handleJoinCommunity = (community) => {
+  const handleJoinCommunity = async (community) => {
     if (joiningIds.has(community.id)) return;
 
     // Restricted communities cannot be joined
@@ -72,6 +63,30 @@ export default function DiscoverCommunities({ onBack }) {
       return;
     }
 
+    // For public communities, join directly without code
+    if (community.type === "public" || community.type === "Public" || !community.type) {
+      try {
+        setJoiningIds(prev => new Set(prev).add(community.id));
+        await communityService.joinCommunity(community.id || community._id);
+        
+        // Optimistic update - remove from lists after joining
+        setRecommendedCommunities(prev => prev.filter(c => c.id !== community.id));
+        setCategoryCommunities(prev => prev.filter(c => c.id !== community.id));
+      } catch (err) {
+        console.error('Error joining community:', err);
+        setError("Failed to join community. Please try again.");
+        setTimeout(() => setError(""), 5000);
+      } finally {
+        setJoiningIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(community.id);
+          return newSet;
+        });
+      }
+      return;
+    }
+
+    // For private communities, show code modal
     setSelectedCommunity(community);
     setShowCodeModal(true);
   };

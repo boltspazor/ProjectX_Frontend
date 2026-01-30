@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Globe, Lock, Upload } from "lucide-react";
 import { communityService } from "../services/communityService";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { COMMUNITY_CATEGORIES } from "../constants/communityCategories";
 
 export default function CreateCommunity({ setActiveView }) {
+  const navigate = useNavigate();
   const { username } = useUserProfile();
   const [communityName, setCommunityName] = useState("");
   const [description, setDescription] = useState("");
@@ -16,7 +19,7 @@ export default function CreateCommunity({ setActiveView }) {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState("");
 
-  const topics = ["Art", "Cooking", "Coding", "Law", "Business", "Design", "Finance", "Music", "Dance", "Technology", "Cars", "Food", "Places"];
+  const topics = COMMUNITY_CATEGORIES;
 
   const handleTopicToggle = (topic) => {
     setSelectedTopics((prev) =>
@@ -128,7 +131,7 @@ export default function CreateCommunity({ setActiveView }) {
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button
-            onClick={() => setActiveView("communities")}
+            onClick={() => navigate(-1)}
             className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition"
           >
             <ArrowLeft className="w-5 h-5 text-black dark:text-white" />

@@ -53,8 +53,8 @@ function NotificationsPage({ onViewUserProfile }) {
       const transformed = {
         id: notif._id,
         type: notif.type,
-        avatar: notif.sender?.profilePicture || "https://i.pravatar.cc/100",
-        username: notif.sender?.username || "user",
+        avatar: notif.sender?.profilePhoto || notif.sender?.profilePicture || notif.sender?.avatar,
+        username: notif.sender?.username,
         message: notif.message || getNotificationMessage(notif),
         action: getNotificationAction(notif),
         actionType: notif.type,

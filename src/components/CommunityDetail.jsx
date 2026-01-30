@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Globe, Pencil, Heart, Bookmark, X, Settings, Share2, Copy, Check } from "lucide-react";
 import ShareModal from "../components/ShareModal";
 import Comments from "../components/Comments";
@@ -15,6 +16,7 @@ import { communityService } from "../services/communityService";
 import { postService } from "../services/postService";
 
 export default function CommunityDetail({ setActiveView, communityId, onViewUserProfile }) {
+  const navigate = useNavigate();
   const { username } = useUserProfile();
   const [isJoined, setIsJoined] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -130,7 +132,19 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
       return;
     }
 
-    // Show community code modal first for all communities
+    // For public communities, join directly without code
+    if (community.type === "public" || community.type === "Public" || !community.type) {
+      try {
+        await communityService.joinCommunity(community.id || community._id);
+        setIsJoined(true);
+      } catch (err) {
+        console.error("Error joining community:", err);
+        setError("Failed to join community. Please try again.");
+      }
+      return;
+    }
+
+    // For private communities, show code modal
     setShowCodeModal(true);
   };
 
@@ -451,7 +465,7 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
 
         {/* Back Button */}
         <button
-          onClick={() => setActiveView("communities", null)}
+          onClick={() => navigate(-1)}
           className="absolute top-2 sm:top-4 left-2 sm:left-4 p-1.5 sm:p-2 bg-black/50 hover:bg-black/70 dark:bg-black/50 dark:hover:bg-black/70 rounded-full transition backdrop-blur-sm z-10"
         >
           <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
@@ -466,32 +480,34 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
             <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-3 sm:p-4 space-y-3 sm:space-y-4">
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                 <Pencil className="w-4 h-4 text-primary" />
-                <span>Created {community.createdDate}</span>
+                <span>Created {community.createdAt ? new Date(community.createdAt).toLocaleDateString() : 'Unknown'}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                 <Globe className="w-4 h-4 text-primary" />
-                <span>{community.type}</span>
+                <span>{community.type || 'Public'}</span>
               </div>
 
               {/* Community Description */}
               <div>
                 <h3 className="text-black dark:text-white font-semibold mb-2">{community.name}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {community.description}
+                  {community.description || 'No description available'}
                 </p>
               </div>
 
               {/* Rules */}
-              <div>
-                <h3 className="text-black dark:text-white font-semibold mb-2">Rules</h3>
-                <ul className="space-y-1">
-                  {community.rules.map((rule, index) => (
-                    <li key={index} className="text-sm text-gray-600 dark:text-gray-400">
-                      {index + 1}. {rule}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {community.rules && community.rules.length > 0 && (
+                <div>
+                  <h3 className="text-black dark:text-white font-semibold mb-2">Rules</h3>
+                  <ul className="space-y-1">
+                    {community.rules.map((rule, index) => (
+                      <li key={index} className="text-sm text-gray-600 dark:text-gray-400">
+                        {index + 1}. {rule}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Community Code */}
               <div>
@@ -553,48 +569,49 @@ export default function CommunityDetail({ setActiveView, communityId, onViewUser
             </div>
 
             {/* Search By Topic */}
-            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-3 sm:p-4">
-              <h3 className="text-black dark:text-white font-semibold mb-3">Search By Topic</h3>
-              <div className="flex flex-wrap gap-2">
-                {community.topics.map((topic, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleTopicClick(topic)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${index < 3
-                      ? "bg-primary text-white"
-                      : "bg-primary text-white"
-                      }`}
-                  >
-                    {topic}
-                  </button>
-                ))}
+            {community.topics && community.topics.length > 0 && (
+              <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-3 sm:p-4">
+                <h3 className="text-black dark:text-white font-semibold mb-3">Search By Topic</h3>
+                <div className="flex flex-wrap gap-2">
+                  {community.topics.map((topic, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleTopicClick(topic)}
+                      className="px-3 py-1.5 rounded-lg text-sm font-medium transition bg-primary text-white hover:bg-primary-700"
+                    >
+                      {topic}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Moderators */}
-            <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-3 sm:p-4">
-              <h3 className="text-black dark:text-white font-semibold mb-3">Moderators</h3>
-              <div className="space-y-3">
-                {community.moderators.map((mod) => (
-                  <div key={mod.id} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                      <LiveProfilePhoto
-                        imageSrc={mod.avatar}
-                        videoSrc={getProfileVideoUrl(mod.avatar, mod.username)}
-                        alt={mod.username}
-                        className="w-8 h-8 rounded-full"
-                      />
+            {community.moderators && community.moderators.length > 0 && (
+              <div className="bg-gray-100 dark:bg-[#121212] border border-black dark:border-gray-800 rounded-xl p-3 sm:p-4">
+                <h3 className="text-black dark:text-white font-semibold mb-3">Moderators</h3>
+                <div className="space-y-3">
+                  {community.moderators.map((mod, index) => (
+                    <div key={mod.id || mod.username || index} className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                        <LiveProfilePhoto
+                          imageSrc={mod.avatar || mod.profilePhoto}
+                          videoSrc={getProfileVideoUrl(mod.avatar || mod.profilePhoto, mod.username)}
+                          alt={mod.username || 'Moderator'}
+                          className="w-8 h-8 rounded-full"
+                        />
+                      </div>
+                      <button
+                        onClick={() => onViewUserProfile && onViewUserProfile(mod.username)}
+                        className="text-sm text-gray-700 dark:text-gray-300 hover:opacity-70 transition-opacity cursor-pointer"
+                      >
+                        {mod.username || 'Unknown'}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => onViewUserProfile && onViewUserProfile(mod.username)}
-                      className="text-sm text-gray-700 dark:text-gray-300 hover:opacity-70 transition-opacity cursor-pointer"
-                    >
-                      {mod.username}...
-                    </button>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </aside>
 
           {/* Main Content - Posts */}
