@@ -156,17 +156,4 @@ export const userService = {
       throw error;
     }
   },
-
-  /**
-   * Update user profile
-   */
-  async updateProfile(profileData) {
-    try {
-      const response = await api.put('/api/users/me', profileData);
-      return response;
-    } catch (error) {
-      console.error('Update profile error:', error);
-      throw error;
-    }
-  },
 };

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ArrowLeft, Camera, Video, Upload, X } from "lucide-react";
+import { toast } from "react-hot-toast";
 import profilePhotoDefault from "../assets/profile-photo.jpg";
 import LiveProfilePhoto from "../components/LiveProfilePhoto";
 import { useAuth } from "../context/AuthContext";
@@ -227,16 +228,26 @@ export default function ProfileSettings({ onBack, onProfileUpdate }) {
           onProfileUpdate(response.user);
         }
         
-        alert("Profile updated successfully!");
+        // Show success toast for 2 seconds
+        toast.success("Profile updated successfully!", {
+          duration: 2000,
+        });
         
-        // Go back to profile page
-        if (onBack) {
-          onBack();
-        }
+        // Go back to profile page after a short delay
+        setTimeout(() => {
+          if (onBack) {
+            onBack();
+          }
+        }, 500);
       }
     } catch (err) {
       console.error("Error updating profile:", err);
       setSaveError(err.message || "Failed to update profile. Please try again.");
+      
+      // Show error toast for 2 seconds
+      toast.error(err.message || "Failed to update profile. Please try again.", {
+        duration: 2000,
+      });
     } finally {
       setIsSaving(false);
     }
