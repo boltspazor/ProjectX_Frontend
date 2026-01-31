@@ -6,9 +6,9 @@ import { communityService } from "../services/communityService";
 import LiveBanner from "./LiveBanner";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 
-export default function CommunitySettings({ communityId, setActiveView }) {
+export default function CommunitySettings({ communityId, communitySlug, initialCommunity, setActiveView }) {
   const navigate = useNavigate();
-  const { username } = useUserProfile();
+  const { username, user } = useUserProfile();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -46,9 +46,38 @@ export default function CommunitySettings({ communityId, setActiveView }) {
   // Fetch community data from API
   useEffect(() => {
     const fetchCommunity = async () => {
+      // If we have initial community data, use it immediately
+      if (initialCommunity) {
+        setCommunity(initialCommunity);
+        setFormData({
+          name: initialCommunity.name || "",
+          description: initialCommunity.description || "",
+          rules: initialCommunity.rules || [],
+          newRule: "",
+          password: "",
+          newPassword: "",
+          confirmPassword: "",
+          showPassword: false,
+          showNewPassword: false,
+          showConfirmPassword: false,
+          communityCode: initialCommunity.code || initialCommunity.id?.toString() || initialCommunity._id?.toString() || "",
+          communityType: initialCommunity.type || "Public",
+          hasPassword: initialCommunity.hasPassword || !!initialCommunity.password,
+        });
+        setModerators(initialCommunity.moderators || []);
+        setBannerPreview(initialCommunity.banner);
+        setBannerVideoPreview(initialCommunity.bannerVideo || null);
+        setProfilePreview(initialCommunity.icon || initialCommunity.avatar);
+        setProfileVideoPreview(initialCommunity.profileVideo || null);
+        setLoading(false);
+        return;
+      }
+
+      // Otherwise fetch from API using slug
       try {
         setLoading(true);
-        const data = await communityService.getCommunityById(communityId);
+        setError("");
+        const data = await communityService.getCommunityBySlug(communitySlug || communityId);
         setCommunity(data);
         setFormData({
           name: data.name || "",
@@ -61,7 +90,7 @@ export default function CommunitySettings({ communityId, setActiveView }) {
           showPassword: false,
           showNewPassword: false,
           showConfirmPassword: false,
-          communityCode: data.code || data.id?.toString() || "",
+          communityCode: data.code || data.id?.toString() || data._id?.toString() || "",
           communityType: data.type || "Public",
           hasPassword: data.hasPassword || !!data.password,
         });
@@ -78,20 +107,32 @@ export default function CommunitySettings({ communityId, setActiveView }) {
       }
     };
 
-    if (communityId) {
+    if (initialCommunity || communityId || communitySlug) {
       fetchCommunity();
+    } else {
+      setLoading(false);
     }
-  }, [communityId]);
+  }, [communityId, communitySlug, initialCommunity]);
 
   // Check if user is admin/moderator
-  const isAdmin = community?.creator === username || community?.creatorId === username;
-  const isModerator = moderators.some(mod => mod.username === username || mod.id === username);
+  const userUid = user?.uid;
+  const isAdmin = community?.creatorId === userUid;
+  const isModerator = moderators.includes(userUid);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full bg-[#fffcfa] dark:bg-[#0b0b0b] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (!community) {
     return (
       <div className="min-h-screen w-full bg-[#fffcfa] dark:bg-[#0b0b0b] flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Community not found</h1>
+          <h1 className="text-2xl font-bold text-black dark:text-white mb-4">Community not found</h1>
           <button
             onClick={() => setActiveView ? setActiveView("detail") : navigate(`/communities/${communityId}`)}
             className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition"
@@ -107,7 +148,7 @@ export default function CommunitySettings({ communityId, setActiveView }) {
     return (
       <div className="min-h-screen w-full bg-[#fffcfa] dark:bg-[#0b0b0b] flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
+          <h1 className="text-2xl font-bold text-black dark:text-white mb-4">Access Denied</h1>
           <p className="text-gray-400 mb-4">You don't have permission to access this page.</p>
           <button
             onClick={() => setActiveView ? setActiveView("detail") : navigate(`/communities/${communityId}`)}

@@ -116,13 +116,18 @@ export default function CreateCommunity({ setActiveView }) {
       const response = await communityService.createCommunity(newCommunity);
       
       if (response && response.community) {
-        // Show the community code to the user
         const communityCode = response.community.code;
-        alert(`Community created successfully!\n\nYour Community Code: ${communityCode}\n\nShare this code with others so they can join your community.`);
+        const isPrivate = communityType.toLowerCase() === 'private';
         
-        // Navigate to the newly created community detail page using slug or id
-        const communityId = response.community.slug || response.community.id || response.community._id;
-        setActiveView("communityDetail", communityId);
+        // Show appropriate message based on community type
+        if (isPrivate) {
+          alert(`Community created successfully!\n\nYour Community Code: ${communityCode}\n\nShare this code with others so they can join your private community.`);
+        } else {
+          alert('Community created successfully!');
+        }
+        
+        // Navigate back to communities page
+        navigate('/communities');
       } else {
         throw new Error('Failed to create community');
       }

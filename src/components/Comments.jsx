@@ -22,18 +22,44 @@ export default function Comments({ isOpen, onClose, variant = "sidebar", initial
   const handleLikeComment = async (commentId) => {
     if (onLikeComment) {
       try {
+        // Optimistic update - find the comment and toggle its like state
+        setComments(prevComments => prevComments.map(comment => {
+          const cId = comment._id || comment.id;
+          if (cId === commentId) {
+            const currentlyLiked = comment.isLiked || comment.liked || false;
+            return {
+              ...comment,
+              isLiked: !currentlyLiked,
+              liked: !currentlyLiked,
+              likesCount: currentlyLiked ? Math.max(0, (comment.likesCount || 0) - 1) : (comment.likesCount || 0) + 1,
+              likes: currentlyLiked ? Math.max(0, (comment.likes || 0) - 1) : (comment.likes || 0) + 1
+            };
+          }
+          return comment;
+        }));
+
         await onLikeComment(commentId);
         // The parent will update initialComments which triggers useEffect
       } catch (error) {
         console.error('Error liking comment:', error);
+        // Revert on error - restore from initialComments
+        setComments(initialComments);
       }
     } else {
       // Fallback to local state
       setComments(comments.map(comment => {
         const cId = comment._id || comment.id;
-        return cId === commentId
-          ? { ...comment, liked: !comment.liked, isLiked: !comment.liked, likes: comment.liked ? (comment.likes || 0) - 1 : (comment.likes || 0) + 1, likesCount: comment.liked ? (comment.likesCount || 0) - 1 : (comment.likesCount || 0) + 1 }
-          : comment;
+        if (cId === commentId) {
+          const currentlyLiked = comment.isLiked || comment.liked || false;
+          return {
+            ...comment,
+            isLiked: !currentlyLiked,
+            liked: !currentlyLiked,
+            likesCount: currentlyLiked ? Math.max(0, (comment.likesCount || 0) - 1) : (comment.likesCount || 0) + 1,
+            likes: currentlyLiked ? Math.max(0, (comment.likes || 0) - 1) : (comment.likes || 0) + 1
+          };
+        }
+        return comment;
       }));
     }
   };

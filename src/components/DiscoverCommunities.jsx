@@ -204,8 +204,8 @@ export default function DiscoverCommunities({ onBack }) {
       <div className="flex items-start gap-3">
         <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
           <LiveProfilePhoto
-            imageSrc={community.avatar}
-            videoSrc={getCommunityProfileVideoUrl(community.id, community.avatar, community)}
+            imageSrc={community.icon}
+            videoSrc={getCommunityProfileVideoUrl(community._id || community.id, community.icon, community)}
             alt={community.name}
             className="w-12 h-12 rounded-xl"
             maxDuration={10}
@@ -218,7 +218,14 @@ export default function DiscoverCommunities({ onBack }) {
             {community.description}
           </p>
         </div>
-        {community.type === "Restricted" ? (
+        {community.isJoined ? (
+          <button
+            disabled
+            className="px-4 py-1.5 bg-green-600 text-white text-sm font-medium rounded-full cursor-default flex-shrink-0"
+          >
+            Joined
+          </button>
+        ) : community.type === "Restricted" ? (
           <button
             disabled
             className="px-4 py-1.5 bg-gray-500/50 text-gray-400 text-sm font-medium rounded-full cursor-not-allowed flex-shrink-0"
@@ -257,20 +264,6 @@ export default function DiscoverCommunities({ onBack }) {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        {/* Join by Code Button */}
-        <div className="mb-6">
-          <button
-            onClick={() => {
-              setSelectedCommunity(null);
-              setShowCodeModal(true);
-            }}
-            className="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-primary via-primary to-primary-700 hover:from-primary-700 hover:via-primary-700 hover:to-primary-800 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
-          >
-            <Key className="w-5 h-5" />
-            Join by Community Code
-          </button>
-        </div>
-
         {loading && (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>

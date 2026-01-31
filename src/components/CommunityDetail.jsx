@@ -17,7 +17,7 @@ import CommunitySettings from "./CommunitySettings";
 
 export default function CommunityDetail({ communityId, onViewUserProfile }) {
   const navigate = useNavigate();
-  const { username } = useUserProfile();
+  const { username, user } = useUserProfile();
   const [activeView, setActiveView] = useState("detail"); // "detail" or "settings"
   const [isJoined, setIsJoined] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -84,8 +84,10 @@ export default function CommunityDetail({ communityId, onViewUserProfile }) {
   }, [communityId, refreshKey]);
 
   // Check if user is admin/moderator
-  const isAdmin = community?.creator === username || community?.creatorId === username;
-  const isModerator = community?.moderators?.some(mod => mod.username === username || mod.id === username);
+  // Backend uses creatorId field which contains the user's uid, not username
+  const userUid = user?.uid;
+  const isAdmin = community?.creatorId === userUid;
+  const isModerator = community?.moderators?.includes(userUid);
   const canManageSettings = isAdmin || isModerator;
 
   // Loading state
@@ -383,7 +385,14 @@ export default function CommunityDetail({ communityId, onViewUserProfile }) {
 
   // Render settings view if active
   if (activeView === "settings") {
-    return <CommunitySettings communityId={communityId} setActiveView={setActiveView} />;
+    return (
+      <CommunitySettings 
+        communityId={community?._id || community?.id} 
+        communitySlug={communityId}
+        initialCommunity={community}
+        setActiveView={setActiveView} 
+      />
+    );
   }
 
   // Render community detail view
@@ -451,15 +460,17 @@ export default function CommunityDetail({ communityId, onViewUserProfile }) {
                     >
                       Add Post
                     </button>
-                    {/* Settings button - visible to all users, but functionality protected by backend */}
-                    <button
-                      onClick={() => setActiveView("settings")}
-                      className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg bg-transparent text-white border border-primary text-xs sm:text-sm font-medium hover:bg-primary/10 transition flex items-center gap-1 sm:gap-2 flex-shrink-0"
-                      title={canManageSettings ? "Manage community settings" : "View community settings"}
-                    >
-                      <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span className="hidden sm:inline">Settings</span>
-                    </button>
+                    {/* Settings button - visible only to admins and moderators */}
+                    {canManageSettings && (
+                      <button
+                        onClick={() => setActiveView("settings")}
+                        className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg bg-transparent text-white border border-primary text-xs sm:text-sm font-medium hover:bg-primary/10 transition flex items-center gap-1 sm:gap-2 flex-shrink-0"
+                        title="Manage community settings"
+                      >
+                        <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">Settings</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
