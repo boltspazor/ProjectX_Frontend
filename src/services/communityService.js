@@ -7,10 +7,17 @@ import { API_ENDPOINTS } from '../config/api';
 export const communityService = {
   /**
    * Get public communities
+   * @param {number} limit - Maximum number of communities to return
+   * @param {string} category - Optional category filter
    */
-  async getPublicCommunities(limit = 20) {
+  async getPublicCommunities(limit = 20, category = null) {
     try {
-      const response = await api.get(API_ENDPOINTS.COMMUNITIES.PUBLIC, { limit });
+      const params = { limit };
+      if (category) {
+        params.category = category;
+      }
+      
+      const response = await api.get(API_ENDPOINTS.COMMUNITIES.PUBLIC, params);
       if (response.success && response.data) {
         // Handle nested structure: response.data.communities
         if (Array.isArray(response.data.communities)) {
@@ -160,7 +167,20 @@ export const communityService = {
   },
 
   /**
-   * Add moderator
+   * Delete community
+   */
+  async deleteCommunity(communityId) {
+    try {
+      const response = await api.delete(API_ENDPOINTS.COMMUNITIES.DELETE(communityId));
+      return response;
+    } catch (error) {
+      console.error('Delete community error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Add moderator to community
    */
   async addModerator(communityId, userId) {
     try {

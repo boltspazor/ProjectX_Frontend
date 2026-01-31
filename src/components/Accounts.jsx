@@ -11,7 +11,7 @@ export default function Accounts({ searchQuery = "", hasSearched = false }) {
   // Fetch search results when searchQuery changes
   useEffect(() => {
     const fetchSearchResults = async () => {
-      if (searchQuery && hasSearched) {
+      if (searchQuery && searchQuery.trim() && hasSearched) {
         try {
           setLoading(true);
           const results = await userService.searchUsers(searchQuery, 12);
@@ -32,8 +32,8 @@ export default function Accounts({ searchQuery = "", hasSearched = false }) {
   useEffect(() => {
     const fetchSuggested = async () => {
       try {
-        // Fetch random suggested users - using empty query to get general users
-        const results = await userService.searchUsers("", 8);
+        // Fetch random suggested users - using a space or wildcard to avoid empty query validation
+        const results = await userService.searchUsers(" ", 8);
         setSuggestedAccounts(Array.isArray(results) ? results : results.users || []);
       } catch (error) {
         console.error("Error fetching suggested accounts:", error);

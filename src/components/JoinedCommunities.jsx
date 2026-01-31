@@ -58,8 +58,10 @@ export default function JoinedCommunities({ onDiscoverClick }) {
     }
   };
 
-  const handleCommunityClick = (communityId) => {
-    navigate(`/communities/${communityId}`);
+  const handleCommunityClick = (community) => {
+    // Use slug if available, otherwise use ID
+    const identifier = community.slug || community._id || community.id;
+    navigate(`/communities/${identifier}`);
   };
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -126,7 +128,7 @@ export default function JoinedCommunities({ onDiscoverClick }) {
           {communities.map((community) => (
           <article
             key={community._id || community.id}
-            onClick={() => handleCommunityClick(community._id || community.id)}
+            onClick={() => handleCommunityClick(community)}
             className="group relative rounded-3xl border border-black dark:border-gray-800 bg-white dark:bg-[#121212] transition-all duration-500 hover:border-primary hover:shadow-[0_0_35px_rgba(249,115,22,0.15)] cursor-pointer"
           >
             <div className="relative h-40 overflow-hidden rounded-t-3xl">
@@ -189,7 +191,7 @@ export default function JoinedCommunities({ onDiscoverClick }) {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleCommunityClick(community._id || community.id);
+                    handleCommunityClick(community);
                   }}
                   className="flex-1 rounded-xl border border-black dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 transition-all duration-300 hover:border-primary hover:text-black dark:hover:text-white"
                 >

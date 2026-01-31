@@ -181,8 +181,8 @@ export default function FollowersFollowingModal({
                             </button>
                           </div>
 
-                          {/* Follow/Unfollow Button - Don't show for current user */}
-                          {user.username !== currentUsername && (
+                          {/* Follow/Unfollow Button - Don't show for current user or mutual followers */}
+                          {user.username !== currentUsername && !(activeTab === "followers" && user.isFollowing) && !(activeTab === "following" && user.isFollowingBack) && (
                             <button
                               onClick={() => {
                                 if (user.isFollowing) {

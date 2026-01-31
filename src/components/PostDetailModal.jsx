@@ -10,8 +10,8 @@ import { postService } from "../services/postService";
 import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfile }) {
-  const [liked, setLiked] = useState(post?.isLiked || false);
-  const [likes, setLikes] = useState(post?.likesCount || 0);
+  const [liked, setLiked] = useState(post?.isLiked || post?.liked || false);
+  const [likes, setLikes] = useState(post?.likesCount || post?.likes || 0);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
   const commentsEndRef = useRef(null);
@@ -41,6 +41,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
         setLoading(true);
         setError(null);
         const response = await postService.getPostComments(postId);
+        // Ensure we preserve the isLiked state from backend
         setComments(response.comments || []);
       } catch (err) {
         console.error('Error fetching comments:', err);
@@ -52,11 +53,11 @@ export default function PostDetailModal({ isOpen, onClose, post, onViewUserProfi
 
     if (isOpen && postId) {
       loadComments();
-      // Update like state from post prop
-      setLiked(post?.isLiked || false);
-      setLikes(post?.likesCount || 0);
+      // Update like state from post prop - ensure we use the backend value
+      setLiked(post?.isLiked || post?.liked || false);
+      setLikes(post?.likesCount || post?.likes || 0);
     }
-  }, [isOpen, postId, post?.isLiked, post?.likesCount]);
+  }, [isOpen, postId, post?.isLiked, post?.liked, post?.likesCount, post?.likes]);
 
   const fetchComments = async () => {
     if (!postId) return;

@@ -3,6 +3,7 @@ import { ArrowLeft, Key } from "lucide-react";
 import { communityService } from "../services/communityService";
 import LiveProfilePhoto from "./LiveProfilePhoto";
 import { getCommunityProfileVideoUrl } from "../utils/communityVideos";
+import { DISCOVERY_CATEGORIES } from "../constants/communityCategories";
 
 export default function DiscoverCommunities({ onBack }) {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -19,17 +20,7 @@ export default function DiscoverCommunities({ onBack }) {
   const [codeError, setCodeError] = useState("");
   const [selectedCommunity, setSelectedCommunity] = useState(null);
 
-  const categories = [
-    "All",
-    "Technology",
-    "Games",
-    "Pop Culture",
-    "Anime & Manga",
-    "Food & Recipes",
-    "Music",
-    "Sports",
-    "Art & Design"
-  ];
+  const categories = DISCOVERY_CATEGORIES;
 
   useEffect(() => {
     fetchCommunities();
@@ -62,8 +53,9 @@ export default function DiscoverCommunities({ onBack }) {
     }
   };
 
-  const handleJoinCommunity = (community) => {
-    if (joiningIds.has(community.id)) return;
+  const handleJoinCommunity = async (community) => {
+    const communityId = community._id || community.id;
+    if (joiningIds.has(communityId)) return;
 
     // Restricted communities cannot be joined
     if (community.type === "Restricted") {
@@ -72,6 +64,30 @@ export default function DiscoverCommunities({ onBack }) {
       return;
     }
 
+    // For public communities, join directly without code
+    if (community.type === "public" || community.type === "Public" || !community.type) {
+      try {
+        setJoiningIds(prev => new Set(prev).add(communityId));
+        await communityService.joinCommunity(communityId);
+        
+        // Optimistic update - remove from lists after joining
+        setRecommendedCommunities(prev => prev.filter(c => (c._id || c.id) !== communityId));
+        setCategoryCommunities(prev => prev.filter(c => (c._id || c.id) !== communityId));
+      } catch (err) {
+        console.error('Error joining community:', err);
+        setError("Failed to join community. Please try again.");
+        setTimeout(() => setError(""), 5000);
+      } finally {
+        setJoiningIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(communityId);
+          return newSet;
+        });
+      }
+      return;
+    }
+
+    // For private communities, show code modal
     setSelectedCommunity(community);
     setShowCodeModal(true);
   };
@@ -181,13 +197,15 @@ export default function DiscoverCommunities({ onBack }) {
     }
   };
 
-  const CommunityCard = ({ community, onJoin, isJoining }) => (
+  const CommunityCard = ({ community, onJoin, isJoining }) => {
+    const communityId = community._id || community.id;
+    return (
     <div className="bg-white dark:bg-[#0f0f0f] border border-black dark:border-gray-800 rounded-2xl p-4 hover:border-primary transition-all duration-300">
       <div className="flex items-start gap-3">
         <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
           <LiveProfilePhoto
-            imageSrc={community.avatar}
-            videoSrc={getCommunityProfileVideoUrl(community.id, community.avatar, community)}
+            imageSrc={community.icon}
+            videoSrc={getCommunityProfileVideoUrl(community._id || community.id, community.icon, community)}
             alt={community.name}
             className="w-12 h-12 rounded-xl"
             maxDuration={10}
@@ -200,7 +218,14 @@ export default function DiscoverCommunities({ onBack }) {
             {community.description}
           </p>
         </div>
-        {community.type === "Restricted" ? (
+        {community.isJoined ? (
+          <button
+            disabled
+            className="px-4 py-1.5 bg-green-600 text-white text-sm font-medium rounded-full cursor-default flex-shrink-0"
+          >
+            Joined
+          </button>
+        ) : community.type === "Restricted" ? (
           <button
             disabled
             className="px-4 py-1.5 bg-gray-500/50 text-gray-400 text-sm font-medium rounded-full cursor-not-allowed flex-shrink-0"
@@ -219,7 +244,8 @@ export default function DiscoverCommunities({ onBack }) {
         )}
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#fffcfa] dark:bg-[#0b0b0b] text-black dark:text-white pb-20 md:pb-0">
@@ -238,20 +264,6 @@ export default function DiscoverCommunities({ onBack }) {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        {/* Join by Code Button */}
-        <div className="mb-6">
-          <button
-            onClick={() => {
-              setSelectedCommunity(null);
-              setShowCodeModal(true);
-            }}
-            className="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-primary via-primary to-primary-700 hover:from-primary-700 hover:via-primary-700 hover:to-primary-800 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
-          >
-            <Key className="w-5 h-5" />
-            Join by Community Code
-          </button>
-        </div>
-
         {loading && (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -308,10 +320,10 @@ export default function DiscoverCommunities({ onBack }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {recommendedCommunities.map((community) => (
                 <CommunityCard
-                  key={community.id}
+                  key={community._id || community.id}
                   community={community}
                   onJoin={handleJoinCommunity}
-                  isJoining={joiningIds.has(community.id)}
+                  isJoining={joiningIds.has(community._id || community.id)}
                 />
               ))}
             </div>
@@ -328,7 +340,7 @@ export default function DiscoverCommunities({ onBack }) {
                   key={community.id}
                   community={community}
                   onJoin={handleJoinCommunity}
-                  isJoining={joiningIds.has(community.id)}
+                  isJoining={joiningIds.has(community._id || community.id)}
                 />
               ))}
             </div>

@@ -22,7 +22,6 @@ import CreatePost from "./components/CreatePost";
 import CommunitiesPage from "./pages/communities/CommunitiesPage";
 import CreateCommunity from "./components/CreateCommunity";
 import CommunityDetail from "./components/CommunityDetail";
-import CommunitySettings from "./components/CommunitySettings";
 import Notifications from "./components/Notifications";
 import AddStory from "./components/AddStory";
 import OtherUserProfile from "./components/OtherUserProfile";
@@ -176,15 +175,6 @@ export default function App() {
       </ErrorBoundary>
     );
   };
-  
-  const CommunitySettingsWrapper = () => {
-    const { id } = useParams();
-    return (
-      <ErrorBoundary>
-        <CommunitySettings communityId={id} onViewUserProfile={handleViewUserProfile} />
-      </ErrorBoundary>
-    );
-  };
 
   const AIToolsWrapper = () => (
     <ErrorBoundary>
@@ -225,7 +215,6 @@ export default function App() {
               <Route path="/ai-tools" element={<AIToolsWrapper />} />
               <Route path="/communities/create" element={<CreateCommunity />} />
               <Route path="/communities/:id" element={<CommunityDetailWrapper />} />
-              <Route path="/communities/:id/settings" element={<CommunitySettingsWrapper />} />
               <Route path="/notifications" element={<NotificationsWrapper />} />
               <Route path="/shop" element={<ShopPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
